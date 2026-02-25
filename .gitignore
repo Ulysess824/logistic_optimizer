@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+
+# Logistics Projekt
+outputs/maps/*.html
+outputs/results/*.json
+logs/*.log
+
+# VS Code / IDE
+.vscode/
+.idea/
+.gemini/

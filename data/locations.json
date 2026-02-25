@@ -1,0 +1,145 @@
+{
+  "paper_plant": {
+    "name": "Sede Central de Papel (Madrid)",
+    "address": "Calle de la Ribera del Sena, 28042 Madrid, Spain",
+    "lat": 40.4578,
+    "lng": -3.6174
+  },
+  "carton_plants": [
+    {
+      "id": "CP_TOLEDO",
+      "name": "Cartonajes Toledo",
+      "address": "Calle Río Jarama, Toledo, Spain",
+      "lat": 39.8712,
+      "lng": -3.9821,
+      "customers": [
+        {
+          "id": "C_TO_1",
+          "name": "Mercadona Toledo",
+          "lat": 39.8624,
+          "lng": -4.0254
+        },
+        {
+          "id": "C_TO_2",
+          "name": "Logística Illescas",
+          "lat": 40.1251,
+          "lng": -3.8471
+        },
+        {
+          "id": "C_TO_3",
+          "name": "Distribución Parla",
+          "lat": 40.2371,
+          "lng": -3.7741
+        }
+      ]
+    },
+    {
+      "id": "CP_VALENCIA",
+      "name": "Cartonajes Valencia",
+      "address": "Polígono Fuente del Jarro, Paterna, Spain",
+      "lat": 39.5221,
+      "lng": -0.4412,
+      "customers": [
+        {
+          "id": "C_VA_1",
+          "name": "Puerto Valencia",
+          "lat": 39.4478,
+          "lng": -0.3294
+        },
+        {
+          "id": "C_VA_2",
+          "name": "Alimentación Torrent",
+          "lat": 39.4351,
+          "lng": -0.4651
+        },
+        {
+          "id": "C_VA_3",
+          "name": "Suministros Sagunto",
+          "lat": 39.6821,
+          "lng": -0.2781
+        }
+      ]
+    },
+    {
+      "id": "CP_ZARAGOZA",
+      "name": "Cartonajes Zaragoza",
+      "address": "Plaza Logística, Zaragoza, Spain",
+      "lat": 41.6488,
+      "lng": -0.8891,
+      "customers": [
+        {
+          "id": "C_ZA_1",
+          "name": "Inditex Zaragoza",
+          "lat": 41.6612,
+          "lng": -1.0121
+        },
+        {
+          "id": "C_ZA_2",
+          "name": "Logística Huesca",
+          "lat": 42.1321,
+          "lng": -0.4081
+        },
+        {
+          "id": "C_ZA_3",
+          "name": "Distribución Calatayud",
+          "lat": 41.3521,
+          "lng": -1.6421
+        }
+      ]
+    },
+    {
+      "id": "CP_SEVILLA",
+      "name": "Cartonajes Sevilla",
+      "address": "Polígono Isla de la Cartuja, Sevilla, Spain",
+      "lat": 37.4081,
+      "lng": -6.0021,
+      "customers": [
+        {
+          "id": "C_SE_1",
+          "name": "Puerto Sevilla",
+          "lat": 37.3481,
+          "lng": -5.9912
+        },
+        {
+          "id": "C_SE_2",
+          "name": "Alimentación Dos Hermanas",
+          "lat": 37.2831,
+          "lng": -5.9221
+        },
+        {
+          "id": "C_SE_3",
+          "name": "Suministros Córdoba",
+          "lat": 37.8881,
+          "lng": -4.7794
+        }
+      ]
+    },
+    {
+      "id": "CP_BURGOS",
+      "name": "Cartonajes Burgos",
+      "address": "Polígono Villalonquéjar, Burgos, Spain",
+      "lat": 42.3431,
+      "lng": -3.7041,
+      "customers": [
+        {
+          "id": "C_BU_1",
+          "name": "Logística Vitoria",
+          "lat": 42.8461,
+          "lng": -2.6721
+        },
+        {
+          "id": "C_BU_2",
+          "name": "Distribución Aranda",
+          "lat": 41.6701,
+          "lng": -3.6891
+        },
+        {
+          "id": "C_BU_3",
+          "name": "Suministros Valladolid",
+          "lat": 41.6521,
+          "lng": -4.7241
+        }
+      ]
+    }
+  ]
+}
