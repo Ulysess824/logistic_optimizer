@@ -6,7 +6,7 @@ venv/
 .env
 
 # Logistics Projekt
-outputs/maps/*.html
+# outputs/maps/*.html  (Permitida subida a GitHub por petición)
 outputs/results/*.json
 logs/*.log
 

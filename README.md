@@ -1,65 +1,76 @@
 # 🚚 SOTA Logistics Optimizer: Multi-Vehicle VRP with Backhauling
 
-[![SOTA](https://img.shields.io/badge/Algorithm-SOTA-blue.svg)](https://developers.google.com/optimization)
-[![Python](https://img.shields.io/badge/Python-3.12-green.svg)](https://www.python.org/)
-[![Google OR-Tools](https://img.shields.io/badge/Engine-Google%20OR--Tools-orange.svg)](https://developers.google.com/optimization/routing)
+[![License](https://img.shields.io/badge/Status-Optimized-blue?style=for-the-badge)](https://github.com/Ulysess824/logistic_optimizer)
+[![Python](https://img.shields.io/badge/Python-3.12%2B-blue?style=for-the-badge&logo=python)](https://www.python.org/)
 
-Sistema profesional de optimización logística de vanguardia (State-of-the-Art) diseñado para resolver problemas complejos de **ruteo de vehículos (VRP) con retroceso (Backhauling)**. El sistema coordina una flota para suministrar papel a plantas industriales y gestionar la distribución de productos terminados (cartón) a clientes finales en una única ruta optimizada.
+Este proyecto representa una solución avanzada para la optimización logística de la cadena de suministro de papel y cartón. El modelo integra un flujo circular complejo: desde la planta de papel de **Mengíbar**, pasando por plantas de cartón estratégicas, hasta la entrega a clientes finales optimizada por proximidad en la ruta de retorno.
 
-## 🧠 Arquitectura del Sistema
-El sistema ha sido reestructurado siguiendo patrones de diseño SOTA para escalabilidad y mantenimiento:
+---
 
-```text
-logistic_optimizer/
-├── src/                # Código fuente del núcleo
-│   ├── engine/         # Motor de optimización (Google OR-Tools)
-│   ├── utils/          # Utilidades de Geometría y Visualización
-│   └── config.py       # Configuración centralizada
-├── data/               # Base de datos de localizaciones (JSON)
-├── outputs/            # Resultados de ejecución
-│   ├── maps/           # Mapas interactivos (Folium)
-│   └── results/        # Rutas calculadas (JSON)
-├── logs/               # Registros de ejecución
-└── main.py             # Punto de entrada principal
-```
+## 🧠 Concepto del Modelo
 
-## 🔬 Algoritmo de Optimización
-El núcleo utiliza una combinación de **Constraint Programming (CP)** y **Metaheurísticas** sobre el motor **Google OR-Tools**:
+El modelo adopta un enfoque de **Optimización de Retorno (Backhauling Optimization)**. 
 
-1.  **Guided Local Search (GLS):** Nuestra metaheurística principal que permite al algoritmo escapar de óptimos locales mediante penalizaciones dinámicas.
-2.  **Backhauling Logic:** Restricciones estrictas de precedencia que aseguran que el suministro de la planta (Pickup) siempre ocurra antes de la entrega al cliente (Delivery).
-3.  **Cluster-based Assignment:** Cada vehículo se asigna estratégicamente a una planta industrial para maximizar la cobertura regional.
+### El Ciclo Operativo:
+1. **Salida (Depósito):** Camión sale de la fábrica de papel (Mengíbar) cargado de bobinas de papel.
+2. **Entregas/Recogidas (Plantas):** Entrega el papel en una planta de cartón y recoge el producto terminado (cajas de cartón).
+3. **Distribución (Clientes):** Entrega el cartón a clientes seleccionados inteligentemente.
+4. **Retorno:** El camión vuelve a Mengíbar vacío para reiniciar el ciclo, minimizando los kilómetros "muertos".
+
+---
+
+## ➗ Fundamentos Matemáticos
+
+El optimizador utiliza el motor de **Google OR-Tools** resolviendo una variante compleja del VRP:
+
+### 1. Función Objetivo
+Minimizar el coste total (distancia) sujeto a:
+$$\min \sum_{i,j \in V} d_{ij} x_{ij}$$
+
+### 2. Restricciones de Precedencia
+Para cada ruta $r$, se asegura que la visita a la Planta de Cartón $P$ preceda a cualquier Cliente $C$ asignado:
+$$T_{visit}(P) < T_{visit}(C)$$
+
+### 3. Filtro de Proximidad de Retorno
+Seleccionamos clientes $C$ tales que el desvío respecto a la ruta directa de vuelta ($P \to M$) sea inferior a un umbral $\tau$:
+$$(dist(P, C) + dist(C, M)) - dist(P, M) < \tau$$
+
+---
+
+## 🛠️ Arquitectura del Código
+
+El sistema está modularizado siguiendo estándares de ingeniería de software profesionales:
+
+- **`DataManager`**: Implementa el filtro de retorno utilizando **Polars** y **NumPy** para procesamiento vectorizado de alta velocidad.
+- **`LogisticsSolver`**: El motor de decisión. Utiliza metaheurísticas de búsqueda local (Guided Local Search) para escapar de óptimos locales.
+- **`Visualizer`**: Genera un Dashboard interactivo en HTML utilizando **Folium**, con tablas laterales de KPI y diferenciación de rutas por colores.
+
+---
 
 ## 🚀 Instalación y Uso
 
-### 1. Clonar y Preparar
-```bash
-# Instalar dependencias
-pip install -r requirements.txt
-```
+1. **Requisitos:**
+   ```bash
+   pip install ortools folium polars numpy googlemaps python-dotenv
+   ```
 
-### 2. Configurar API (Google Maps)
-Crea un archivo `.env` en la raíz del proyecto:
-```env
-GOOGLE_MAPS_API_KEY=tu_api_key_aqui
-```
-*Nota: El sistema funcionará con distancias Haversine (línea recta) si la API no está configurada.*
+2. **Ejecución:**
+   ```bash
+   python main.py
+   ```
 
-### 3. Ejecutar Optimización
-```bash
-python main.py
-```
-
-## 📊 Visualización de Resultados
-Tras la ejecución, el sistema genera automáticamente:
-*   **Mapa SOTA:** En `outputs/maps/optimized_multiple_routes.html` con rutas diferenciadas por colores e íconos inteligentes.
-*   **JSON de Rutas:** En `outputs/results/routes.json` para integración con otros sistemas.
-
-## 🛠️ Tecnologías Principales
-*   **Google OR-Tools**: El estándar de oro en optimización combinatoria.
-*   **Google Maps Platform**: Para distancias reales por carretera e infraestructura vial.
-*   **Folium**: Generación de capas geoespaciales dinámicas.
-*   **Numpy**: Procesamiento de matrices de alta velocidad.
+3. **Resultado:** 
+   Se generará un archivo `Logistics_Dashboard.html` en la carpeta `outputs/maps/`.
 
 ---
-*Optimizado para operaciones logísticas de alta complejidad.*
+
+## 📊 Dashboard de Visualización
+
+El dashboard generado no es solo un mapa; es una interfaz de toma de decisiones que incluye:
+- **Resumen Estadístico:** Kilómetros totales y número de rutas.
+- **Tabla Lateral:** Detalles por ruta con nombres de plantas y distancias.
+- **Iconografía Unificada:** Iconos diferenciados para Fábrica, Plantas de Cartón y Clientes.
+
+---
+
+*Desarrollado con estándares de excelencia operativa para Smurfit Westrock.*

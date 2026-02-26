@@ -1,0 +1,59 @@
+{
+    "paper_plant": {
+        "name": "Smurfit Westrock Paper Mill Mengíbar",
+        "address": "Polígono Industrial de Mengíbar, 23440 Mengíbar, Jaén, Spain",
+        "lat": 37.98148,
+        "lng": -3.80058
+    },
+    "carton_plants": [
+        {
+            "id": "CP_ALCALA",
+            "name": "Smurfit Westrock Alcalá",
+            "address": "Avda. de Camarmilla s/n, Alcalá de Henares, Madrid",
+            "lat": 40.48205,
+            "lng": -3.35996
+        },
+        {
+            "id": "CP_ALICANTE",
+            "name": "Smurfit Westrock Alicante",
+            "address": "Pol. Ind. El Canastell, San Vicente del Raspeig, Alicante",
+            "lat": 38.40289,
+            "lng": -0.54019
+        },
+        {
+            "id": "CP_CORDOBA",
+            "name": "Smurfit Westrock Córdoba",
+            "address": "Pol. Ind. Alcolea, Córdoba",
+            "lat": 37.93214,
+            "lng": -4.67292
+        },
+        {
+            "id": "CP_HUELVA",
+            "name": "Smurfit Westrock Huelva",
+            "address": "Pol. Ind. Dehesa Boyal, La Palma del Condado, Huelva",
+            "lat": 37.3635,
+            "lng": -6.5430
+        },
+        {
+            "id": "CP_BURGOS",
+            "name": "Smurfit Westrock Burgos",
+            "address": "Pol. Ind. Villalonquéjar, Burgos",
+            "lat": 42.36921,
+            "lng": -3.73705
+        },
+        {
+            "id": "CP_NAVARRA",
+            "name": "Smurfit Westrock Navarra",
+            "address": "Cordovilla, Navarra",
+            "lat": 42.78831,
+            "lng": -1.64541
+        },
+        {
+            "id": "CP_VALENCIA",
+            "name": "Smurfit Westrock Valencia",
+            "address": "Quart de Poblet, Valencia",
+            "lat": 39.47960,
+            "lng": -0.46162
+        }
+    ]
+}
