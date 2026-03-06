@@ -5,9 +5,15 @@ __pycache__/
 venv/
 .env
 
-# Logistics Projekt
-# outputs/maps/*.html  (Permitida subida a GitHub por petición)
+# Jupyter
+.ipynb_checkpoints/
+
+# Raw data (large files, not needed at runtime)
+data/raw/
+
+# Generated outputs (re-generated on each run)
 outputs/results/*.json
+outputs/results/*.png
 logs/*.log
 
 # VS Code / IDE

@@ -1,79 +1,272 @@
+import logging
 import googlemaps
 import numpy as np
+import requests
 from src.config import GOOGLE_MAPS_API_KEY
+
+logger = logging.getLogger(__name__)
+
 
 class GeoUtils:
     _api_disabled = False
 
-    def __init__(self):
+    def __init__(self, api_type="routes_api"):
+        """Inicializa GeoUtils con la API especificada ('routes_api', 'google_maps', o 'haversine')."""
         self.gmaps = None
+        self.api_type = api_type
+        self.truck_specs = {}  # Para Routes API
+        
         if GOOGLE_MAPS_API_KEY:
+            # Cliente clásico de Directions / Distance Matrix API
             self.gmaps = googlemaps.Client(key=GOOGLE_MAPS_API_KEY)
+            
+    def set_truck_specs(self, **kwargs):
+        """
+        Configura los parámetros del camión para la Google Routes API.
+        Ejemplo: .set_truck_specs(emissionType="DIESEL", heightCm=365, weightKg=10000)
+        """
+        self.truck_specs = kwargs
+        if self.truck_specs:
+            logger.info("Especificaciones de camión configuradas: %s", self.truck_specs)
 
+    # ------------------------------------------------------------------
+    # Haversine — versión "nodo dict" (metros)
+    # ------------------------------------------------------------------
+    def haversine_distance(self, node_a, node_b):
+        """Distancia en línea recta (metros) entre dos nodos {'lat', 'lng'}."""
+        return self.haversine_km(
+            node_a['lat'], node_a['lng'],
+            node_b['lat'], node_b['lng']
+        ) * 1000
+
+    # ------------------------------------------------------------------
+    # Haversine — versión vectorizada (km). Acepta escalares o np.arrays.
+    # ------------------------------------------------------------------
+    @staticmethod
+    def haversine_km(lat1, lon1, lat2, lon2):
+        """Calcula la distancia Haversine en **km**.
+
+        Acepta escalares o arrays de NumPy para cálculos vectorizados.
+        """
+        R = 6371  # Radio de la Tierra en km
+        dlat = np.radians(lat2 - lat1)
+        dlon = np.radians(lon2 - lon1)
+        a = (np.sin(dlat / 2) ** 2
+             + np.cos(np.radians(lat1)) * np.cos(np.radians(lat2))
+             * np.sin(dlon / 2) ** 2)
+        return R * 2 * np.arctan2(np.sqrt(a), np.sqrt(1 - a))
+
+    # ------------------------------------------------------------------
+    # Matriz de distancias
+    # ------------------------------------------------------------------
     def calculate_distance_matrix(self, nodes):
         """
-        Calcula la matriz de distancias (en metros) entre todos los nodos.
-        Utiliza Google Maps API con optimización de lotes por origen.
+        Calcula la matriz de distancias (en metros) entre todos los nodos,
+        seleccionando el proveedor configurado en self.api_type.
         """
+        if self.api_type == "haversine" or GeoUtils._api_disabled:
+            return self._fallback_haversine_matrix(nodes)
+        
+        if self.api_type == "routes_api":
+            return self._calculate_distance_matrix_routes_api(nodes)
+            
+        # Fallback a la implementación clásica (Distance Matrix v1)
+        return self._calculate_distance_matrix_google_maps(nodes)
+
+    def _fallback_haversine_matrix(self, nodes):
         num_nodes = len(nodes)
         matrix = np.zeros((num_nodes, num_nodes))
-        
-        # Primero intentamos con Google Maps
-        use_roadmap = self.gmaps is not None and not GeoUtils._api_disabled
-        
-        if use_roadmap:
-            print("Fetching Real Road Distances from Google Maps (Origin-by-Origin Batching)...")
-            try:
-                for i in range(num_nodes):
-                    # Google Matrix API permite hasta 25 destinos por origen
-                    origins = [(nodes[i]['lat'], nodes[i]['lng'])]
-                    destinations = [(n['lat'], n['lng']) for n in nodes]
-                    
-                    response = self.gmaps.distance_matrix(
-                        origins, 
-                        destinations, 
-                        mode="driving"
-                    )
-                    
-                    if response['status'] == 'OK':
-                        row_results = response['rows'][0]['elements']
-                        for j, result in enumerate(row_results):
-                            if result['status'] == 'OK':
-                                matrix[i][j] = result['distance']['value']
-                            else:
-                                if result.get('status') == 'REQUEST_DENIED' or 'billing' in str(result).lower():
-                                    raise Exception("BILLING_ERROR")
-                                matrix[i][j] = self.haversine_distance(nodes[i], nodes[j])
-                    else:
-                        raise Exception("API_ERROR")
-                return matrix, True
-            except Exception as e:
-                if "BILLING" in str(e).upper():
-                    print("AVISO: Google Maps Billing no activo. Usando estimación Haversine (Línea recta).")
-                    GeoUtils._api_disabled = True
-                else:
-                    print(f"Error en API Google: {e}. Usando estimación Haversine.")
-        
-        # Fallback a Haversine
+        logger.info("Calculando matriz de distancias con Haversine (línea recta)...")
         for i in range(num_nodes):
             for j in range(num_nodes):
                 matrix[i][j] = self.haversine_distance(nodes[i], nodes[j])
         return matrix, False
 
-    def haversine_distance(self, node_a, node_b):
-        """Calcula la distancia en línea recta (metros) entre dos puntos GPS."""
-        R = 6371000 # Radio Tierra en metros
-        lat1, lon1 = np.radians(node_a['lat']), np.radians(node_a['lng'])
-        lat2, lon2 = np.radians(node_b['lat']), np.radians(node_b['lng'])
-        dlat = lat2 - lat1
-        dlon = lon2 - lon1
-        a = np.sin(dlat/2)**2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon/2)**2
-        c = 2 * np.arctan2(np.sqrt(a), np.sqrt(1-a))
-        return R * c
+    def _calculate_distance_matrix_routes_api(self, nodes):
+        """Calcula distancias usando la nueva Routes API de Google Maps (v2) con soporte para camiones."""
+        num_nodes = len(nodes)
+        matrix = np.zeros((num_nodes, num_nodes))
+        
+        if not GOOGLE_MAPS_API_KEY:
+            logger.warning("Falta GOOGLE_MAPS_API_KEY para Routes API. Usando Haversine.")
+            return self._fallback_haversine_matrix(nodes)
 
+        logger.info("Obteniendo distancias reales de Google Routes API (matriz)...")
+        # Routes API permite hasta 100 elementos por matriz general
+        
+        url = "https://routes.googleapis.com/distanceMatrix/v2:computeRouteMatrix"
+        headers = {
+            "Content-Type": "application/json",
+            "X-Goog-Api-Key": GOOGLE_MAPS_API_KEY,
+            "X-Goog-FieldMask": "originIndex,destinationIndex,distanceMeters,status"
+        }
+        
+        try:
+            origins_full = [{"waypoint": {"location": {"latLng": {"latitude": n['lat'], "longitude": n['lng']}}}} for n in nodes]
+            
+            # Sanitizar payload de camiones
+            valid_vehicle_info = {}
+            if self.truck_specs and "emissionType" in self.truck_specs:
+                valid_vehicle_info["emissionType"] = self.truck_specs["emissionType"]
+                
+            if valid_vehicle_info:
+                for origin in origins_full:
+                    origin["routeModifiers"] = {"vehicleInfo": valid_vehicle_info}
+            
+            destinations_full = [{"waypoint": {"location": {"latLng": {"latitude": n['lat'], "longitude": n['lng']}}}} for n in nodes]
+            
+            BATCH_SIZE = 25
+            for i in range(0, num_nodes, BATCH_SIZE):
+                batch_origins = origins_full[i:i+BATCH_SIZE]
+                for j in range(0, num_nodes, BATCH_SIZE):
+                    batch_destinations = destinations_full[j:j+BATCH_SIZE]
+                    
+                    payload = {
+                        "origins": batch_origins,
+                        "destinations": batch_destinations,
+                        "travelMode": "DRIVE",
+                        "routingPreference": "TRAFFIC_AWARE",
+                    }
+        
+                    response = requests.post(url, json=payload, headers=headers)
+                    if response.status_code == 200:
+                        data = response.json()
+                        for element in data:
+                            o_idx = i + element.get('originIndex', 0)
+                            d_idx = j + element.get('destinationIndex', 0)
+                            dist = element.get('distanceMeters')
+                            status = element.get('status', {}).get('code', 0)
+                            
+                            # Validar que si la llave status existe, sea 0 (OK)
+                            has_error = False
+                            if isinstance(status, dict) and status.get('code', 0) != 0:
+                                has_error = True
+                            elif isinstance(element.get('status'), dict):
+                                if element.get('status', {}).get('code') not in [None, 0]:
+                                    has_error = True
+
+                            if has_error:
+                                 matrix[o_idx][d_idx] = self.haversine_distance(nodes[o_idx], nodes[d_idx])
+                            else:
+                                matrix[o_idx][d_idx] = dist if dist is not None else self.haversine_distance(nodes[o_idx], nodes[d_idx])
+                    else:
+                        if response.status_code in [403, 401] or "bill" in response.text.lower() or "not enabled" in response.text.lower():
+                            logger.warning("Google Maps Billing/Auth/API no activo (Routes API). Usando Haversine.")
+                            GeoUtils._api_disabled = True
+                            return self._fallback_haversine_matrix(nodes)
+                        else:
+                            logger.warning(f"Error Routes API HTTP {response.status_code}: {response.text}")
+                            # fallback de este bloque a haversine
+                            for o in range(i, min(i+BATCH_SIZE, num_nodes)):
+                                for d in range(j, min(j+BATCH_SIZE, num_nodes)):
+                                    matrix[o][d] = self.haversine_distance(nodes[o], nodes[d])
+                                    
+            return matrix, True
+        except Exception as e:
+            logger.error(f"Excepción al llamar a Routes API: {e}")
+            return self._fallback_haversine_matrix(nodes)
+            
+    def _calculate_distance_matrix_google_maps(self, nodes):
+        """
+        Implementación original usando la clásica Google Maps Distance Matrix API.
+        """
+        num_nodes = len(nodes)
+        matrix = np.zeros((num_nodes, num_nodes))
+        
+        use_roadmap = self.gmaps is not None and not GeoUtils._api_disabled
+
+        if use_roadmap:
+            BATCH_SIZE = 25  # Límite de Google Maps Distance Matrix API
+            logger.info("Obteniendo distancias reales de Google Maps Clásico (lotes de %d)...", BATCH_SIZE)
+            try:
+                all_destinations = [(n['lat'], n['lng']) for n in nodes]
+                for i in range(num_nodes):
+                    origins = [(nodes[i]['lat'], nodes[i]['lng'])]
+                    # Partir destinos en lotes de BATCH_SIZE
+                    for batch_start in range(0, num_nodes, BATCH_SIZE):
+                        batch_end = min(batch_start + BATCH_SIZE, num_nodes)
+                        batch_destinations = all_destinations[batch_start:batch_end]
+
+                        response = self.gmaps.distance_matrix(
+                            origins,
+                            batch_destinations,
+                            mode="driving"
+                        )
+
+                        if response['status'] == 'OK':
+                            row_results = response['rows'][0]['elements']
+                            for k, result in enumerate(row_results):
+                                j = batch_start + k
+                                if result['status'] == 'OK':
+                                    matrix[i][j] = result['distance']['value']
+                                else:
+                                    if result.get('status') == 'REQUEST_DENIED' or 'billing' in str(result).lower():
+                                        raise Exception("BILLING_ERROR")
+                                    matrix[i][j] = self.haversine_distance(nodes[i], nodes[j])
+                        else:
+                            raise Exception("API_ERROR")
+                return matrix, True
+            except Exception as e:
+                if "BILLING" in str(e).upper():
+                    logger.warning("Google Maps Billing no activo. Usando estimación Haversine.")
+                    GeoUtils._api_disabled = True
+                else:
+                    logger.warning("Error en API Google: %s. Usando estimación Haversine.", e)
+
+        # Fallback a Haversine si no se hizo arriba
+        return self._fallback_haversine_matrix(nodes)
+
+    # ------------------------------------------------------------------
+    # Polyline para carreteras
+    # ------------------------------------------------------------------
     def get_route_polyline(self, start_coords, end_coords):
-        """Obtiene la geometría de la carretera entre dos puntos."""
-        if not self.gmaps or GeoUtils._api_disabled:
+        """Obtiene la geometría de la carretera entre dos puntos basándose en la API configurada."""
+        if GeoUtils._api_disabled or not GOOGLE_MAPS_API_KEY:
+            return None
+            
+        if self.api_type == "routes_api":
+            return self._get_route_polyline_routes_api(start_coords, end_coords)
+        return self._get_route_polyline_google_maps(start_coords, end_coords)
+        
+    def _get_route_polyline_routes_api(self, start_coords, end_coords):
+        """Obtiene polyline usando Routes API."""
+        url = "https://routes.googleapis.com/directions/v2:computeRoutes"
+        headers = {
+            "Content-Type": "application/json",
+            "X-Goog-Api-Key": GOOGLE_MAPS_API_KEY,
+            "X-Goog-FieldMask": "routes.polyline.encodedPolyline"
+        }
+        
+        payload = {
+            "origin": {"location": {"latLng": {"latitude": start_coords[0], "longitude": start_coords[1]}}},
+            "destination": {"location": {"latLng": {"latitude": end_coords[0], "longitude": end_coords[1]}}},
+            "travelMode": "DRIVE",
+            "routingPreference": "TRAFFIC_AWARE",
+        }
+        
+        valid_vehicle_info = {}
+        if self.truck_specs and "emissionType" in self.truck_specs:
+            valid_vehicle_info["emissionType"] = self.truck_specs["emissionType"]
+            
+        if valid_vehicle_info:
+            payload["routeModifiers"] = {"vehicleInfo": valid_vehicle_info}
+            
+        try:
+            response = requests.post(url, json=payload, headers=headers)
+            if response.status_code == 200:
+                data = response.json()
+                if "routes" in data and len(data["routes"]) > 0:
+                    return data["routes"][0].get("polyline", {}).get("encodedPolyline")
+            elif response.status_code in [403, 401] or "bill" in response.text.lower():
+                GeoUtils._api_disabled = True
+                return "BILLING_ERROR"
+        except Exception as e:
+            logger.error(f"Error consultando Routes API Polyline: {e}")
+        return None
+
+    def _get_route_polyline_google_maps(self, start_coords, end_coords):
+        """Obtiene la geometría de la carretera usando la API clásica."""
+        if not self.gmaps:
             return None
         try:
             result = self.gmaps.directions(

@@ -1,4 +1,5 @@
 import os
+import logging
 from dotenv import load_dotenv
 from pathlib import Path
 
@@ -13,7 +14,6 @@ GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
 
 # Data Paths
 DATA_DIR = BASE_DIR / "data"
-LOCATIONS_FILE = DATA_DIR / "locations.json"
 
 # Output Paths
 OUTPUT_DIR = BASE_DIR / "outputs"
@@ -22,9 +22,34 @@ MAPS_DIR = OUTPUT_DIR / "maps"
 LOGS_DIR = BASE_DIR / "logs"
 
 # Solver config
-MAX_SEARCH_TIME = 40
-DIST_LIMIT = 4000000
+MAX_SEARCH_TIME = 90          # Segundos máximos de búsqueda del solver
+DIST_LIMIT = 4_000_000        # Límite de distancia por vehículo (metros)
+DEFAULT_N_CLIENTES = 4        # Máximo de clientes por ruta (dimensión del solver)
+DEFAULT_MAX_PLANTS_PER_ROUTE = 1  # Plantas por ruta (1=VRPB clásico, >1=MC-VRPB)
+
+# Data Manager config
+DEFAULT_MAX_CUSTOMERS = 4     # Clientes máximos por planta (pre-filtro DataManager)
+DEFAULT_THRESHOLD_KM = 100    # Umbral de desvío en km para filtro de retorno
 
 # Create folders if they don't exist
 for folder in [OUTPUT_DIR, RESULTS_DIR, MAPS_DIR, LOGS_DIR]:
     folder.mkdir(parents=True, exist_ok=True)
+
+# --- Logging Configuration ---
+LOG_FORMAT = "%(asctime)s | %(levelname)-8s | %(name)s | %(message)s"
+LOG_FILE = LOGS_DIR / "optimizer.log"
+
+logging.basicConfig(
+    level=logging.INFO,
+    format=LOG_FORMAT,
+    handlers=[
+        logging.FileHandler(LOG_FILE, encoding="utf-8"),
+        logging.StreamHandler()
+    ]
+)
+
+# Warn if API key is missing
+if not GOOGLE_MAPS_API_KEY:
+    logging.getLogger("config").warning(
+        "GOOGLE_MAPS_API_KEY no está configurada. Se usará estimación Haversine."
+    )

@@ -1,79 +1,191 @@
 import json
-import sys
+import logging
 from pathlib import Path
-
-# Fix path for imports
-project_root = str(Path(__file__).resolve().parent)
-if project_root not in sys.path:
-    sys.path.append(project_root)
 
 from src.engine.solver import LogisticsSolver
 from src.utils.visualizer import Visualizer
 from src.utils.data_manager import DataManager
+from src.utils.report_generator import generate_dashboard
 from src.config import RESULTS_DIR, DATA_DIR
 
+logger = logging.getLogger(__name__)
+
+
+# ======================================================================
+# 🔧 PARÁMETROS DE EJECUCIÓN — Modifica estos valores para configurar
+# ======================================================================
+N_CLIENTES = 1              # Máximo de clientes por ruta
+VARIAS_PLANTAS = False      # True → permite recoger en >1 planta por ruta (MC-VRPB)
+MAX_PLANTAS_RUTA = 1        # Plantas máximas por ruta (solo si VARIAS_PLANTAS=True)
+MAX_CUSTOMERS_PER_PLANT = 4 # Clientes pre-seleccionados por planta (filtro DataManager)
+THRESHOLD_KM = 100          # Umbral de desvío para filtro de retorno (km)
+MAX_RADIUS_KM = 50          # Radio máximo (km por carretera) desde la planta hacia el cliente
+
+
+# Especificaciones de Camión (Tráiler estándar para bobinas de papel)
+TRUCK_SPECS = {
+    "emissionType": "DIESEL",
+    "heightCm": 400,        # Altura máxima: 4.0 metros
+    "weightKg": 40_000,      # Peso Máximo Autorizado: 40 toneladas
+}
+# ======================================================================
+
+
 def run_optimization():
-    print("\n" + "🚀 " * 20)
-    print("Logistics Optimizer - Strategic Overhaul Active")
-    print("🚀 " * 20 + "\n")
+    logger.info("=" * 60)
+    logger.info("Logistics Optimizer — Inicio de ejecución")
+    logger.info("=" * 60)
+    logger.info("Parámetros: n_clientes=%d | varias_plantas=%s | max_plantas_ruta=%d",
+                N_CLIENTES, VARIAS_PLANTAS, MAX_PLANTAS_RUTA)
 
     # 1. Rutas de Archivos
     plants_file = DATA_DIR / "locations_smurfit.json"
     clients_file = DATA_DIR / "cliente_ubi.json"
 
     if not plants_file.exists() or not clients_file.exists():
-        print(f"❌ Error: Faltan archivos de datos en {DATA_DIR}")
+        logger.error("Faltan archivos de datos en %s", DATA_DIR)
         return
 
     # 2. Cargar Plantas y Sede
     with open(plants_file, 'r', encoding='utf-8') as f:
         plants_data = json.load(f)
 
-    # 3. Data Engineering: Selección Inteligente de Clientes (Filtro de Retorno)
+    # Inicializar Motor Geográfico
+    from src.utils.geo import GeoUtils
+    geo_engine = GeoUtils(api_type="routes_api")
+    geo_engine.set_truck_specs(**TRUCK_SPECS)
+
+    # 3. Selección Inteligente de Clientes (Filtros Radio/Retorno via API)
     dm = DataManager(
         paper_plant=plants_data['paper_plant'],
         carton_plants=plants_data['carton_plants'],
-        clients_file=clients_file
+        clients_file=clients_file,
+        geo_utils=geo_engine
     )
-    
-    # 1. Cargar y seleccionar clientes
-    # Seleccionamos hasta 4 clientes por planta que estén en la ruta de vuelta a Mengíbar
-    enriched_data = dm.get_optimized_locations(max_customers_per_plant=4, threshold_km=100)
-    
-    # 2. Solver
-    solver = LogisticsSolver(enriched_data)
-    
-    print(f"\nEngine Status: {'GPS Real' if solver.is_real_road else 'Haversine Matrix'}")
-    print(f"Nodos totales a optimizar: {len(solver.nodes)}")
+    enriched_data = dm.get_optimized_locations(
+        max_customers_per_plant=MAX_CUSTOMERS_PER_PLANT,
+        threshold_km=THRESHOLD_KM,
+        max_radius_km=MAX_RADIUS_KM
+    )
+
+    # 4. Resolver VRP
+    solver = LogisticsSolver(enriched_data, geo_engine=geo_engine)
+    logger.info("Motor de distancias: %s", 'GPS Real' if solver.is_real_road else 'Haversine')
+    logger.info("Nodos totales a optimizar: %d", len(solver.nodes))
 
     # 5. Ejecutar Optimización
-    routes = solver.solve()
+    routes = solver.solve(
+        n_clientes=N_CLIENTES,
+        varias_plantas=VARIAS_PLANTAS,
+        max_plantas_ruta=MAX_PLANTAS_RUTA,
+    )
 
     if routes:
-        print(f"\n✅ ÉXITO: Se han generado {len(routes)} rutas logísticas integradas.")
-        
-        # Guardar resultados
+        logger.info("Se han generado %d rutas logísticas integradas.", len(routes))
+
+        # 6. Guardar rutas detalladas
         output_json = RESULTS_DIR / "optimized_routes.json"
         with open(output_json, 'w', encoding='utf-8') as f:
             json.dump(routes, f, indent=2, ensure_ascii=False)
+        logger.info("Rutas guardadas en: %s", output_json)
 
-        # 6. Visualización con Dashboard
-        visualizer = Visualizer(routes, solver.distance_matrix)
+        # 7. Generar y guardar resumen de KPIs
+        summary = _build_summary(routes, solver)
+        summary_json = RESULTS_DIR / "optimization_summary.json"
+        with open(summary_json, 'w', encoding='utf-8') as f:
+            json.dump(summary, f, indent=2, ensure_ascii=False)
+        logger.info("Resumen guardado en: %s", summary_json)
+
+        # 8. Visualización
+        visualizer = Visualizer(routes, solver.distance_matrix, geo_utils=solver.geo)
         map_path = visualizer.create_map("Logistics_Dashboard.html")
         graph_path = visualizer.create_plotly_graph("Logistics_Graph.html")
         
-        print(f"\n🔎 Visualización del Mapa generada en: {map_path}")
-        print(f"📊 Visualización del Grafo (Plotly) en: {graph_path}")
-        print("\n" + "="*50)
-        print("RESUMEN DE OPERACIÓN")
-        print("="*50)
-        for i, route in enumerate(routes):
-            # Calcular km reales para el log
-            dist_km = sum(solver.distance_matrix[n1['matrix_idx']][n2['matrix_idx']] 
-                         for n1, n2 in zip(route, route[1:])) / 1000
-            print(f"Ruta {i+1} (D->{route[1]['name']}->Clientes->D): {dist_km:.2f} km")
+        # Grafo Global de Complejidad (Sin filtrar)
+        with open(clients_file, 'r', encoding='utf-8') as f:
+            raw_clients = json.load(f)
+        all_clients_list = []
+        for z, dests in raw_clients.items():
+            for d in dests:
+                if "latitude" in d and "longitude" in d:
+                    all_clients_list.append({"name": d.get("municipio_destino", z), "lat": d["latitude"], "lng": d["longitude"]})
+        
+        complexity_graph_path = visualizer.create_global_complexity_graph(
+            plants_data['paper_plant'], plants_data['carton_plants'], all_clients_list, "Logistics_Global_Complexity.html"
+        )
+
+        logger.info("Mapa: %s", map_path)
+        logger.info("Grafo Optimizado: %s", graph_path)
+        logger.info("Grafo Complejidad: %s", complexity_graph_path)
+
+        # 9. Actualizar Presentación HTML (Dashboard Global)
+        presentation_path = "outputs/Presentacion_Logistica.html"
+        generate_dashboard(summary_json, output_json, presentation_path)
+        
+        # 10. Log de resumen
+        logger.info("=" * 60)
+        logger.info("RESUMEN DE OPERACIÓN")
+        logger.info("=" * 60)
+        for r in summary['routes']:
+            plants_str = ", ".join(r['plants']) if len(r['plants']) > 1 else r['plants'][0]
+            logger.info("Ruta %d: %s → %d clientes → %.2f km (%.2f km en vacío)",
+                        r['route_id'], plants_str, r['num_customers'], r['distance_km'], r['empty_km'])
+        logger.info("TOTAL: %.2f km (%.2f km en vacío) en %d rutas", summary['total_km'], summary['total_empty_km'], summary['num_routes'])
+        
+        # Resumen Analítico
+        print("\n")
+        print(solver.summary())
+        print("\n")
     else:
-        print("\n❌ FALLO: El optimizador no pudo encontrar una solución válida con las restricciones actuales.")
+        logger.error("El optimizador no encontró una solución válida.")
+
+
+def _build_summary(routes, solver):
+    """Genera un JSON de resumen con KPIs por ruta."""
+    route_summaries = []
+    total_km = 0
+    total_empty_km = 0
+
+    for i, route in enumerate(routes):
+        dist_km = 0
+        empty_km = 0
+        for j in range(len(route) - 1):
+            n1, n2 = route[j], route[j+1]
+            d = solver.distance_matrix[n1['matrix_idx']][n2['matrix_idx']] / 1000
+            dist_km += d
+            if j == len(route) - 2 and n2['type'] == 'depot':
+                empty_km += d
+
+        plant_nodes = [n for n in route if n['type'] == 'carton_plant']
+        customer_nodes = [n for n in route if n['type'] == 'customer']
+
+        route_summaries.append({
+            "route_id": i + 1,
+            "plants": [p['name'] for p in plant_nodes],
+            "plant_ids": [p['id'] for p in plant_nodes],
+            "num_plants": len(plant_nodes),
+            "num_customers": len(customer_nodes),
+            "customers": [c['name'] for c in customer_nodes],
+            "distance_km": round(dist_km, 2),
+            "empty_km": round(empty_km, 2),
+            "num_stops": len(route)
+        })
+        total_km += dist_km
+        total_empty_km += empty_km
+
+    return {
+        "num_routes": len(routes),
+        "total_km": round(total_km, 2),
+        "total_empty_km": round(total_empty_km, 2),
+        "distance_source": "GPS Real" if solver.is_real_road else "Haversine (estimación)",
+        "parameters": {
+            "n_clientes": N_CLIENTES,
+            "varias_plantas": VARIAS_PLANTAS,
+            "max_plantas_ruta": MAX_PLANTAS_RUTA,
+        },
+        "routes": route_summaries
+    }
+
 
 if __name__ == "__main__":
     run_optimization()

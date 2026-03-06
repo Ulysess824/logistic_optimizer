@@ -54,6 +54,34 @@
             "address": "Quart de Poblet, Valencia",
             "lat": 39.47960,
             "lng": -0.46162
+        },
+        {
+            "id": "CP_ALMERIA",
+            "name": "Smurfit Westrock Almeria",
+            "address": "Lugar Finca el Vizconde, Carretera Iryda Sector IV, La Canal - Paraje El Vizconde, 04738 Vícar, Almería",
+            "lat": 36.785126,
+            "lng": -2.6657936
+        },
+        {
+            "id": "CP_CANOVELLES",
+            "name": "Smurfit Westrock Canovelles",
+            "address": "Polígono Industrial Can Castells 112-114, 08420 Canovelles, Barcelona",
+            "lat": 41.624792,
+            "lng": 2.2745367
+        },
+        {
+            "id": "CP_CELPACK",
+            "name": "Smurfit Westrock Celpack",
+            "address": "Rua Da Concharinha 256, 4536-907 S.Paio de Oleiros, Portugal",
+            "lat": 40.9757657,
+            "lng": -8.577239399999999
+        },
+        {
+            "id": "CP_VIGO",
+            "name": "Smurfit Westrock Vigo",
+            "address": "Ctra. Coruña-Portugal km 160, 36400 Porriño Pontevedra",
+            "lat": 42.13338299999999,
+            "lng": -8.6215009
         }
     ]
 }

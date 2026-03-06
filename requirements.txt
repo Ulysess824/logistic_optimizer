@@ -2,6 +2,9 @@ ortools
 googlemaps
 python-dotenv
 folium
-pandas
+polars
 numpy
 polyline
+plotly
+networkx
+matplotlib
