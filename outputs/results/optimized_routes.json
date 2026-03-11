@@ -11,7 +11,7 @@
     },
     {
       "id": "CP_CORDOBA",
-      "name": "Smurfit Westrock Córdoba",
+      "name": "Córdoba",
       "address": "Pol. Ind. Alcolea, Córdoba",
       "lat": 37.93214,
       "lng": -4.67292,
@@ -23,7 +23,9 @@
       "name": "El Carpio",
       "lat": 37.9409,
       "lng": -4.4966,
+      "hav_dist": 15.493662860568243,
       "detour": 0.0015014649163020977,
+      "real_dist_km": 15.493662860568243,
       "type": "customer",
       "parent_cp": "CP_CORDOBA",
       "matrix_idx": 12
@@ -50,22 +52,12 @@
     },
     {
       "id": "CP_ALMERIA",
-      "name": "Smurfit Westrock Almeria",
+      "name": "Almeria",
       "address": "Lugar Finca el Vizconde, Carretera Iryda Sector IV, La Canal - Paraje El Vizconde, 04738 Vícar, Almería",
       "lat": 36.785126,
       "lng": -2.6657936,
       "type": "carton_plant",
       "matrix_idx": 36
-    },
-    {
-      "id": "C_18500_GUA",
-      "name": "Guadix",
-      "lat": 37.2986,
-      "lng": -3.1368,
-      "detour": 0.006588313176621341,
-      "type": "customer",
-      "parent_cp": "CP_ALMERIA",
-      "matrix_idx": 37
     },
     {
       "name": "Mengíbar",
@@ -89,7 +81,7 @@
     },
     {
       "id": "CP_HUELVA",
-      "name": "Smurfit Westrock Huelva",
+      "name": "Huelva",
       "address": "Pol. Ind. Dehesa Boyal, La Palma del Condado, Huelva",
       "lat": 37.3635,
       "lng": -6.543,
@@ -97,11 +89,13 @@
       "matrix_idx": 16
     },
     {
-      "id": "C_14820_SAN",
-      "name": "Santa Cruz (Cordoba)",
-      "lat": 37.7875,
-      "lng": -4.6945,
-      "detour": 4.250331639354954e-05,
+      "id": "C_41809_ALB",
+      "name": "Albaida Del Aljarafe",
+      "lat": 37.4235,
+      "lng": -6.1667,
+      "hav_dist": 33.90614319092758,
+      "detour": 0.165277782437812,
+      "real_dist_km": 33.90614319092758,
       "type": "customer",
       "parent_cp": "CP_HUELVA",
       "matrix_idx": 17
@@ -128,7 +122,7 @@
     },
     {
       "id": "CP_ALCALA",
-      "name": "Smurfit Westrock Alcalá",
+      "name": "Alcalá",
       "address": "Avda. de Camarmilla s/n, Alcalá de Henares, Madrid",
       "lat": 40.48205,
       "lng": -3.35996,
@@ -136,11 +130,13 @@
       "matrix_idx": 1
     },
     {
-      "id": "C_13250_DAI",
-      "name": "Daimiel",
-      "lat": 39.0701,
-      "lng": -3.6123,
-      "detour": 6.1079273336872575e-06,
+      "id": "C_28320_PIN",
+      "name": "Pinto",
+      "lat": 40.2415,
+      "lng": -3.7,
+      "hav_dist": 39.3128646298167,
+      "detour": -36.03651412176379,
+      "real_dist_km": 45.856,
       "type": "customer",
       "parent_cp": "CP_ALCALA",
       "matrix_idx": 2
@@ -167,7 +163,7 @@
     },
     {
       "id": "CP_ALICANTE",
-      "name": "Smurfit Westrock Alicante",
+      "name": "Alicante",
       "address": "Pol. Ind. El Canastell, San Vicente del Raspeig, Alicante",
       "lat": 38.40289,
       "lng": -0.54019,
@@ -175,11 +171,13 @@
       "matrix_idx": 6
     },
     {
-      "id": "C_23310_MOG",
-      "name": "Mogon",
-      "lat": 38.0804,
-      "lng": -3.0309,
-      "detour": 0.00962807810896038,
+      "id": "C_03680_ASP",
+      "name": "Aspe",
+      "lat": 38.3451,
+      "lng": -0.7672,
+      "hav_dist": 20.80654796425026,
+      "detour": 0.31319541327758316,
+      "real_dist_km": 20.80654796425026,
       "type": "customer",
       "parent_cp": "CP_ALICANTE",
       "matrix_idx": 7
@@ -206,7 +204,7 @@
     },
     {
       "id": "CP_VALENCIA",
-      "name": "Smurfit Westrock Valencia",
+      "name": "Valencia",
       "address": "Quart de Poblet, Valencia",
       "lat": 39.4796,
       "lng": -0.46162,
@@ -214,11 +212,13 @@
       "matrix_idx": 31
     },
     {
-      "id": "C_23712_JAB",
-      "name": "Jabalquinto",
-      "lat": 38.0194,
-      "lng": -3.7276,
-      "detour": 0.007340549619584635,
+      "id": "C_46960_ALD",
+      "name": "Aldaya",
+      "lat": 39.4764,
+      "lng": -0.462,
+      "hav_dist": 0.3573153564464521,
+      "detour": 0.15717123324191107,
+      "real_dist_km": 0.3573153564464521,
       "type": "customer",
       "parent_cp": "CP_VALENCIA",
       "matrix_idx": 32
@@ -245,7 +245,7 @@
     },
     {
       "id": "CP_BURGOS",
-      "name": "Smurfit Westrock Burgos",
+      "name": "Burgos",
       "address": "Pol. Ind. Villalonquéjar, Burgos",
       "lat": 42.36921,
       "lng": -3.73705,
@@ -253,11 +253,13 @@
       "matrix_idx": 21
     },
     {
-      "id": "C_28946_FUE",
-      "name": "Fuenlabrada",
-      "lat": 40.274,
-      "lng": -3.7694,
-      "detour": 2.8710960748412617e-05,
+      "id": "C_09001_BUR",
+      "name": "Burgos",
+      "lat": 42.3378,
+      "lng": -3.7188,
+      "hav_dist": 3.8009829209352928,
+      "detour": 0.32831638777605576,
+      "real_dist_km": 3.8009829209352928,
       "type": "customer",
       "parent_cp": "CP_BURGOS",
       "matrix_idx": 22
@@ -284,22 +286,24 @@
     },
     {
       "id": "CP_CELPACK",
-      "name": "Smurfit Westrock Celpack",
+      "name": "Celpack",
       "address": "Rua Da Concharinha 256, 4536-907 S.Paio de Oleiros, Portugal",
       "lat": 40.9757657,
       "lng": -8.5772394,
       "type": "carton_plant",
-      "matrix_idx": 46
+      "matrix_idx": 42
     },
     {
-      "id": "C_10191_SAN",
-      "name": "Santiago Del Campo",
-      "lat": 39.6284,
-      "lng": -6.3636,
-      "detour": 0.007334636125619909,
+      "id": "C_4520-606_SAN",
+      "name": "Santa Maria Da Feira",
+      "lat": 40.9499,
+      "lng": -8.5624,
+      "hav_dist": 3.1344413392901176,
+      "detour": 4.248,
+      "real_dist_km": 4.248,
       "type": "customer",
       "parent_cp": "CP_CELPACK",
-      "matrix_idx": 47
+      "matrix_idx": 45
     },
     {
       "name": "Mengíbar",
@@ -323,7 +327,7 @@
     },
     {
       "id": "CP_NAVARRA",
-      "name": "Smurfit Westrock Navarra",
+      "name": "Navarra",
       "address": "Cordovilla, Navarra",
       "lat": 42.78831,
       "lng": -1.64541,
@@ -331,14 +335,16 @@
       "matrix_idx": 26
     },
     {
-      "id": "C_13200_MAN",
-      "name": "Manzanares",
-      "lat": 38.9991,
-      "lng": -3.3699,
-      "detour": 2.0855228513028123e-05,
+      "id": "C_31110_NOA",
+      "name": "Noain",
+      "lat": 42.7624,
+      "lng": -1.6345,
+      "hav_dist": 3.0155339440431694,
+      "detour": -559.5913851120611,
+      "real_dist_km": 5.158,
       "type": "customer",
       "parent_cp": "CP_NAVARRA",
-      "matrix_idx": 27
+      "matrix_idx": 29
     },
     {
       "name": "Mengíbar",
@@ -362,22 +368,24 @@
     },
     {
       "id": "CP_VIGO",
-      "name": "Smurfit Westrock Vigo",
+      "name": "Vigo",
       "address": "Ctra. Coruña-Portugal km 160, 36400 Porriño Pontevedra",
       "lat": 42.13338299999999,
       "lng": -8.6215009,
       "type": "carton_plant",
-      "matrix_idx": 51
+      "matrix_idx": 47
     },
     {
-      "id": "C_10600_PLA",
-      "name": "Plasencia",
-      "lat": 40.0337,
-      "lng": -6.0876,
-      "detour": 0.0005484676147489154,
+      "id": "C_36470_SAL",
+      "name": "Salceda De Caselas",
+      "lat": 42.1,
+      "lng": -8.575,
+      "hav_dist": 5.337615214110911,
+      "detour": 0.006193501420398206,
+      "real_dist_km": 5.337615214110911,
       "type": "customer",
       "parent_cp": "CP_VIGO",
-      "matrix_idx": 52
+      "matrix_idx": 49
     },
     {
       "name": "Mengíbar",
@@ -401,22 +409,24 @@
     },
     {
       "id": "CP_CANOVELLES",
-      "name": "Smurfit Westrock Canovelles",
+      "name": "Canovelles",
       "address": "Polígono Industrial Can Castells 112-114, 08420 Canovelles, Barcelona",
       "lat": 41.624792,
       "lng": 2.2745367,
       "type": "carton_plant",
-      "matrix_idx": 41
+      "matrix_idx": 37
     },
     {
-      "id": "C_43883_ROD",
-      "name": "Roda De Bara",
-      "lat": 41.1833,
-      "lng": 1.4667,
-      "detour": 0.000518542677809819,
+      "id": "C_08210_BAR",
+      "name": "Barbera Del Valles",
+      "lat": 41.5159,
+      "lng": 2.1246,
+      "hav_dist": 17.38358769496888,
+      "detour": 0.17811743422635118,
+      "real_dist_km": 17.38358769496888,
       "type": "customer",
       "parent_cp": "CP_CANOVELLES",
-      "matrix_idx": 42
+      "matrix_idx": 38
     },
     {
       "name": "Mengíbar",

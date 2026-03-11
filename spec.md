@@ -26,6 +26,10 @@ logistics_optimizer/
 │   ├── config.py                    # Variables de entorno y rutas (RESULTS_DIR, DATA_DIR, etc.)
 │   ├── engine/
 │   │   └── solver.py                # Contiene LogisticsSolver. Usa Google OR-Tools para el cálculo.
+│   ├── simulation/
+│   │   ├── camion.py                # Clase TruckSimulated (SimPy) para simular la flota de camiones.
+│   │   ├── animador.py              # Clase AnimadorLogistico para generación de GIFs desde un DataFrame.
+│   │   └── __init__.py              # Módulo independiente para simulación.
 │   └── utils/
 │       ├── data_manager.py          # DataManager: Pre-filtra qué clientes son viables mediante umbrales (Haversine).
 │       ├── geo.py                   # Lógica de cálculo de distancias (API de Google Maps real o Haversine).

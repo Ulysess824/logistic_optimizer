@@ -52,7 +52,7 @@ def run_optimization():
 
     # Inicializar Motor Geográfico
     from src.utils.geo import GeoUtils
-    geo_engine = GeoUtils(api_type="routes_api")
+    geo_engine = GeoUtils(api_type="haversine")
     geo_engine.set_truck_specs(**TRUCK_SPECS)
 
     # 3. Selección Inteligente de Clientes (Filtros Radio/Retorno via API)

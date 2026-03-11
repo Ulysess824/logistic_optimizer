@@ -12,8 +12,9 @@ venv/
 data/raw/
 
 # Generated outputs (re-generated on each run)
-outputs/results/*.json
-outputs/results/*.png
+# (User requested to upload these to GitHub)
+# outputs/results/*.json
+# outputs/results/*.png
 logs/*.log
 
 # VS Code / IDE

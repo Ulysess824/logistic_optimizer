@@ -1,6 +1,6 @@
 {
     "paper_plant": {
-        "name": "Smurfit Westrock Paper Mill Mengíbar",
+        "name": "Mengíbar",
         "address": "Polígono Industrial de Mengíbar, 23440 Mengíbar, Jaén, Spain",
         "lat": 37.98148,
         "lng": -3.80058
@@ -8,77 +8,77 @@
     "carton_plants": [
         {
             "id": "CP_ALCALA",
-            "name": "Smurfit Westrock Alcalá",
+            "name": "Alcalá",
             "address": "Avda. de Camarmilla s/n, Alcalá de Henares, Madrid",
             "lat": 40.48205,
             "lng": -3.35996
         },
         {
             "id": "CP_ALICANTE",
-            "name": "Smurfit Westrock Alicante",
+            "name": "Alicante",
             "address": "Pol. Ind. El Canastell, San Vicente del Raspeig, Alicante",
             "lat": 38.40289,
             "lng": -0.54019
         },
         {
             "id": "CP_CORDOBA",
-            "name": "Smurfit Westrock Córdoba",
+            "name": "Córdoba",
             "address": "Pol. Ind. Alcolea, Córdoba",
             "lat": 37.93214,
             "lng": -4.67292
         },
         {
             "id": "CP_HUELVA",
-            "name": "Smurfit Westrock Huelva",
+            "name": "Huelva",
             "address": "Pol. Ind. Dehesa Boyal, La Palma del Condado, Huelva",
             "lat": 37.3635,
             "lng": -6.5430
         },
         {
             "id": "CP_BURGOS",
-            "name": "Smurfit Westrock Burgos",
+            "name": "Burgos",
             "address": "Pol. Ind. Villalonquéjar, Burgos",
             "lat": 42.36921,
             "lng": -3.73705
         },
         {
             "id": "CP_NAVARRA",
-            "name": "Smurfit Westrock Navarra",
+            "name": "Navarra",
             "address": "Cordovilla, Navarra",
             "lat": 42.78831,
             "lng": -1.64541
         },
         {
             "id": "CP_VALENCIA",
-            "name": "Smurfit Westrock Valencia",
+            "name": "Valencia",
             "address": "Quart de Poblet, Valencia",
             "lat": 39.47960,
             "lng": -0.46162
         },
         {
             "id": "CP_ALMERIA",
-            "name": "Smurfit Westrock Almeria",
+            "name": "Almeria",
             "address": "Lugar Finca el Vizconde, Carretera Iryda Sector IV, La Canal - Paraje El Vizconde, 04738 Vícar, Almería",
             "lat": 36.785126,
             "lng": -2.6657936
         },
         {
             "id": "CP_CANOVELLES",
-            "name": "Smurfit Westrock Canovelles",
+            "name": "Canovelles",
             "address": "Polígono Industrial Can Castells 112-114, 08420 Canovelles, Barcelona",
             "lat": 41.624792,
             "lng": 2.2745367
         },
         {
             "id": "CP_CELPACK",
-            "name": "Smurfit Westrock Celpack",
+            "name": "Celpack",
             "address": "Rua Da Concharinha 256, 4536-907 S.Paio de Oleiros, Portugal",
             "lat": 40.9757657,
             "lng": -8.577239399999999
         },
         {
             "id": "CP_VIGO",
-            "name": "Smurfit Westrock Vigo",
+            "name": "Vigo",
             "address": "Ctra. Coruña-Portugal km 160, 36400 Porriño Pontevedra",
             "lat": 42.13338299999999,
             "lng": -8.6215009

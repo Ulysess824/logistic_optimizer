@@ -12,6 +12,7 @@ Actualmente, el proyecto cuenta con un sistema maduro, empaquetado y altamente v
 2. **Sistema de GPS Real (Compatible con Camiones)**: Integración precisa para recuperar distancias terrestres a través de la moderna **Google Routes API**, permitiendo perfiles de enrutamiento pesado (emisiones, altura, peso máximo). Posee un sistema de respaldo automático que hace estimaciones geográficas si no hay API disponible.
 3. **Smart Data Filtering (Filtros Inteligentes)**: El sistema automáticamente descarta ramificaciones inviables por distancia antes de saturar el motor matemático, asegurando mucha mayor rapidez computacional al descartar clientes que se alejan excesivamente en la ruta de retorno natural.
 4. **Dashboard Interactivo Profesional**: En lugar de simples planillas de texto, el proyecto emite un archivo HTML interactivo (`Presentacion_Logistica.html`) combinando Mapas satelitales (Folium), Grafos relacionales (Plotly), y tablas de KPIs matemáticos que cualquier ejecutivo o supervisor puede entender de un vistazo.
+5. **Simulación Dinámica de Flotas (SimPy)**: Módulo especializado (`src/simulation/`) para prever cuellos de botella reales en los muelles de carga y disponibilidad de conductores. Incorpora la generación de animaciones GIF para previsualizar el comportamiento logístico a lo largo del tiempo.
 
 ---
 
@@ -48,6 +49,14 @@ python main.py
 Al instante, en la consola observarás un **Resumen Analítico (Summary)** que detalla los kilómetros, tiempos estimados por vehículo y especificaciones del camión. Además, en la carpeta `outputs/` se generarán reportes automáticos y un `Presentacion_Logistica.html` que podrás abrir en cualquier navegador web. Te mostrará el esquema de cómo deberían moverse tus camiones, la lista de qué clientes ha juntado en qué rutas de entrega y cuántos **kilómetros de más (o en vacío)** lograste reducir con esta decisión.
 
 También puedes revisar `example_usage.py` para un código minimalista sobre cómo inicializar el motor directamente con parámetros de camiones (Routes API).
+
+### 4. Simulación de Flotas
+Si deseas simular temporalmente las salidas y llegadas de la flota de camiones teniendo en cuenta las limitaciones operativas (muelles y conductores), puedes ejecutar:
+
+```bash
+python ejemplo_simulacion.py
+```
+Esto generará un GIF animado (`outputs/simulacion_logistica_demo.gif`) que muestra los horarios de salida y las posiciones en ruta de los camiones.
 
 ---
 

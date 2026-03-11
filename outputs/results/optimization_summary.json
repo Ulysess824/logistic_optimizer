@@ -1,12 +1,12 @@
 {
   "num_routes": 11,
-  "total_km": 8507.69,
-  "total_empty_km": 1975.01,
-  "distance_source": "Haversine (estimación)",
+  "total_km": 8519.94,
+  "total_empty_km": 4123.56,
+  "distance_source": "GPS Real",
   "parameters": {
     "n_clientes": 1,
     "varias_plantas": false,
-    "max_plantas_ruta": 2
+    "max_plantas_ruta": 1
   },
   "routes": [
     {
@@ -29,24 +29,22 @@
     {
       "route_id": 2,
       "plants": [
-        "Smurfit Westrock Almeria"
+        "Almeria"
       ],
       "plant_ids": [
         "CP_ALMERIA"
       ],
       "num_plants": 1,
-      "num_customers": 1,
-      "customers": [
-        "Guadix"
-      ],
+      "num_customers": 0,
+      "customers": [],
       "distance_km": 333.16,
-      "empty_km": 95.82,
-      "num_stops": 4
+      "empty_km": 166.58,
+      "num_stops": 3
     },
     {
       "route_id": 3,
       "plants": [
-        "Smurfit Westrock Huelva"
+        "Huelva"
       ],
       "plant_ids": [
         "CP_HUELVA"
@@ -54,16 +52,16 @@
       "num_plants": 1,
       "num_customers": 1,
       "customers": [
-        "Santa Cruz (Cordoba)"
+        "Albaida Del Aljarafe"
       ],
-      "distance_km": 501.89,
-      "empty_km": 81.36,
+      "distance_km": 502.06,
+      "empty_km": 217.21,
       "num_stops": 4
     },
     {
       "route_id": 4,
       "plants": [
-        "Smurfit Westrock Alcalá"
+        "Alcalá"
       ],
       "plant_ids": [
         "CP_ALCALA"
@@ -71,16 +69,16 @@
       "num_plants": 1,
       "num_customers": 1,
       "customers": [
-        "Daimiel"
+        "Pinto"
       ],
-      "distance_km": 561.25,
-      "empty_km": 122.15,
+      "distance_km": 571.39,
+      "empty_km": 251.45,
       "num_stops": 4
     },
     {
       "route_id": 5,
       "plants": [
-        "Smurfit Westrock Alicante"
+        "Alicante"
       ],
       "plant_ids": [
         "CP_ALICANTE"
@@ -88,16 +86,16 @@
       "num_plants": 1,
       "num_customers": 1,
       "customers": [
-        "Mogon"
+        "Aspe"
       ],
-      "distance_km": 577.5,
-      "empty_km": 68.3,
+      "distance_km": 577.8,
+      "empty_km": 268.25,
       "num_stops": 4
     },
     {
       "route_id": 6,
       "plants": [
-        "Smurfit Westrock Valencia"
+        "Valencia"
       ],
       "plant_ids": [
         "CP_VALENCIA"
@@ -105,16 +103,16 @@
       "num_plants": 1,
       "num_customers": 1,
       "customers": [
-        "Jabalquinto"
+        "Aldaya"
       ],
-      "distance_km": 668.18,
-      "empty_km": 7.66,
+      "distance_km": 668.33,
+      "empty_km": 333.88,
       "num_stops": 4
     },
     {
       "route_id": 7,
       "plants": [
-        "Smurfit Westrock Burgos"
+        "Burgos"
       ],
       "plant_ids": [
         "CP_BURGOS"
@@ -122,16 +120,16 @@
       "num_plants": 1,
       "num_customers": 1,
       "customers": [
-        "Fuenlabrada"
+        "Burgos"
       ],
-      "distance_km": 975.85,
-      "empty_km": 254.93,
+      "distance_km": 976.17,
+      "empty_km": 484.45,
       "num_stops": 4
     },
     {
       "route_id": 8,
       "plants": [
-        "Smurfit Westrock Celpack"
+        "Celpack"
       ],
       "plant_ids": [
         "CP_CELPACK"
@@ -139,16 +137,16 @@
       "num_plants": 1,
       "num_customers": 1,
       "customers": [
-        "Santiago Del Campo"
+        "Santa Maria Da Feira"
       ],
-      "distance_km": 1055.99,
-      "empty_km": 287.83,
+      "distance_km": 1056.37,
+      "empty_km": 525.25,
       "num_stops": 4
     },
     {
       "route_id": 9,
       "plants": [
-        "Smurfit Westrock Navarra"
+        "Navarra"
       ],
       "plant_ids": [
         "CP_NAVARRA"
@@ -156,16 +154,16 @@
       "num_plants": 1,
       "num_customers": 1,
       "customers": [
-        "Manzanares"
+        "Noain"
       ],
-      "distance_km": 1129.5,
-      "empty_km": 119.2,
+      "distance_km": 1130.1,
+      "empty_km": 562.34,
       "num_stops": 4
     },
     {
       "route_id": 10,
       "plants": [
-        "Smurfit Westrock Vigo"
+        "Vigo"
       ],
       "plant_ids": [
         "CP_VIGO"
@@ -173,16 +171,16 @@
       "num_plants": 1,
       "num_customers": 1,
       "customers": [
-        "Plasencia"
+        "Salceda De Caselas"
       ],
-      "distance_km": 1234.85,
-      "empty_km": 301.84,
+      "distance_km": 1234.86,
+      "empty_km": 612.1,
       "num_stops": 4
     },
     {
       "route_id": 11,
       "plants": [
-        "Smurfit Westrock Canovelles"
+        "Canovelles"
       ],
       "plant_ids": [
         "CP_CANOVELLES"
@@ -190,10 +188,10 @@
       "num_plants": 1,
       "num_customers": 1,
       "customers": [
-        "Roda De Bara"
+        "Barbera Del Valles"
       ],
-      "distance_km": 1316.16,
-      "empty_km": 574.71,
+      "distance_km": 1316.33,
+      "empty_km": 640.87,
       "num_stops": 4
     }
   ]
