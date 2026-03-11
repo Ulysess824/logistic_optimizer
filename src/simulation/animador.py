@@ -142,10 +142,16 @@ class AnimadorLogistico:
         return self.puntos_camiones, self.texto_reloj, self.texto_stats
 
     def generar_gif(self, nombre_archivo='outputs/simulacion_dinamica.gif', fps=10):
-        t_max = self.df['t_retorno_base'].max() if not self.df.empty else 26.0
-        t_max = min(max(t_max, 10.0), 30.0)
-
-        tiempos = np.arange(6.0, t_max + 1.0, 0.2)
+        # Encontrar el tiempo en que el último camión regresa a la base
+        t_max = self.df['t_retorno_base'].max() if not self.df.empty else 24.0
+        
+        # Añadir un margen de 2 horas para que el GIF no se corte justo al llegar
+        t_final = t_max + 2.0
+        
+        # Eliminamos el tope de 30h para permitir rutas de larga distancia (>1000km)
+        # que pueden tardar más de un día en completarse (con descansos y esperas).
+        tiempos = np.arange(6.0, t_final, 0.2)
+        
         ani = animation.FuncAnimation(
             self.fig, self.actualizar, frames=tiempos,
             interval=1000 / fps, blit=True

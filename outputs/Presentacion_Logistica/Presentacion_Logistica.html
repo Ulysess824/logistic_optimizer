@@ -2,482 +2,699 @@
 <html lang="es">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Logístico: MC-VRPB Multi-Planta</title>
-    <!-- Tailwind CSS for styling -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chart.js for visualizations -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f3f4f6;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Logístico: MC-VRPB Multi-Planta</title>
+  <!-- Tailwind CSS for styling -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js for visualizations -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- MathJax for LaTeX -->
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f3f4f6;
+    }
 
-        .card {
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-        }
+    .card {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+    }
 
-        .kpi-value {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #1d4ed8;
-        }
+    .kpi-value {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: #1d4ed8;
+    }
 
-        .kpi-label {
-            font-size: 0.875rem;
-            color: #6b7280;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
+    .kpi-label {
+      font-size: 0.875rem;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
 
-        header {
-            background-color: #1e3a8a;
-            color: white;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
+    header {
+      background-color: #1e3a8a;
+      color: white;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
 
-        .tab-content {
-            display: none;
-        }
+    .tab-content {
+      display: none;
+    }
 
-        .tab-content.active {
-            display: block;
-        }
+    .tab-content.active {
+      display: block;
+    }
 
-        .tab-btn {
-            padding: 10px 20px;
-            font-weight: 600;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-        }
+    .tab-btn {
+      padding: 10px 20px;
+      font-weight: 600;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+    }
 
-        .tab-btn.active {
-            border-bottom: 3px solid #3b82f6;
-            color: #1e3a8a;
-        }
-    </style>
+    .tab-btn.active {
+      border-bottom: 3px solid #3b82f6;
+      color: #1e3a8a;
+    }
+  </style>
 </head>
 
 <body>
 
-    <header class="flex justify-between items-center shadow-md">
-        <div>
-            <h1 class="text-3xl font-bold">Logistics Optimizer</h1>
-            <p class="text-sm mt-1 opacity-80">MC-VRPB con Backhauling Multi-Planta</p>
-        </div>
-        <div>
-            <p class="text-lg font-mono bg-blue-800 px-4 py-2 rounded">v1.2</p>
-        </div>
-    </header>
-    Ahorro
-    <div class="max-w-7xl mx-auto px-4">
-        <!-- Dashboard Tabs -->
-        <div class="flex space-x-4 mb-6 border-b border-gray-300">
-            <button class="tab-btn active text-gray-500" onclick="openTab('resumen')">🚀 Resumen Ejecutivo</button>
-            <button class="tab-btn text-gray-500" onclick="openTab('metodologia')">🧠 Metodología (MC-VRPB)</button>
-            <button class="tab-btn text-gray-500" onclick="openTab('resultados')">📊 Detalles de Rutas</button>
-            <button class="tab-btn text-gray-500" onclick="openTab('mapa')">🗺️ Mapa Lógico Interactivo</button>
-            <button class="tab-btn text-gray-500" onclick="openTab('grafo')">🕸️ Grafo de Red</button>
-        </div>
+  <header class="flex justify-between items-center shadow-md px-8 bg-[#1e3a8a] text-white mb-6">
+    <div class="flex items-center py-4"><img src="https://corrugandodigital.acccsa.org/hubfs/SW_LOGO_2COL.png"
+        alt="Smurfit Logo" class="h-12 mr-6 bg-white p-1 rounded">
+      <div>
+        <h1 class="text-3xl font-bold">Logistics Optimizer</h1>
+        <p class="text-sm mt-1 opacity-80">MC-VRPB con Backhauling Multi-Planta</p>
+      </div>
+    </div>
+    <div>
+      <p class="text-lg font-mono bg-blue-800 px-4 py-2 rounded">v1.2</p>
+    </div>
+  </header>
 
-        <!-- Tab 1: Resumen -->
-        <div id="resumen" class="tab-content active transition-opacity duration-300">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-                <!-- KPIs -->
-                <div class="card text-center border-t-4 border-blue-500">
-                    <p class="kpi-label">Rutas Totales Generadas</p>
-                    <p class="kpi-value">11</p>
-                </div>
-                <div class="card text-center border-t-4 border-green-500">
-                    <p class="kpi-label">Distancia Total (km)</p>
-                    <p class="kpi-value">8,507.69</p>
-                </div>
-                <div class="card text-center border-t-4 border-yellow-500">
-                    <p class="kpi-label">Plantas Visitadas</p>
-                    <p class="kpi-value">11</p>
-                </div>
-                <div class="card text-center border-t-4 border-purple-500">
-                    <p class="kpi-label">Clientes Satisfechos</p>
-                    <p class="kpi-value">11</p>
-                </div>
-                <div class="card text-center border-t-4 border-red-500">
-                    <p class="kpi-label">Ahorro Km Vacíos</p>
-                    <p class="kpi-value" style="color: #ef4444;">~53.6%</p>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 gap-6 mb-6">
-                <div class="card bg-green-50 border border-green-200">
-                    <h2 class="text-xl font-bold mb-2 text-green-900">📉 El Impacto de la Optimización: Kilómetros en
-                        Vacío</h2>
-                    <p class="text-gray-700">
-                        <strong>Antes de la optimización (Operativa Tradicional):</strong> El camión viaja de Mengíbar a
-                        la Planta y regresa vacío. El análisis matemático sobre las permutaciones revela que <strong>el
-                            50% del kilometraje total de la flota</strong> se realiza completamente en vacío,
-                        incurriendo en altos costes operativos.
-                    </p>
-                    <p class="text-gray-700 mt-2">
-                        <strong>Después de la optimización (MC-VRPB):</strong> El camión <em>no regresa vacío</em> desde
-                        la Planta. En su lugar, carga cartón y lo reparte a 4 clientes estratégicamente seleccionados en
-                        ruta. El único <strong>kilómetro vacío</strong> es el tramo final (Último Cliente &rarr;
-                        Mengíbar), reduciendo drásticamente la tasa de retorno ineficiente.
-                    </p>
-
-                    <!-- Tabla de impacto de Km Vacíos -->
-<div class="overflow-x-auto mt-6 mb-2">
-<table class="min-w-full bg-white text-sm border mt-4 rounded-lg shadow">
-<thead class="bg-red-50">
-<tr>
-<th class="py-3 px-4 border-b text-left font-semibold text-red-900 rounded-tl-lg">Ruta / Planta Origen</th>
-<th class="py-3 px-4 border-b text-center font-semibold text-red-900">Km Vacíos (Tradicional)</th>
-<th class="py-3 px-4 border-b text-center font-semibold text-green-900 bg-green-50">Km Vacíos (MC-VRPB)</th>
-<th class="py-3 px-4 border-b text-center font-bold text-blue-900 bg-blue-50">Ahorro Neto (Km)</th>
-<th class="py-3 px-4 border-b text-center font-bold text-blue-900 bg-blue-50 rounded-tr-lg">Mejora (%)</th>
-</tr>
-</thead>
-<tbody class="text-gray-700">
-<tr class="border-b hover:bg-gray-50"><td class="py-2 px-4 font-semibold border-r">Ruta 1 - Córdoba</td><td class="py-2 px-4 text-center text-red-500 font-mono">76.68 km</td><td class="py-2 px-4 text-center text-green-600 font-mono bg-green-50/30">61.19 km</td><td class="py-2 px-4 text-center font-bold text-blue-600 bg-blue-50/30">15.49 km</td><td class="py-2 px-4 text-center font-bold text-blue-600 bg-blue-50/30">20.2%</td></tr>
-<tr class="border-b hover:bg-gray-50"><td class="py-2 px-4 font-semibold border-r">Ruta 2 - Almeria</td><td class="py-2 px-4 text-center text-red-500 font-mono">166.58 km</td><td class="py-2 px-4 text-center text-green-600 font-mono bg-green-50/30">95.82 km</td><td class="py-2 px-4 text-center font-bold text-blue-600 bg-blue-50/30">70.76 km</td><td class="py-2 px-4 text-center font-bold text-blue-600 bg-blue-50/30">42.5%</td></tr>
-<tr class="border-b hover:bg-gray-50"><td class="py-2 px-4 font-semibold border-r">Ruta 3 - Huelva</td><td class="py-2 px-4 text-center text-red-500 font-mono">250.95 km</td><td class="py-2 px-4 text-center text-green-600 font-mono bg-green-50/30">81.36 km</td><td class="py-2 px-4 text-center font-bold text-blue-600 bg-blue-50/30">169.59 km</td><td class="py-2 px-4 text-center font-bold text-blue-600 bg-blue-50/30">67.6%</td></tr>
-<tr class="border-b hover:bg-gray-50"><td class="py-2 px-4 font-semibold border-r">Ruta 4 - Alcalá</td><td class="py-2 px-4 text-center text-red-500 font-mono">280.63 km</td><td class="py-2 px-4 text-center text-green-600 font-mono bg-green-50/30">122.15 km</td><td class="py-2 px-4 text-center font-bold text-blue-600 bg-blue-50/30">158.48 km</td><td class="py-2 px-4 text-center font-bold text-blue-600 bg-blue-50/30">56.5%</td></tr>
-<tr class="border-b hover:bg-gray-50"><td class="py-2 px-4 font-semibold border-r">Ruta 5 - Alicante</td><td class="py-2 px-4 text-center text-red-500 font-mono">288.75 km</td><td class="py-2 px-4 text-center text-green-600 font-mono bg-green-50/30">68.30 km</td><td class="py-2 px-4 text-center font-bold text-blue-600 bg-blue-50/30">220.44 km</td><td class="py-2 px-4 text-center font-bold text-blue-600 bg-blue-50/30">76.3%</td></tr>
-<tr class="border-b hover:bg-gray-50"><td class="py-2 px-4 font-semibold border-r">Ruta 6 - Valencia</td><td class="py-2 px-4 text-center text-red-500 font-mono">334.08 km</td><td class="py-2 px-4 text-center text-green-600 font-mono bg-green-50/30">7.66 km</td><td class="py-2 px-4 text-center font-bold text-blue-600 bg-blue-50/30">326.43 km</td><td class="py-2 px-4 text-center font-bold text-blue-600 bg-blue-50/30">97.7%</td></tr>
-<tr class="border-b hover:bg-gray-50"><td class="py-2 px-4 font-semibold border-r">Ruta 7 - Burgos</td><td class="py-2 px-4 text-center text-red-500 font-mono">487.92 km</td><td class="py-2 px-4 text-center text-green-600 font-mono bg-green-50/30">254.93 km</td><td class="py-2 px-4 text-center font-bold text-blue-600 bg-blue-50/30">232.99 km</td><td class="py-2 px-4 text-center font-bold text-blue-600 bg-blue-50/30">47.8%</td></tr>
-<tr class="border-b hover:bg-gray-50"><td class="py-2 px-4 font-semibold border-r">Ruta 8 - Celpack</td><td class="py-2 px-4 text-center text-red-500 font-mono">527.99 km</td><td class="py-2 px-4 text-center text-green-600 font-mono bg-green-50/30">287.83 km</td><td class="py-2 px-4 text-center font-bold text-blue-600 bg-blue-50/30">240.16 km</td><td class="py-2 px-4 text-center font-bold text-blue-600 bg-blue-50/30">45.5%</td></tr>
-<tr class="border-b hover:bg-gray-50"><td class="py-2 px-4 font-semibold border-r">Ruta 9 - Navarra</td><td class="py-2 px-4 text-center text-red-500 font-mono">564.75 km</td><td class="py-2 px-4 text-center text-green-600 font-mono bg-green-50/30">119.20 km</td><td class="py-2 px-4 text-center font-bold text-blue-600 bg-blue-50/30">445.55 km</td><td class="py-2 px-4 text-center font-bold text-blue-600 bg-blue-50/30">78.9%</td></tr>
-<tr class="border-b hover:bg-gray-50"><td class="py-2 px-4 font-semibold border-r">Ruta 10 - Vigo</td><td class="py-2 px-4 text-center text-red-500 font-mono">617.43 km</td><td class="py-2 px-4 text-center text-green-600 font-mono bg-green-50/30">301.84 km</td><td class="py-2 px-4 text-center font-bold text-blue-600 bg-blue-50/30">315.58 km</td><td class="py-2 px-4 text-center font-bold text-blue-600 bg-blue-50/30">51.1%</td></tr>
-<tr class="border-b hover:bg-gray-50"><td class="py-2 px-4 font-semibold border-r">Ruta 11 - Canovelles</td><td class="py-2 px-4 text-center text-red-500 font-mono">658.08 km</td><td class="py-2 px-4 text-center text-green-600 font-mono bg-green-50/30">574.71 km</td><td class="py-2 px-4 text-center font-bold text-blue-600 bg-blue-50/30">83.36 km</td><td class="py-2 px-4 text-center font-bold text-blue-600 bg-blue-50/30">12.7%</td></tr>
-<tr class="bg-gray-100 border-t-2 border-gray-400">
-<td class="py-3 px-4 font-bold text-right uppercase border-r text-gray-800">Total Flota</td>
-<td class="py-3 px-4 text-center font-bold text-red-600">4253.83 km</td>
-<td class="py-3 px-4 text-center font-bold text-green-600">1975.01 km</td>
-<td class="py-3 px-4 text-center font-extrabold text-blue-700">2278.82 km</td>
-<td class="py-3 px-4 text-center font-extrabold text-blue-700">~53.6%</td>
-</tr>
-</tbody>
-</table>
-</div>
-
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Left Column -->
-                <div class="card">
-                    <h2 class="text-xl font-bold mb-4 border-b pb-2 text-gray-800">El Reto de Negocio</h2>
-                    <ul class="space-y-3 text-gray-700">
-                        <li class="flex"><span class="mr-2">✔️</span> Minimizar kilómetros muertos (vacíos) en el
-                            retorno al depósito de Mengíbar.</li>
-                        <li class="flex"><span class="mr-2">✔️</span> Integrar un ciclo operativo complejo: Depósito ->
-                            Planta/s -> Clientes -> Depósito.</li>
-                        <li class="flex"><span class="mr-2">✔️</span> Entregar resultados rápidos (computación en < 2
-                                minutos vs manual u horas).</li>
-                        <li class="flex"><span class="mr-2">✔️</span> Diseñar rutas respetando límites de plantas y
-                            clientes por camión.</li>
-                    </ul>
-                </div>
-                <!-- Right Column: Chart Placeholder -->
-                <div class="card">
-                    <h2 class="text-xl font-bold mb-4 border-b pb-2 text-gray-800">Carga Operativa por Ruta (km)</h2>
-                    <canvas id="kmChart" width="400" height="200"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <!-- Tab 2: Metodologia -->
-        <div id="metodologia" class="tab-content">
-            <div class="grid grid-cols-1 gap-6 mb-6">
-                <div class="card bg-blue-50">
-                    <h2 class="text-2xl font-bold text-blue-900 mb-2">Arquitectura del Modelo (MC-VRPB)</h2>
-                    <p class="text-gray-700 mb-4">
-                        El proyecto resuelve una variante avanzada del clásico Vehicle Routing Problem (VRP) conocida
-                        como
-                        <strong>VRP with Multi-Commodity Backhauls (MC-VRPB)</strong>.
-                    </p>
-                    <div class="flex justify-between items-center text-center mt-6">
-                        <div class="w-1/4 p-4 bg-white rounded shadow border border-blue-200">
-                            <div class="text-3xl mb-2">🏭</div>
-                            <strong class="text-sm">1. Depósito Origen</strong>
-                            <p class="text-xs text-gray-500 mt-1">Mengíbar (Salen camiones)</p>
-                        </div>
-                        <div class="text-2xl text-blue-400">➡️</div>
-                        <div class="w-1/4 p-4 bg-white rounded shadow border border-blue-200">
-                            <div class="text-3xl mb-2">🏗️</div>
-                            <strong class="text-sm">2. Recogida (Linehaul)</strong>
-                            <p class="text-xs text-gray-500 mt-1">Plantas Cartoneras (Se recoge material)</p>
-                        </div>
-                        <div class="text-2xl text-blue-400">➡️</div>
-                        <div class="w-1/4 p-4 bg-white rounded shadow border border-blue-200">
-                            <div class="text-3xl mb-2">🧑‍🤝‍🧑</div>
-                            <strong class="text-sm">3. Distribución (Backhaul)</strong>
-                            <p class="text-xs text-gray-500 mt-1">Clientes (Se reparte material)</p>
-                        </div>
-                        <div class="text-2xl text-blue-400">➡️</div>
-                        <div class="w-1/4 p-4 bg-white rounded shadow border border-blue-200">
-                            <div class="text-3xl mb-2">🔙</div>
-                            <strong class="text-sm">4. Retorno Eficiente</strong>
-                            <p class="text-xs text-gray-500 mt-1">Vuelta a Mengíbar minimizando desvío</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card mb-6 bg-green-50">
-                <h3 class="font-bold text-xl mb-3 text-green-900">📐 El Modelo Matemático (Explicado de Forma Sencilla)
-                </h3>
-                <p class="text-gray-700 mb-4">El objetivo principal (la <strong>Función Objetivo</strong>) no es otro
-                    que buscar las rutas más cortas posibles, lo cual se traduce matemáticamente en:</p>
-                <div
-                    class="bg-white p-4 rounded text-center border font-mono text-lg mb-4 text-gray-800 shadow-sm overflow-x-auto">
-                    Minimizar: Σ (Distancia entre Nodo i y Nodo j) * Recorrido_ij
-                </div>
-                <p class="text-gray-700 mb-3">Sin embargo, el modelo debe cumplir con <strong>Restricciones Lógicas
-                        Fundamentales</strong> para que el resultado sea aplicable a la vida real y a la industria:</p>
-                <div class="space-y-3">
-                    <div class="bg-white border-l-4 border-yellow-500 p-3 shadow-sm rounded-r">
-                        <h4 class="font-bold text-gray-800 mb-1">1. Restricción de Precedencia (La Lógica Operativa)
-                        </h4>
-                        <p class="text-sm text-gray-600">Representación: <em>T<sub>planta</sub> &lt;
-                                T<sub>cliente</sub></em></p>
-                        <p class="text-sm text-gray-600 mt-1">El modelo obliga matemáticamente a que el momento (T) en
-                            el que el camión entra en la planta cartonera sea estrictamente anterior al momento de la
-                            llegada a los clientes de dicho material. Asegurando así que nunca se intente entregar
-                            material que aún no ha sido recogido.</p>
-                    </div>
-                    <div class="bg-white border-l-4 border-blue-500 p-3 shadow-sm rounded-r">
-                        <h4 class="font-bold text-gray-800 mb-1">2. Filtro de Retorno Eficiente (La Lógica del Ahorro)
-                        </h4>
-                        <p class="text-sm text-gray-600">Representación: <em>[Distancia(Planta &rarr; Cliente) +
-                                Distancia(Cliente &rarr; Depósito)] - Distancia(Planta &rarr; Depósito) &lt;
-                                Umbral_Fijado</em></p>
-                        <p class="text-sm text-gray-600 mt-1">Asegura que el triángulo geográfico que dibuja la ruta al
-                            visitar a un cliente para repartir el cartón no resulta en un "rodeo inasumible" o un exceso
-                            de kilómetros muertos al tener que conducir de vuelta al depósito base en Mengíbar.</p>
-                    </div>
-                    <div class="bg-white border-l-4 border-red-500 p-3 shadow-sm rounded-r">
-                        <h4 class="font-bold text-gray-800 mb-1">3. Restricciones de Capacidad (La Lógica Física)</h4>
-                        <p class="text-sm text-gray-600">Representación: <em>&sum; Clientes_Atendidos &le; N</em></p>
-                        <p class="text-sm text-gray-600 mt-1">Garantiza que la lógica matemática contemple el mundo
-                            físico, forzando que ningún vehículo sobrepase su volumen intentando atender más clientes de
-                            los configurados (en este caso, 4 entregas máximas por viaje).</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="card">
-                    <h3 class="font-bold text-lg mb-3">Parámetros del Optimizador Matemático</h3>
-                    <table class="min-w-full bg-white border">
-                        <thead class="bg-gray-100">
-                            <tr>
-                                <th class="py-2 px-4 border-b text-left text-sm font-semibold text-gray-700">Variable
-                                </th>
-                                <th class="py-2 px-4 border-b text-left text-sm font-semibold text-gray-700">Valor
-                                    Inicial</th>
-                                <th class="py-2 px-4 border-b text-left text-sm font-semibold text-gray-700">Significado
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="py-2 px-4 border-b font-mono text-sm">N_CLIENTES</td>
-                                <td class="py-2 px-4 border-b font-bold text-blue-600">4</td>
-                                <td class="py-2 px-4 border-b text-xs">Máximo clientes por camión</td>
-                            </tr>
-                            <tr>
-                                <td class="py-2 px-4 border-b font-mono text-sm">VARIAS_PLANTAS</td>
-                                <td class="py-2 px-4 border-b font-bold text-blue-600">False</td>
-                                <td class="py-2 px-4 border-b text-xs">Multi-planta habilitado o no</td>
-                            </tr>
-                            <tr>
-                                <td class="py-2 px-4 border-b font-mono text-sm">MAX_PLANTAS_RUTA</td>
-                                <td class="py-2 px-4 border-b font-bold text-blue-600">2</td>
-                                <td class="py-2 px-4 border-b text-xs">Max plantas a visitar si act.</td>
-                            </tr>
-                            <tr>
-                                <td class="py-2 px-4 border-b font-mono text-sm">THRESHOLD_KM</td>
-                                <td class="py-2 px-4 border-b font-bold text-blue-600">100 km</td>
-                                <td class="py-2 px-4 border-b text-xs">Desvío máximo permitido en retorno</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="card">
-                    <h3 class="font-bold text-lg mb-3">Restricciones Modeladas en OR-Tools</h3>
-                    <ul class="list-disc pl-5 space-y-2 text-sm text-gray-700">
-                        <li><strong>Precedencia Estricta:</strong> El camión debe visitar y cargar en las plantas de
-                            cartón <em>antes</em> de dejar material en ningún cliente.</li>
-                        <li><strong>Filtro Vectorial de Retorno:</strong> Algoritmo previo (Haversine) que descarta
-                            clientes cuyo desvío para volver a Mengíbar supera el umbral (THRESHOLD_KM).</li>
-                        <li><strong>Búsqueda:</strong> Implementación usando metaheurísticas (Metaheuristic:
-                            GUIDED_LOCAL_SEARCH) para escapar de óptimos locales en tiempo límite de 90s.</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <!-- Tab 3: Resultados -->
-        <div id="resultados" class="tab-content">
-            <div class="card">
-                <h2 class="text-xl font-bold mb-4 border-b pb-2 text-gray-800">Detalle Operativo de Rutas Optimizadas
-                </h2>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full bg-white text-sm">
-                        <thead class="bg-blue-800 text-white">
-                            <tr>
-                                <th class="py-3 px-4 text-left rounded-tl-lg">ID Ruta</th>
-                                <th class="py-3 px-4 text-left">Planta Cartonera Origen</th>
-                                <th class="py-3 px-4 text-left"># Clientes Atendidos</th>
-                                <th class="py-3 px-4 text-left">Distancia Total (km)</th>
-                                <th class="py-3 px-4 text-left rounded-tr-lg">Nodos / Puntos de Entrega</th>
-                            </tr>
-                        </thead>
-                        <tbody class="text-gray-700">
-                            <tr class="border-b hover:bg-gray-50">
-                                <td class="py-3 px-4 font-bold text-center">1</td>
-                                <td class="py-3 px-4">Córdoba</td>
-                                <td class="py-3 px-4 text-center">4</td>
-                                <td class="py-3 px-4 font-mono">153.56 km</td>
-                                <td class="py-3 px-4 text-xs italic">Alcolea, El Carpio (x2), Arjonilla</td>
-                            </tr>
-                            <tr class="border-b hover:bg-gray-50 bg-gray-50">
-                                <td class="py-3 px-4 font-bold text-center">2</td>
-                                <td class="py-3 px-4">Huelva</td>
-                                <td class="py-3 px-4 text-center">4</td>
-                                <td class="py-3 px-4 font-mono">502.14 km</td>
-                                <td class="py-3 px-4 text-xs italic">San Jose De La Rinconada (x2), Fuente Palmera,
-                                    Santa Cruz</td>
-                            </tr>
-                            <tr class="border-b hover:bg-gray-50">
-                                <td class="py-3 px-4 font-bold text-center">3</td>
-                                <td class="py-3 px-4">Alcalá</td>
-                                <td class="py-3 px-4 text-center">4</td>
-                                <td class="py-3 px-4 font-mono">561.26 km</td>
-                                <td class="py-3 px-4 text-xs italic">Alcala De Henares, Chinchon, Daimiel, Bailen</td>
-                            </tr>
-                            <tr class="border-b hover:bg-gray-50 bg-gray-50">
-                                <td class="py-3 px-4 font-bold text-center">4</td>
-                                <td class="py-3 px-4">Alicante</td>
-                                <td class="py-3 px-4 text-center">4</td>
-                                <td class="py-3 px-4 font-mono">578.65 km</td>
-                                <td class="py-3 px-4 text-xs italic">Mogon (x2), Villacarrillo, Torreperogil</td>
-                            </tr>
-                            <tr class="border-b hover:bg-gray-50">
-                                <td class="py-3 px-4 font-bold text-center">5</td>
-                                <td class="py-3 px-4">Valencia</td>
-                                <td class="py-3 px-4 text-center">4</td>
-                                <td class="py-3 px-4 font-mono">668.52 km</td>
-                                <td class="py-3 px-4 text-xs italic">Aldaya, Castellar De Santisteban, Navas De San
-                                    Juan, Jabalquinto</td>
-                            </tr>
-                            <tr class="border-b hover:bg-gray-50 bg-gray-50">
-                                <td class="py-3 px-4 font-bold text-center">6</td>
-                                <td class="py-3 px-4">Burgos</td>
-                                <td class="py-3 px-4 text-center">4</td>
-                                <td class="py-3 px-4 font-mono">975.87 km</td>
-                                <td class="py-3 px-4 text-xs italic">Gumiel Del Mercado, Leganes, Fuenlabrada, Esquivias
-                                </td>
-                            </tr>
-                            <tr class="border-b hover:bg-gray-50">
-                                <td class="py-3 px-4 font-bold text-center">7</td>
-                                <td class="py-3 px-4">Navarra</td>
-                                <td class="py-3 px-4 text-center">4</td>
-                                <td class="py-3 px-4 font-mono">1129.65 km</td>
-                                <td class="py-3 px-4 text-xs italic">Castilruiz (x2), Manzanares (x2)</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800">
-                <strong>💡 Nota Estratégica:</strong> La variabilidad de distancias (desde 153 km hasta 1316 km) refleja la enorme dispersión geográfica de las plantas origen respecto al depósito y al mercado destino. Las rutas de mayor distancia son susceptibles para estrategias de consolidación de carga.</div>
-        </div>
-
-        <!-- Tab 4: Mapa -->
-        <div id="mapa" class="tab-content h-[700px]">
-            <div class="card h-full flex flex-col">
-                <h2 class="text-xl font-bold mb-4 border-b pb-2 text-gray-800 flex justify-between items-center">
-                    <span>Mapa de Nodos y Rutas</span>
-                    <a href="maps/Logistics_Dashboard.html" target="_blank"
-                        class="text-sm bg-blue-100 text-blue-700 px-3 py-1 rounded hover:bg-blue-200 transition-colors">Abrir
-                        en Pestaña Nueva</a>
-                </h2>
-                <iframe src="maps/Logistics_Dashboard.html" class="w-full flex-grow border-0 rounded"
-                    title="Mapa Interactivo de Rutas"></iframe>
-            </div>
-        </div>
-
-        <!-- Tab 5: Grafo -->
-        <div id="grafo" class="tab-content h-[700px]">
-            <div class="card h-full flex flex-col">
-                <h2 class="text-xl font-bold mb-4 border-b pb-2 text-gray-800 flex justify-between items-center">
-                    <span>Topología de Red Logística</span>
-                    <a href="results/Logistics_Graph.html" target="_blank"
-                        class="text-sm bg-blue-100 text-blue-700 px-3 py-1 rounded hover:bg-blue-200 transition-colors">Abrir
-                        en Pestaña Nueva</a>
-                </h2>
-                <iframe src="results/Logistics_Graph.html" class="w-full flex-grow border-0 rounded"
-                    title="Grafo de Decisión Matemático"></iframe>
-            </div>
-        </div>
-
+  <div class="max-w-7xl mx-auto px-4 pb-12">
+    <!-- Dashboard Tabs -->
+    <div class="flex space-x-4 mb-6 border-b border-gray-300">
+      <button class="tab-btn active text-gray-500" onclick="openTab('resumen')">Resumen Ejecutivo</button>
+      <button class="tab-btn text-gray-500" onclick="openTab('metodologia')">Metodología (MC-VRPB)</button>
+      <button class="tab-btn text-gray-500" onclick="openTab('resultados')">Detalle Operativo</button>
+      <button class="tab-btn text-gray-500" onclick="openTab('mapa')">Mapa Lógico Interactivo</button>
+      <button class="tab-btn text-gray-500" onclick="openTab('grafo')">Grafo de Red</button>
+      <button class="tab-btn text-gray-500" onclick="openTab('simulacion')">Simulación Operativa</button>
     </div>
 
-    <script>
-        // Tab switching logic
-        function openTab(tabName) {
-            let i, tabcontent, tablinks;
-            tabcontent = document.getElementsByClassName("tab-content");
-            for (i = 0; i < tabcontent.length; i++) {
-                tabcontent[i].style.display = "none";
-                tabcontent[i].classList.remove("active");
-            }
-            tablinks = document.getElementsByClassName("tab-btn");
-            for (i = 0; i < tablinks.length; i++) {
-                tablinks[i].classList.remove("active");
-                tablinks[i].classList.replace("text-blue-600", "text-gray-500");
-            }
-            document.getElementById(tabName).style.display = "block";
-            document.getElementById(tabName).classList.add("active");
-            event.currentTarget.classList.add("active");
-            event.currentTarget.classList.replace("text-gray-500", "text-blue-600");
-        }
+    <!-- Tab 1: Resumen -->
+    <div id="resumen" class="tab-content active transition-opacity duration-300">
+      <!-- KPIs -->
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-6">
+        <div class="card text-center border-t-4 border-blue-500">
+          <p class="kpi-label">Rutas Totales Generadas</p>
+          <p class="kpi-value">11</p>
+        </div>
+        <div class="card text-center border-t-4 border-green-500">
+          <p class="kpi-label">Distancia Total (km)</p>
+          <p class="kpi-value">11,042.54 <br><span class="text-[10px] uppercase opacity-60">(GPS Real)</span>
+          </p>
+        </div>
+        <div class="card text-center border-t-4 border-yellow-500">
+          <p class="kpi-label">Plantas Visitadas</p>
+          <p class="kpi-value">11</p>
+        </div>
+        <div class="card text-center border-t-4 border-purple-500">
+          <p class="kpi-label">Clientes Satisfechos</p>
+          <p class="kpi-value">10</p>
+        </div>
+        <div class="card text-center border-t-4 border-red-500">
+          <p class="kpi-label">Ahorro Km Vacíos</p>
+          <p class="kpi-value" style="color: #ef4444;">~3.1%</p>
+        </div>
+      </div>
 
-        // Initialize Chart.js graphic
-        const ctx = document.getElementById('kmChart').getContext('2d');
-        const kmChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ["R1 (C\u00f3rdoba)", "R2 (Almeria)", "R3 (Huelva)", "R4 (Alcal\u00e1)", "R5 (Alicante)", "R6 (Valencia)", "R7 (Burgos)", "R8 (Celpack)", "R9 (Navarra)", "R10 (Vigo)", "R11 (Canovelles)"],
-                datasets: [{
-                    label: 'Distancia (km)',
-                    data: [153.36, 333.16, 501.89, 561.25, 577.5, 668.18, 975.85, 1055.99, 1129.5, 1234.85, 1316.16],
-                    backgroundColor: 'rgba(59, 130, 246, 0.7)',
-                    borderColor: 'rgba(59, 130, 246, 1)',
-                    borderWidth: 1,
-                    borderRadius: 4
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        title: { display: true, text: 'Kilómetros' }
-                    }
-                },
-                plugins: {
-                    legend: { display: false }
-                }
-            }
-        });
-    </script>
+      <!-- Comparativa -->
+      <div class="grid grid-cols-1 gap-6 mb-6">
+        <div class="card bg-white border border-gray-200 shadow-sm">
+          <h2 class="text-xl font-bold mb-2 text-gray-800">Impacto de la Optimización (Antes vs. Después)</h2>
+          <p class="text-[11px] text-blue-600 mb-4 bg-blue-50 inline-block px-2 py-1 rounded">ℹ Las columnas vacías
+            están por
+            considerar la disponibilidad y relevancia de los datos.</p>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left text-gray-600">
+              <thead class="bg-gray-50 text-gray-800 uppercase text-[10px] tracking-wider border-b border-t">
+                <tr>
+                  <th class="px-3 py-3">Ruta (Planta)</th>
+                  <th class="px-3 py-3 text-center">Distancia Total (km)</th>
+                  <th class="px-3 py-3 text-center">Km Vacíos (Tradicional)</th>
+                  <th class="px-3 py-3 text-center text-blue-800">Km Vacíos (MC-VRPB)</th>
+                  <th class="px-3 py-3 text-center font-bold text-green-600">Mejora (%)</th>
+                  <th class="px-3 py-3 text-center text-gray-400">Emisiones CO₂</th>
+                  <th class="px-3 py-3 text-center text-gray-400">Coste (€)</th>
+                  <th class="px-3 py-3 text-center text-gray-400">Flota</th>
+                  <th class="px-3 py-3 text-center text-gray-400">Horas</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-100">
+
+                <tr class="hover:bg-gray-50 border-b">
+                  <td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">Córdoba</td>
+                  <td class="px-3 py-2 text-center font-mono">153.36</td>
+                  <td class="px-3 py-2 text-center font-mono">92.17</td>
+                  <td class="px-3 py-2 text-center font-mono font-bold text-blue-700">61.19</td>
+                  <td class="px-3 py-2 text-center font-bold text-green-600">+33.6%</td>
+                  <td class="px-3 py-2 text-center text-gray-400" title="Por recolectar">-</td>
+                  <td class="px-3 py-2 text-center text-gray-400" title="Por recolectar">-</td>
+                  <td class="px-3 py-2 text-center text-gray-400" title="Por recolectar">-</td>
+                  <td class="px-3 py-2 text-center text-gray-400" title="Por recolectar">-</td>
+                </tr>
+
+                <tr class="hover:bg-gray-50 border-b">
+                  <td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">Almeria</td>
+                  <td class="px-3 py-2 text-center font-mono">333.16</td>
+                  <td class="px-3 py-2 text-center font-mono">166.58</td>
+                  <td class="px-3 py-2 text-center font-mono font-bold text-blue-700">166.58</td>
+                  <td class="px-3 py-2 text-center text-gray-400">-</td>
+                  <td class="px-3 py-2 text-center text-gray-400" title="Por recolectar">-</td>
+                  <td class="px-3 py-2 text-center text-gray-400" title="Por recolectar">-</td>
+                  <td class="px-3 py-2 text-center text-gray-400" title="Por recolectar">-</td>
+                  <td class="px-3 py-2 text-center text-gray-400" title="Por recolectar">-</td>
+                </tr>
+
+                <tr class="hover:bg-gray-50 border-b">
+                  <td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">Huelva</td>
+                  <td class="px-3 py-2 text-center font-mono">502.06</td>
+                  <td class="px-3 py-2 text-center font-mono">284.85</td>
+                  <td class="px-3 py-2 text-center font-mono font-bold text-blue-700">217.21</td>
+                  <td class="px-3 py-2 text-center font-bold text-green-600">+23.7%</td>
+                  <td class="px-3 py-2 text-center text-gray-400" title="Por recolectar">-</td>
+                  <td class="px-3 py-2 text-center text-gray-400" title="Por recolectar">-</td>
+                  <td class="px-3 py-2 text-center text-gray-400" title="Por recolectar">-</td>
+                  <td class="px-3 py-2 text-center text-gray-400" title="Por recolectar">-</td>
+                </tr>
+
+                <tr class="hover:bg-gray-50 border-b">
+                  <td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">Alcalá</td>
+                  <td class="px-3 py-2 text-center font-mono">571.39</td>
+                  <td class="px-3 py-2 text-center font-mono">319.94</td>
+                  <td class="px-3 py-2 text-center font-mono font-bold text-blue-700">251.45</td>
+                  <td class="px-3 py-2 text-center font-bold text-green-600">+21.4%</td>
+                  <td class="px-3 py-2 text-center text-gray-400" title="Por recolectar">-</td>
+                  <td class="px-3 py-2 text-center text-gray-400" title="Por recolectar">-</td>
+                  <td class="px-3 py-2 text-center text-gray-400" title="Por recolectar">-</td>
+                  <td class="px-3 py-2 text-center text-gray-400" title="Por recolectar">-</td>
+                </tr>
+
+                <tr class="hover:bg-gray-50 border-b">
+                  <td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">Alicante</td>
+                  <td class="px-3 py-2 text-center font-mono">577.80</td>
+                  <td class="px-3 py-2 text-center font-mono">309.55</td>
+                  <td class="px-3 py-2 text-center font-mono font-bold text-blue-700">268.25</td>
+                  <td class="px-3 py-2 text-center font-bold text-green-600">+13.3%</td>
+                  <td class="px-3 py-2 text-center text-gray-400" title="Por recolectar">-</td>
+                  <td class="px-3 py-2 text-center text-gray-400" title="Por recolectar">-</td>
+                  <td class="px-3 py-2 text-center text-gray-400" title="Por recolectar">-</td>
+                  <td class="px-3 py-2 text-center text-gray-400" title="Por recolectar">-</td>
+                </tr>
+
+                <tr class="hover:bg-gray-50 border-b">
+                  <td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">Valencia</td>
+                  <td class="px-3 py-2 text-center font-mono">668.33</td>
+                  <td class="px-3 py-2 text-center font-mono">334.45</td>
+                  <td class="px-3 py-2 text-center font-mono font-bold text-blue-700">333.88</td>
+                  <td class="px-3 py-2 text-center font-bold text-green-600">+0.2%</td>
+                  <td class="px-3 py-2 text-center text-gray-400" title="Por recolectar">-</td>
+                  <td class="px-3 py-2 text-center text-gray-400" title="Por recolectar">-</td>
+                  <td class="px-3 py-2 text-center text-gray-400" title="Por recolectar">-</td>
+                  <td class="px-3 py-2 text-center text-gray-400" title="Por recolectar">-</td>
+                </tr>
+
+                <tr class="hover:bg-gray-50 border-b">
+                  <td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">Burgos</td>
+                  <td class="px-3 py-2 text-center font-mono">976.17</td>
+                  <td class="px-3 py-2 text-center font-mono">491.72</td>
+                  <td class="px-3 py-2 text-center font-mono font-bold text-blue-700">484.45</td>
+                  <td class="px-3 py-2 text-center font-bold text-green-600">+1.5%</td>
+                  <td class="px-3 py-2 text-center text-gray-400" title="Por recolectar">-</td>
+                  <td class="px-3 py-2 text-center text-gray-400" title="Por recolectar">-</td>
+                  <td class="px-3 py-2 text-center text-gray-400" title="Por recolectar">-</td>
+                  <td class="px-3 py-2 text-center text-gray-400" title="Por recolectar">-</td>
+                </tr>
+
+                <tr class="hover:bg-gray-50 border-b">
+                  <td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">Celpack</td>
+                  <td class="px-3 py-2 text-center font-mono">1,056.37</td>
+                  <td class="px-3 py-2 text-center font-mono">531.12</td>
+                  <td class="px-3 py-2 text-center font-mono font-bold text-blue-700">525.25</td>
+                  <td class="px-3 py-2 text-center font-bold text-green-600">+1.1%</td>
+                  <td class="px-3 py-2 text-center text-gray-400" title="Por recolectar">-</td>
+                  <td class="px-3 py-2 text-center text-gray-400" title="Por recolectar">-</td>
+                  <td class="px-3 py-2 text-center text-gray-400" title="Por recolectar">-</td>
+                  <td class="px-3 py-2 text-center text-gray-400" title="Por recolectar">-</td>
+                </tr>
+
+                <tr class="hover:bg-gray-50 border-b">
+                  <td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">Navarra</td>
+                  <td class="px-3 py-2 text-center font-mono">1,130.10</td>
+                  <td class="px-3 py-2 text-center font-mono">567.76</td>
+                  <td class="px-3 py-2 text-center font-mono font-bold text-blue-700">562.34</td>
+                  <td class="px-3 py-2 text-center font-bold text-green-600">+1.0%</td>
+                  <td class="px-3 py-2 text-center text-gray-400" title="Por recolectar">-</td>
+                  <td class="px-3 py-2 text-center text-gray-400" title="Por recolectar">-</td>
+                  <td class="px-3 py-2 text-center text-gray-400" title="Por recolectar">-</td>
+                  <td class="px-3 py-2 text-center text-gray-400" title="Por recolectar">-</td>
+                </tr>
+
+                <tr class="hover:bg-gray-50 border-b">
+                  <td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">Vigo</td>
+                  <td class="px-3 py-2 text-center font-mono">1,234.86</td>
+                  <td class="px-3 py-2 text-center font-mono">622.76</td>
+                  <td class="px-3 py-2 text-center font-mono font-bold text-blue-700">612.10</td>
+                  <td class="px-3 py-2 text-center font-bold text-green-600">+1.7%</td>
+                  <td class="px-3 py-2 text-center text-gray-400" title="Por recolectar">-</td>
+                  <td class="px-3 py-2 text-center text-gray-400" title="Por recolectar">-</td>
+                  <td class="px-3 py-2 text-center text-gray-400" title="Por recolectar">-</td>
+                  <td class="px-3 py-2 text-center text-gray-400" title="Por recolectar">-</td>
+                </tr>
+
+                <tr class="hover:bg-gray-50 border-b">
+                  <td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">Canovelles</td>
+                  <td class="px-3 py-2 text-center font-mono">1,316.33</td>
+                  <td class="px-3 py-2 text-center font-mono">675.46</td>
+                  <td class="px-3 py-2 text-center font-mono font-bold text-blue-700">640.87</td>
+                  <td class="px-3 py-2 text-center font-bold text-green-600">+5.1%</td>
+                  <td class="px-3 py-2 text-center text-gray-400" title="Por recolectar">-</td>
+                  <td class="px-3 py-2 text-center text-gray-400" title="Por recolectar">-</td>
+                  <td class="px-3 py-2 text-center text-gray-400" title="Por recolectar">-</td>
+                  <td class="px-3 py-2 text-center text-gray-400" title="Por recolectar">-</td>
+                </tr>
+
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  </div>
+  </div>
+  </div>
+
+  <!-- Reto -->
+  <div class="grid grid-cols-1 gap-6 mt-6">
+    <div class="card">
+      <h2 class="text-xl font-bold mb-4 border-b pb-2 text-gray-800">El Reto de Negocio</h2>
+      <ul class="space-y-3 text-gray-700">
+        <li class="flex"><span class="mr-2 text-green-600">✓</span>Minimizar kilómetros muertos en el
+          retorno al depósito base.</li>
+        <li class="flex"><span class="mr-2 text-green-600">✓</span>Integrar un ciclo operativo
+          complejo: Depósito → Planta → Clientes → Depósito.</li>
+        <li class="flex"><span class="mr-2 text-green-600">✓</span>Garantizar que la carga sea
+          distribuida de forma eficiente y puntual.</li>
+      </ul>
+    </div>
+  </div>
+  </div>
+
+  <!-- Tab 2: Metodología -->
+  <div id="metodologia" class="tab-content transition-opacity duration-300">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+      <!-- Columna Izquierda: Algoritmo de Selección -->
+      <div class="card bg-white border-t-4 border-blue-600">
+        <h2 class="text-2xl font-bold text-blue-900 mb-4">Lógica de Optimización y Flujo</h2>
+        <p class="text-gray-700 mb-4 text-sm">El sistema implementa una arquitectura <b>Dual-Pass</b>, donde se filtra y
+          calcula un universo geográfico complejo y se inyecta en un motor VRP. Todo desarrollado en <b>Python</b>.</p>
+
+        <!-- Diagrama de Flujo Visual -->
+        <div class="bg-gray-50 p-4 rounded-xl border border-gray-100 mb-6 font-sans">
+          <div class="flex flex-col space-y-3">
+            <!-- Paso 1 -->
+            <div class="flex items-center">
+              <div
+                class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold mr-4 shadow">
+                1</div>
+              <div class="flex-1 p-3 bg-white border rounded shadow-sm">
+                <p class="text-xs font-bold text-blue-800 uppercase">Pre-procesamiento (GeoPandas + Haversine)</p>
+                <p class="text-[11px] text-gray-600">Se pre-calcula una matriz densa, seleccionando los nodos más
+                  cercanos a cada cliente en línea recta (<math>
+                    <mi>d</mi>
+                    <mo>=</mo>
+                    <mn>2</mn>
+                    <mi>r</mi>
+                    <mo>&#x2061;</mo>
+                    <mi>arcsin</mi>
+                    <mo>(</mo>
+                    <msqrt>
+                      <mrow>
+                        <msup>
+                          <mi>sin</mi>
+                          <mn>2</mn>
+                        </msup>
+                        <mo>(</mo>
+                        <mfrac>
+                          <mrow>
+                            <mi>Δ</mi>
+                            <mi>φ</mi>
+                          </mrow>
+                          <mn>2</mn>
+                        </mfrac>
+                        <mo>)</mo>
+                        <mo>+</mo>
+                        <mi>cos</mi>
+                        <mo>&#x2061;</mo>
+                        <msub>
+                          <mi>φ</mi>
+                          <mn>1</mn>
+                        </msub>
+                        <mo>·</mo>
+                        <mi>cos</mi>
+                        <mo>&#x2061;</mo>
+                        <msub>
+                          <mi>φ</mi>
+                          <mn>2</mn>
+                        </msub>
+                        <mo>·</mo>
+                        <msup>
+                          <mi>sin</mi>
+                          <mn>2</mn>
+                        </msup>
+                        <mo>(</mo>
+                        <mfrac>
+                          <mrow>
+                            <mi>Δ</mi>
+                            <mi>λ</mi>
+                          </mrow>
+                          <mn>2</mn>
+                        </mfrac>
+                        <mo>)</mo>
+                      </mrow>
+                    </msqrt>
+                    <mo>)</mo>
+                  </math>).</p>
+              </div>
+            </div>
+            <div class="ml-4 h-4 border-l-2 border-dashed border-blue-200"></div>
+            <!-- Paso 2 -->
+            <div class="flex items-center">
+              <div
+                class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold mr-4 shadow">
+                2</div>
+              <div class="flex-1 p-3 bg-white border rounded shadow-sm">
+                <p class="text-xs font-bold text-blue-800 uppercase">Enrutamiento Real (Google Maps API)</p>
+                <p class="text-[11px] text-gray-600">Se validan las rutas factibles usando la red de carreteras real,
+                  tomando en cuenta restricciones de peso y gálibo del camión.</p>
+              </div>
+            </div>
+            <div class="ml-4 h-4 border-l-2 border-dashed border-blue-200"></div>
+            <!-- Paso 3 -->
+            <div class="flex items-center">
+              <div
+                class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold mr-4 shadow">
+                3</div>
+              <div class="flex-1 p-3 bg-white border rounded shadow-sm bg-blue-50 border-blue-100">
+                <p class="text-xs font-bold text-blue-800 uppercase">Resolución VRP (Google OR-Tools)</p>
+                <p class="text-[11px] text-gray-600">Búsqueda Local Guiada. Minimiza la función objetivo penalizando el
+                  kilometraje vacío: <br><i>Coste(i, j) = Distancia(i, j) + Penalización(Backhaul)</i></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Columna Derecha: Motor VRP y Matemáticas -->
+      <div class="card bg-gray-50 border-t-4 border-emerald-500 shadow-md">
+        <h2 class="text-xl font-bold text-gray-800 mb-6">Software y Modelado VRP</h2>
+        <div class="space-y-4">
+          <div class="p-4 bg-white rounded border border-gray-100 shadow-sm">
+            <p class="text-xs uppercase text-gray-500 font-bold mb-2">Stack Tecnológico</p>
+            <ul class="text-[12px] text-gray-700 list-disc pl-5 space-y-1">
+              <li><b>Google OR-Tools:</b> Solver de optimización combinatoria avanzado.</li>
+              <li><b>NetworkX & Folium:</b> Visualización de grafo de red lógica y mapas web interactivos.</li>
+              <li><b>SimPy & Matplotlib:</b> Simulación de eventos discretos para flotas y cuellos de botella (muelles).
+              </li>
+              <li><b>Pandas & Numpy:</b> Profiling de datos masivos y cálculo numérico rápido.</li>
+            </ul>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div class="p-4 bg-white rounded-lg border border-gray-100 text-center shadow-inner">
+              <p class="text-[10px] text-gray-500 uppercase mb-1">Función Objetivo</p>
+              <p class="text-sm font-serif italic text-emerald-700">min Z = ΣΣ c<sub>ij</sub> x<sub>ij</sub></p>
+            </div>
+            <div class="p-4 bg-white rounded-lg border border-gray-100 text-center shadow-inner">
+              <p class="text-[10px] text-gray-500 uppercase mb-1">Restricciones Camión</p>
+              <p class="text-sm font-serif italic text-blue-700">Σ x<sub>ij</sub> = 1 ∀ i</p>
+            </div>
+          </div>
+
+          <div class="bg-blue-900 p-4 rounded-lg text-white mt-4">
+            <p class="text-xs font-bold uppercase opacity-60 mb-2 italic">Lógica de Backhauling</p>
+            <p class="text-xs leading-relaxed">Cada ruta sale del Depot hacia una <b>Planta de Cartón</b> (Linehaul),
+              luego hace entregas a los <b>Clientes</b> correspondientes, y finaliza regresando al <b>Depot</b> de
+              Mengíbar. Google OR-Tools penaliza los kilómetros del último tramo (Cliente → Depot) para minimizarlos
+              intencionalmente.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Tab 3: Resultados -->
+  <div id="resultados" class="tab-content transition-opacity duration-300">
+    <div class="card">
+      <h2 class="text-xl font-bold mb-4 border-b pb-2 text-gray-800">Detalle Operativo</h2>
+      <div class="overflow-x-auto">
+        <table class="min-w-full bg-white text-sm">
+          <thead class="bg-blue-800 text-white">
+            <tr>
+              <th class="py-3 px-4 text-left rounded-tl-lg">Ruta</th>
+              <th class="py-3 px-4 text-left">Planta</th>
+              <th class="py-3 px-4 text-center">Clientes</th>
+              <th class="py-3 px-4 text-center">Distancia</th>
+              <th class="py-3 px-4 text-left rounded-tr-lg">Itinerario</th>
+            </tr>
+          </thead>
+          <tbody id="routes-tbody" class="text-gray-700 divide-y divide-gray-200">
+            <tr class="border-b hover:bg-gray-50">
+              <td class="py-3 px-4 font-bold text-center">1</td>
+              <td class="py-3 px-4">Córdoba</td>
+              <td class="py-3 px-4 text-center">1</td>
+              <td class="py-3 px-4 font-mono">153.36 km</td>
+              <td class="py-3 px-4 text-xs italic">El Carpio</td>
+            </tr>
+            <tr class="border-b hover:bg-gray-50 bg-gray-50">
+              <td class="py-3 px-4 font-bold text-center">2</td>
+              <td class="py-3 px-4">Almeria</td>
+              <td class="py-3 px-4 text-center">0</td>
+              <td class="py-3 px-4 font-mono">333.16 km</td>
+              <td class="py-3 px-4 text-xs italic"></td>
+            </tr>
+            <tr class="border-b hover:bg-gray-50">
+              <td class="py-3 px-4 font-bold text-center">3</td>
+              <td class="py-3 px-4">Huelva</td>
+              <td class="py-3 px-4 text-center">1</td>
+              <td class="py-3 px-4 font-mono">502.06 km</td>
+              <td class="py-3 px-4 text-xs italic">Albaida Del Aljarafe</td>
+            </tr>
+            <tr class="border-b hover:bg-gray-50 bg-gray-50">
+              <td class="py-3 px-4 font-bold text-center">4</td>
+              <td class="py-3 px-4">Alcalá</td>
+              <td class="py-3 px-4 text-center">1</td>
+              <td class="py-3 px-4 font-mono">571.39 km</td>
+              <td class="py-3 px-4 text-xs italic">Pinto</td>
+            </tr>
+            <tr class="border-b hover:bg-gray-50">
+              <td class="py-3 px-4 font-bold text-center">5</td>
+              <td class="py-3 px-4">Alicante</td>
+              <td class="py-3 px-4 text-center">1</td>
+              <td class="py-3 px-4 font-mono">577.80 km</td>
+              <td class="py-3 px-4 text-xs italic">Aspe</td>
+            </tr>
+            <tr class="border-b hover:bg-gray-50 bg-gray-50">
+              <td class="py-3 px-4 font-bold text-center">6</td>
+              <td class="py-3 px-4">Valencia</td>
+              <td class="py-3 px-4 text-center">1</td>
+              <td class="py-3 px-4 font-mono">668.33 km</td>
+              <td class="py-3 px-4 text-xs italic">Aldaya</td>
+            </tr>
+            <tr class="border-b hover:bg-gray-50">
+              <td class="py-3 px-4 font-bold text-center">7</td>
+              <td class="py-3 px-4">Burgos</td>
+              <td class="py-3 px-4 text-center">1</td>
+              <td class="py-3 px-4 font-mono">976.17 km</td>
+              <td class="py-3 px-4 text-xs italic">Burgos</td>
+            </tr>
+            <tr class="border-b hover:bg-gray-50 bg-gray-50">
+              <td class="py-3 px-4 font-bold text-center">8</td>
+              <td class="py-3 px-4">Celpack</td>
+              <td class="py-3 px-4 text-center">1</td>
+              <td class="py-3 px-4 font-mono">1,056.37 km</td>
+              <td class="py-3 px-4 text-xs italic">Santa Maria Da Feira</td>
+            </tr>
+            <tr class="border-b hover:bg-gray-50">
+              <td class="py-3 px-4 font-bold text-center">9</td>
+              <td class="py-3 px-4">Navarra</td>
+              <td class="py-3 px-4 text-center">1</td>
+              <td class="py-3 px-4 font-mono">1,130.10 km</td>
+              <td class="py-3 px-4 text-xs italic">Noain</td>
+            </tr>
+            <tr class="border-b hover:bg-gray-50 bg-gray-50">
+              <td class="py-3 px-4 font-bold text-center">10</td>
+              <td class="py-3 px-4">Vigo</td>
+              <td class="py-3 px-4 text-center">1</td>
+              <td class="py-3 px-4 font-mono">1,234.86 km</td>
+              <td class="py-3 px-4 text-xs italic">Salceda De Caselas</td>
+            </tr>
+            <tr class="border-b hover:bg-gray-50">
+              <td class="py-3 px-4 font-bold text-center">11</td>
+              <td class="py-3 px-4">Canovelles</td>
+              <td class="py-3 px-4 text-center">1</td>
+              <td class="py-3 px-4 font-mono">1,316.33 km</td>
+              <td class="py-3 px-4 text-xs italic">Barbera Del Valles</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab 4: Mapa -->
+  <div id="mapa" class="tab-content h-[700px] transition-opacity duration-300">
+    <iframe src="maps/Logistics_Dashboard.html" class="w-full h-full border-0 rounded shadow-sm"></iframe>
+  </div>
+
+  <!-- Tab 5: Grafo -->
+  <div id="grafo" class="tab-content h-[700px] transition-opacity duration-300">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 h-full">
+      <div class="h-full border rounded shadow-sm relative">
+        <span
+          class="absolute top-2 left-2 bg-white/80 px-2 py-1 text-[10px] font-bold text-gray-400 z-10 rounded">COMPLEJIDAD
+          GLOBAL (SIN FILTRAR)</span>
+        <iframe src="results/Logistics_Global_Complexity.html" class="w-full h-full border-0"></iframe>
+      </div>
+      <div class="h-full border rounded shadow-sm relative">
+        <span class="absolute top-2 left-2 bg-white/80 px-2 py-1 text-[10px] font-bold text-blue-600 z-10 rounded">GRAFO
+          OPTIMIZADO (VRP)</span>
+        <iframe src="results/Logistics_Graph.html" class="w-full h-full border-0"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab 6: Simulacion -->
+  <div id="simulacion" class="tab-content transition-opacity duration-300">
+    <div class="card mb-6 border-t-4 border-purple-600">
+      <h2 class="text-2xl font-bold text-purple-900 mb-4">Simulación de Flota Diaria</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Left Col: Animation & Parameters -->
+        <div class="md:col-span-2 flex flex-col space-y-4">
+          <div class="border rounded-lg shadow-sm bg-white overflow-hidden p-2">
+            <img src="simulacion_rutas_optimizadas.gif" alt="Animación Simulación Flotas" class="w-full h-auto rounded">
+          </div>
+
+          <div class="grid grid-cols-3 gap-4">
+            <div class="bg-gray-50 p-3 rounded border text-center">
+              <p class="text-[10px] font-bold text-gray-500 uppercase">Muelles de Carga</p>
+              <p class="text-xl font-bold text-purple-700">2</p>
+            </div>
+            <div class="bg-gray-50 p-3 rounded border text-center">
+              <p class="text-[10px] font-bold text-gray-500 uppercase">Tiempo Carga Base</p>
+              <p class="text-xl font-bold text-purple-700">30 min</p>
+            </div>
+            <div class="bg-gray-50 p-3 rounded border text-center">
+              <p class="text-[10px] font-bold text-gray-500 uppercase">Velocidad Promedio</p>
+              <p class="text-xl font-bold text-purple-700">80 km/h</p>
+            </div>
+          </div>
+
+          <div class="bg-yellow-50 border border-yellow-200 p-3 rounded text-sm text-yellow-800 flex items-start">
+            <span class="mr-2 mt-0.5">🚀</span>
+            <div>
+              <strong>Mejora Futura:</strong> En próximas versiones se integrará un <em>parámetro de tráfico
+                dinámico</em> usando datos en tiempo real de API, permitiendo ajustar los tiempos de viaje según la
+              franja horaria (hora punta vs valle).
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Col: Table Data -->
+        <div class="card border border-gray-100 shadow-sm bg-white relative">
+          <h3 class="font-bold text-gray-800 mb-2 border-b pb-2">Distribución Diaria (Ejemplo)</h3>
+          <p class="text-xs text-gray-500 mb-4">Volumen típico de envíos extraído (promedio), que dicta la flota inicial
+            en el simulador:</p>
+          <div class="overflow-x-auto text-sm">
+            <table class="w-full text-left text-gray-700 divide-y divide-gray-200">
+              <thead>
+                <tr class="bg-gray-50">
+                  <th class="py-2 px-3 font-bold">Planta</th>
+                  <th class="py-2 px-3 font-bold text-center">Camiones/Día</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-100">
+                <tr>
+                  <td class="py-2 px-3">Celpack</td>
+                  <td class="py-2 px-3 text-center">3</td>
+                </tr>
+                <tr class="bg-gray-50">
+                  <td class="py-2 px-3">Alcalá</td>
+                  <td class="py-2 px-3 text-center">4</td>
+                </tr>
+                <tr>
+                  <td class="py-2 px-3">Alicante</td>
+                  <td class="py-2 px-3 text-center">5</td>
+                </tr>
+                <tr class="bg-gray-50">
+                  <td class="py-2 px-3">Almeria</td>
+                  <td class="py-2 px-3 text-center">5</td>
+                </tr>
+                <tr>
+                  <td class="py-2 px-3">Burgos</td>
+                  <td class="py-2 px-3 text-center">4</td>
+                </tr>
+                <tr class="bg-gray-50">
+                  <td class="py-2 px-3">Canovelles</td>
+                  <td class="py-2 px-3 text-center">2</td>
+                </tr>
+                <tr>
+                  <td class="py-2 px-3">Córdoba</td>
+                  <td class="py-2 px-3 text-center">3</td>
+                </tr>
+                <tr class="bg-gray-50">
+                  <td class="py-2 px-3">Navarra</td>
+                  <td class="py-2 px-3 text-center">2</td>
+                </tr>
+                <tr>
+                  <td class="py-2 px-3">Huelva</td>
+                  <td class="py-2 px-3 text-center">5</td>
+                </tr>
+                <tr class="bg-gray-50">
+                  <td class="py-2 px-3">Valencia</td>
+                  <td class="py-2 px-3 text-center">3</td>
+                </tr>
+                <tr>
+                  <td class="py-2 px-3 border-t border-gray-300">Vigo</td>
+                  <td class="py-2 px-3 text-center border-t border-gray-300">2</td>
+                </tr>
+                <tr class="bg-blue-50 text-blue-900">
+                  <td class="py-2 px-3 font-bold border-t border-blue-200">Total Flota</td>
+                  <td class="py-2 px-3 font-bold text-center border-t border-blue-200">38</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="mt-4 pt-2 border-t text-center">
+            <p class="text-[10px] text-gray-400 font-mono">Fuente: data/n_camiones_a_plantas_diarios.xlsx</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <script>
+    function openTab(tabName) {
+      let i, tabcontent, tablinks;
+      tabcontent = document.getElementsByClassName("tab-content");
+      for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+        tabcontent[i].classList.remove("active");
+      }
+      tablinks = document.getElementsByClassName("tab-btn");
+      for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].classList.remove("active");
+        tablinks[i].classList.replace("text-blue-600", "text-gray-500");
+      }
+      document.getElementById(tabName).style.display = "block";
+      document.getElementById(tabName).classList.add("active");
+      event.currentTarget.classList.add("active");
+      event.currentTarget.classList.replace("text-gray-500", "text-blue-600");
+    }
+  </script>
 </body>
 
 </html>
