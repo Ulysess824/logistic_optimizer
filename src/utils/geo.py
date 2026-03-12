@@ -3,6 +3,7 @@ import googlemaps
 import numpy as np
 import requests
 from src.config import GOOGLE_MAPS_API_KEY
+from src.utils.geo_cache import GeoCache
 
 logger = logging.getLogger(__name__)
 
@@ -15,6 +16,7 @@ class GeoUtils:
         self.gmaps = None
         self.api_type = api_type
         self.truck_specs = {}  # Para Routes API
+        self.cache = GeoCache()
         
         if GOOGLE_MAPS_API_KEY:
             # Cliente clásico de Directions / Distance Matrix API
@@ -87,12 +89,36 @@ class GeoUtils:
         num_nodes = len(nodes)
         matrix = np.zeros((num_nodes, num_nodes))
         
-        if not GOOGLE_MAPS_API_KEY:
-            logger.warning("Falta GOOGLE_MAPS_API_KEY para Routes API. Usando Haversine.")
-            return self._fallback_haversine_matrix(nodes)
+        # 1. Intentar llenar lo máximo posible desde caché
+        missing_pairs = []
+        for i in range(num_nodes):
+            for j in range(num_nodes):
+                if i == j:
+                    matrix[i][j] = 0
+                    continue
+                cached = self.cache.get_route(
+                    (nodes[i]['lat'], nodes[i]['lng']),
+                    (nodes[j]['lat'], nodes[j]['lng']),
+                    truck_specs=self.truck_specs
+                )
+                if cached:
+                    matrix[i][j] = cached['distance_meters']
+                else:
+                    missing_pairs.append((i, j))
 
-        logger.info("Obteniendo distancias reales de Google Routes API (matriz)...")
-        # Routes API permite hasta 100 elementos por matriz general
+        if not missing_pairs:
+            logger.info("Matriz de distancias recuperada íntegramente de la caché.")
+            return matrix, True
+
+        if not GOOGLE_MAPS_API_KEY:
+            logger.warning("Falta GOOGLE_MAPS_API_KEY para Routes API. Usando Haversine para pares faltantes.")
+            for i, j in missing_pairs:
+                matrix[i][j] = self.haversine_distance(nodes[i], nodes[j])
+            return matrix, False
+
+        logger.info("Obteniendo %d pares faltantes de Google Routes API...", len(missing_pairs))
+        # Para simplificar, si faltan pares, relanzamos la matriz completa o por lotes como estaba.
+        # (Routes API es eficiente en matrices). En el futuro se podría optimizar para pedir solo los missing.
         
         url = "https://routes.googleapis.com/distanceMatrix/v2:computeRouteMatrix"
         headers = {
@@ -103,6 +129,8 @@ class GeoUtils:
         
         try:
             origins_full = [{"waypoint": {"location": {"latLng": {"latitude": n['lat'], "longitude": n['lng']}}}} for n in nodes]
+            destinations_full = [{"waypoint": {"location": {"latLng": {"latitude": n['lat'], "longitude": n['lng']}}}} for n in nodes]
+
             
             # Sanitizar payload de camiones
             valid_vehicle_info = {}
@@ -148,7 +176,14 @@ class GeoUtils:
                             if has_error:
                                  matrix[o_idx][d_idx] = self.haversine_distance(nodes[o_idx], nodes[d_idx])
                             else:
-                                matrix[o_idx][d_idx] = dist if dist is not None else self.haversine_distance(nodes[o_idx], nodes[d_idx])
+                                val = dist if dist is not None else self.haversine_distance(nodes[o_idx], nodes[d_idx])
+                                matrix[o_idx][d_idx] = val
+                                # Guardar en caché
+                                self.cache.store_route(
+                                    (nodes[o_idx]['lat'], nodes[o_idx]['lng']),
+                                    (nodes[d_idx]['lat'], nodes[d_idx]['lng']),
+                                    val, duration=0, truck_specs=self.truck_specs
+                                )
                     else:
                         if response.status_code in [403, 401] or "bill" in response.text.lower() or "not enabled" in response.text.lower():
                             logger.warning("Google Maps Billing/Auth/API no activo (Routes API). Usando Haversine.")
@@ -223,10 +258,22 @@ class GeoUtils:
         """Obtiene la geometría de la carretera entre dos puntos basándose en la API configurada."""
         if GeoUtils._api_disabled or not GOOGLE_MAPS_API_KEY:
             return None
+        
+        # Check cache
+        cached = self.cache.get_polyline(start_coords, end_coords, truck_specs=self.truck_specs)
+        if cached:
+            return cached
             
         if self.api_type == "routes_api":
-            return self._get_route_polyline_routes_api(start_coords, end_coords)
-        return self._get_route_polyline_google_maps(start_coords, end_coords)
+            res = self._get_route_polyline_routes_api(start_coords, end_coords)
+        else:
+            res = self._get_route_polyline_google_maps(start_coords, end_coords)
+        
+        # Store in cache
+        if res and res != "BILLING_ERROR":
+            self.cache.store_polyline(start_coords, end_coords, res, truck_specs=self.truck_specs)
+        
+        return res
         
     def _get_route_polyline_routes_api(self, start_coords, end_coords):
         """Obtiene polyline usando Routes API."""

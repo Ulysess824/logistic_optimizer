@@ -12,10 +12,18 @@ import pandas as pd
 sys.path.append(os.path.join(os.getcwd(), 'src'))
 
 from simulation import TruckSimulated, AnimadorLogistico
+from utils.geo import GeoUtils
 
 # --- Archivos de entrada ---
 RUTAS_JSON   = os.path.join('outputs', 'results', 'optimized_routes.json')
 CAMIONES_XLS = os.path.join('data', 'n_camiones_a_plantas_diarios.xlsx')
+
+# Especificaciones de Camión (Sincronizado con main.py para acertar en la caché)
+TRUCK_SPECS = {
+    "emissionType": "DIESEL",
+    "heightCm": 400,
+    "weightKg": 40_000,
+}
 
 # Mapeo de nombres del Excel → nombres en el JSON de rutas
 ALIAS_PLANTAS = {
@@ -93,25 +101,36 @@ def main():
     camiones_por_ruta = []
     total_camiones = 0
     for i, (ruta, planta) in enumerate(zip(rutas, nombres_planta)):
-        n = camiones_dict.get(planta, 1)
+        # Normalizar el nombre quitando 'Smurfit Westrock ' si existe
+        nombre_corto = planta.replace("Smurfit Westrock ", "").strip() if planta else ""
+        n = camiones_dict.get(nombre_corto, 1)
         camiones_por_ruta.append(n)
         total_camiones += n
         destinos = [p["name"] for p in ruta]
-        print(f"   Ruta {i+1} ({planta}): {n} camiones → {' → '.join(destinos)}")
+        print(f"   Ruta {i+1} ({nombre_corto}): {n} camiones → {' → '.join(destinos)}")
 
     print(f"\n   Total camiones a simular: {total_camiones}")
 
     # 3. Ejecutar simulación
-    print("\n⚙ Ejecutando simulación...")
+    print("\n⚙ Ejecutando simulación con rutas REALES (carretera)...")
+    
+    # Inicializamos GeoUtils para que el simulador pueda consultar polilíneas reales
+    geo_utils = GeoUtils(api_type="routes_api")
+    geo_utils.set_truck_specs(**TRUCK_SPECS)
+
     simulador = TruckSimulated(
         origen=origen,
         rutas=rutas,
         num_muelles=2,              # Cuello de botella real: solo 2 muelles de carga
         num_conductores=total_camiones,
         velocidad_kmh=80,
+        inicio_operacion_h = 6.5,
         camiones_por_ruta=camiones_por_ruta,
-        tiempo_carga_h = 0.5)
-    df_resultados = simulador.ejecutar()
+        tiempo_carga_h = (0.66 + 0.5), # 40 min de carga de bobinas + 30 min de atado de bobinas
+        geo_utils=geo_utils) # Inyectamos GeoUtils para carreteras reales
+        
+    df_resultados = simulador.ejecutar(desfase_hora=0.4)
+
 
     # 4. Resumen
     print(f"\n📊 Simulación completada: {len(df_resultados)} viajes registrados")

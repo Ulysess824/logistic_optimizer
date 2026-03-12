@@ -21,23 +21,25 @@ El código sigue una arquitectura modular en Python 3.12:
 ```text
 logistics_optimizer/
 │
-├── main.py                          # Punto de entrada y orquestador. Define parámetros (ej. N_CLIENTES)
+├── main.py                          # Punto de entrada y orquestador. Define parámetros (ej. MANDATORY_CUSTOMERS)
+├── refresh_dashboard.py               # Utilidad para actualizar el HTML sin re-ejecutar el solver.
+├── ejemplo_simulacion.py              # Script para ejecutar la simulación de flota y generar el GIF.
 ├── src/                             # Código fuente principal
-│   ├── config.py                    # Variables de entorno y rutas (RESULTS_DIR, DATA_DIR, etc.)
+│   ├── config.py                    # Variables de entorno y rutas.
 │   ├── engine/
-│   │   └── solver.py                # Contiene LogisticsSolver. Usa Google OR-Tools para el cálculo.
+│   │   └── solver.py                # Contiene LogisticsSolver (OR-Tools).
 │   ├── simulation/
-│   │   ├── camion.py                # Clase TruckSimulated (SimPy) para simular la flota de camiones.
-│   │   ├── animador.py              # Clase AnimadorLogistico para generación de GIFs desde un DataFrame.
-│   │   └── __init__.py              # Módulo independiente para simulación.
+│   │   ├── camion.py                # Clase TruckSimulated (SimPy). Usa duraciones reales de la caché.
+│   │   ├── animador.py              # Clase AnimadorLogistico (GIFs). Soporta polilíneas de carretera.
+│   │   └── __init__.py
 │   └── utils/
-│       ├── data_manager.py          # DataManager: Pre-filtra qué clientes son viables mediante umbrales (Haversine).
-│       ├── geo.py                   # Lógica de cálculo de distancias (API de Google Maps real o Haversine).
-│       ├── visualizer.py            # Generación de mapas interactivos con Folium y grafos con Plotly.
-│       └── report_generator.py      # Plantillas Jinja/HTML para empaquetar resultados en un Dashboard final.
+│       ├── data_manager.py          # DataManager: Soporta 'Mandatory Customers'.
+│       ├── geo.py                   # Google Routes API v2 + GeoCache (SQLite).
+│       ├── visualizer.py            # Mapas (Folium) y Grafos (Plotly).
+│       └── report_generator.py      # Generación dinámica del Dashboard interactivo.
 │
-├── data/                            # Directorio de entradas (JSON).
-└── outputs/                         # Rutas exportadas (JSON, Dashboards HTML).
+├── data/                            # Directorio de entradas (JSON, Excel, DB Cache).
+└── outputs/                         # Resultados, Mapas, y GIFs.
 ```
 
 ## 3. Guía para Expandir Funcionalidades (Para IA)
@@ -45,19 +47,21 @@ logistics_optimizer/
 Si recibes la orden de agregar nuevas funciones, sigue estas pautas:
 
 - **Cambio de Lógica o Restricciones del VRP:** Las reglas de ruteo y penalizaciones van en `src/engine/solver.py`.
-- **Preprocesamiento o Filtros de Datos:** Las modificaciones previas al paso del solver van en `src/utils/data_manager.py`.
-- **Nuevas Métricas o APIs Geoespaciales:** Se deben agregar en `src/utils/geo.py` o dentro del método `_build_summary` en `main.py`.
-- **Nuevos Gráficos:** Agrega los métodos en `src/utils/visualizer.py` y asegúrate de renderizarlos en `report_generator.py`.
+- **Preprocesamiento o Filtros de Datos:** `src/utils/data_manager.py`. Aquí se gestiona el filtrado Haversine inicial y la lógica de clientes obligatorios.
+- **Geolocalización y Caché:** `src/utils/geo.py` maneja las peticiones a Google. La persistencia de rutas (distancia, duración, polilíneas) está en `data/geo_cache.db` vía `geo_cache.py`.
+- **Dashboard:** Se actualiza mediante `report_generator.py`. Las rutas para las tablas provienen de `outputs/results/optimized_routes.json`.
 - **Reglas del Usuario (IMPORTANTE):** 
   - *No modifiques archivos sin autorización explícita* (excepto run_command o si te fue pedido concretamente).
   - *IMPORTANTE:* Cada vez que se modifique una **clase o método**, debes entregar un script de ejemplo o explicación clara de cómo usarlo al usuario. 
   - Si el usuario te pregunta por qué no funciona el código o te hace una pregunta del código, NO modifiques nada, solo explica.
   - Si en el desarrollo de una nueva funcionalidad ocurre un bug(s) debes darle en una tabla resumen al usuario que pasó, por qué y como se solucionó.
+
 ## 4. Dependencias Principales
-- `ortools` (Google OR-Tools para optimización combinatorial).
+- `ortools` (Optimización combinatorial).
 - `folium` (Mapas interactivos).
-- `plotly` (Grafos y reportes visuales).
-- `pandas` y `numpy` (Tratamiento de datos).
+- `simpy` (Simulación de eventos discretos).
+- `googlemaps` (Geocoding y Routing clásico).
+- `polars` (Procesamiento de datos de alto rendimiento en DataManager).
 
 ## 5. Estado Actual (Marzo 2026)
-El modelo cuenta con la capacidad de usar tiempos y distancias reales (Google Maps API) con fallback a Haversine. Además, el pipeline genera automáticamente un archivo HTML (`outputs/Presentacion_Logistica.html`) interactivo, altamente visual y con una sección metodológica que muestra el rigor matemático.
+El sistema es SOTA (State of the Art) en logística de backhauling. Utiliza **Google Routes API v2** con perfiles de camión pesados y una caché persistente en SQLite para optimizar costos. La simulación de flota es fiel a la realidad, utilizando tiempos de tráfico históricos y trazados de carretera reales cuando están disponibles en la caché.

@@ -120,9 +120,10 @@ def generate_dashboard(summary_path, routes_path, output_path):
 
     # --- 3a. KPIs ---
     def _replace_kpi(html_text, label_re, new_value):
+        # El valor puede contener tags como <br> o <span>, por lo que usamos .*? en modo DOTALL
         pat = re.compile(
             rf'(<p\s+class="kpi-label">{label_re}</p>\s*'
-            rf'<p\s+class="kpi-value"[^>]*>)[^<]+(</p>)',
+            rf'<p\s+class="kpi-value"[^>]*>).*?(</p>)',
             re.IGNORECASE | re.DOTALL)
         return pat.sub(rf'\g<1>{new_value}\g<2>', html_text)
 

@@ -54,7 +54,7 @@ class DataManager:
     # ------------------------------------------------------------------
     # Selección inteligente de clientes (Filtro de Retorno)
     # ------------------------------------------------------------------
-    def get_optimized_locations(self, max_customers_per_plant=None, threshold_km=None, max_radius_km=None):
+    def get_optimized_locations(self, max_customers_per_plant=None, threshold_km=None, max_radius_km=None, mandatory_customers=None):
         """
         Selecciona clientes mediante doble filtro:
         1. Filtro local (Haversine): Clientes dentro de max_radius_km.
@@ -64,6 +64,7 @@ class DataManager:
         max_customers_per_plant = max_customers_per_plant or DEFAULT_MAX_CUSTOMERS
         threshold_km = threshold_km or DEFAULT_THRESHOLD_KM
         max_radius_km = max_radius_km or 1000  # Default grande si no se especifica
+        mandatory_customers = mandatory_customers or {}
 
         logger.info("Procesando clientes de %s (Radio Max: %skm)...", self.clients_file.name, max_radius_km)
 
@@ -98,12 +99,31 @@ class DataManager:
             df_temp = df_clients.with_columns(pl.Series("hav_dist", dist_haversine))
             
             # Cogemos candidatos a < max_radius_km, y un máximo absoluto inicial (ej. 150) para no saturar Routes API
-            pre_candidates = (
-                df_temp.filter(pl.col("hav_dist") <= max_radius_km)
-                .sort("hav_dist")
-                .head(150)
-                .to_dicts()
-            )
+            df_candidates = df_temp.filter(pl.col("hav_dist") <= max_radius_km).sort("hav_dist").head(150)
+            
+            # --- MEJORA: Asegurar que los obligatorios se incluyan incluso si están lejos ---
+            # Normalizamos el nombre de la planta para el matching (ej: Smurfit Westrock Almería -> Almería)
+            p_name_norm = plant['name'].replace("Smurfit Westrock ", "").strip()
+            mandatory_for_plant = []
+            if mandatory_customers:
+                # Soporte para String (un solo cliente) o List (varios clientes)
+                m_custs = mandatory_customers.get(p_name_norm, [])
+                mandatory_for_plant = [m_custs] if isinstance(m_custs, str) else m_custs
+
+            if mandatory_for_plant:
+                # Buscamos clientes obligatorios en el dataframe original (sin filtrar por distancia todavía)
+                # Matching más robusto e insensible a mayúsculas/minúsculas
+                try:
+                    m_names_lower = [m.strip().lower() for m in mandatory_for_plant]
+                    df_mandatory = df_temp.filter(
+                        pl.col("name").str.strip_chars().str.to_lowercase().is_in(m_names_lower)
+                    )
+                    if not df_mandatory.is_empty():
+                        df_candidates = pl.concat([df_candidates, df_mandatory]).unique(subset=["lat", "lng"])
+                except Exception as e:
+                    logger.warning("Error filtrando obligatorios para %s: %s", plant['name'], e)
+            
+            pre_candidates = df_candidates.to_dicts()
             
             if not pre_candidates:
                 logger.warning("Ningún cliente local a menos de %skm para %s", max_radius_km, plant['name'])
@@ -123,27 +143,51 @@ class DataManager:
             
             real_dist_PM = matrix[0][1] / 1000.0  # Planta -> Mengíbar
             
+            mandatory_for_plant = mandatory_customers.get(p_name_norm, []) if mandatory_customers else []
             qualified_customers = []
+            
             # Validamos los clientes (índices en la matriz del 2 en adelante)
             for idx, cand in enumerate(pre_candidates, start=2):
                 real_dist_PC = matrix[0][idx] / 1000.0  # Planta -> Cliente
                 real_dist_CM = matrix[idx][1] / 1000.0  # Cliente -> Mengíbar
+                detour = (real_dist_PC + real_dist_CM) - real_dist_PM
                 
-                # Check estricto: ¿La distancia REAL está dentro del radio que pidió el usuario?
+                is_mandatory = False
+                if mandatory_for_plant:
+                    # Matching más robusto (ignora mayúsculas/minúsculas y espacios)
+                    c_name_clean = cand['name'].strip().lower()
+                    m_names_clean = [m.strip().lower() for m in mandatory_for_plant]
+                    is_mandatory = c_name_clean in m_names_clean
+                
+                # --- EXCEPCIÓN VIP: Si es obligatorio, se salta los filtros de Radio y Desvío ---
+                if is_mandatory:
+                    cand['detour'] = detour
+                    cand['real_dist_km'] = real_dist_PC
+                    cand['obligatorio'] = True
+                    qualified_customers.append(cand)
+                    continue
+
+                # Check estricto para clientes normales
                 if real_dist_PC > max_radius_km:
                     continue
                     
-                detour = (real_dist_PC + real_dist_CM) - real_dist_PM
-                
                 if detour <= threshold_km:
                     cand['detour'] = detour
                     cand['real_dist_km'] = real_dist_PC
+                    cand['obligatorio'] = False
                     qualified_customers.append(cand)
                     
             # --- FASE 3: Selección Final ---
-            # Ordenamos por menor desvío y nos quedamos los top N
-            qualified_customers.sort(key=lambda x: x['detour'])
-            eligible_customers = qualified_customers[:max_customers_per_plant]
+            # Aseguramos que los clientes obligatorios sí o sí entren en la lista (al principio)
+            mandatories = [c for c in qualified_customers if c.get('obligatorio')]
+            optionals = [c for c in qualified_customers if not c.get('obligatorio')]
+            
+            # Ordenamos los opcionales por menor desvío
+            optionals.sort(key=lambda x: x['detour'])
+            
+            # Juntamos respetando el límite por planta. Los obligatorios tienen prioridad.
+            combined = mandatories + optionals
+            eligible_customers = combined[:max_customers_per_plant]
 
             new_plant = plant.copy()
             new_plant["customers"] = eligible_customers

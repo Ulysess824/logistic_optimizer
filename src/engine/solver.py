@@ -152,10 +152,11 @@ class LogisticsSolver:
 
         # === RESTRICCIONES ===
 
-        # R1: Cada vehículo debe visitar al menos 1 planta (y como máximo max_plantas_ruta)
-        for v in range(num_vehicles):
-            routing.solver().Add(plant_dim.CumulVar(routing.End(v)) >= 1)
-            # El límite superior ya está impuesto por la dimensión (max=max_plantas_ruta)
+        # R1: Eliminamos la restricción de que cada vehículo deba visitar al menos 1 planta.
+        # Ya que las plantas son obligatorias (R2 abajo), se visitarán igual. 
+        # Esto evita fallos si el solver prefiere usar menos vehículos o si la lógica de precedencia se complica.
+        # for v in range(num_vehicles):
+        #     routing.solver().Add(plant_dim.CumulVar(routing.End(v)) >= 1)
 
         # R2: Todas las plantas son obligatorias
         for p_idx in plant_indices:
@@ -165,32 +166,41 @@ class LogisticsSolver:
         # R3: Clientes — vinculación a su planta padre + precedencia
         for c_idx in customer_indices:
             c_node = manager.NodeToIndex(c_idx)
-
-            # Penalización por no visitar al cliente (permite que el solver lo descarte
-            # si no cabe en n_clientes, pero le sale caro)
-            routing.AddDisjunction([c_node], 1_000_000)
-
-            # Vincular cliente al mismo vehículo que su planta padre
             node = self.nodes[c_idx]
+
+            # Buscar la planta padre
             parent_id = node.get('parent_cp')
             p_idx = next((i for i, n in enumerate(self.nodes) if n['id'] == parent_id), None)
+            p_node = manager.NodeToIndex(p_idx) if p_idx is not None else None
 
-            if p_idx is not None:
-                p_node = manager.NodeToIndex(p_idx)
-                # Mismo vehículo
-                routing.solver().Add(
-                    routing.ActiveVar(c_node)
-                    * (routing.VehicleVar(c_node) - routing.VehicleVar(p_node)) == 0
-                )
-                # Precedencia: planta padre antes que su cliente
-                routing.solver().Add(
-                    dist_dim.CumulVar(p_node) < dist_dim.CumulVar(c_node)
-                )
+            if node.get('obligatorio', False):
+                logger.info("Cliente OBLIGATORIO detectado en Solver: %s (vía planta %s)", node['name'], node.get('parent_cp'))
+                # Forzar visita
+                routing.solver().Add(routing.ActiveVar(c_node) == 1)
+                
+                # Forzar mismo vehículo que la planta padre e ir después de ella
+                if p_node is not None:
+                    routing.solver().Add(routing.VehicleVar(c_node) == routing.VehicleVar(p_node))
+                    routing.solver().Add(dist_dim.CumulVar(p_node) < dist_dim.CumulVar(c_node))
+            else:
+                # Si es opcional, vinculamos el vehículo solo si el cliente está activo
+                routing.AddDisjunction([c_node], 1_000_000)
+                if p_node is not None:
+                    # Si el cliente está activo, debe estar en el mismo vehículo que la planta
+                    # (ActiveVar(C) == 1) => (VehicleVar(C) == VehicleVar(P))
+                    routing.solver().Add(
+                        routing.ActiveVar(c_node).Var() <= (routing.VehicleVar(c_node) == routing.VehicleVar(p_node))
+                    )
+                    # Si el cliente está activo, debe ir después de la planta
+                    routing.solver().Add(
+                        routing.ActiveVar(c_node).Var() <= (dist_dim.CumulVar(p_node) < dist_dim.CumulVar(c_node))
+                    )
 
         # === BÚSQUEDA ===
         search_params = pywrapcp.DefaultRoutingSearchParameters()
+        # SAVINGS suele ser más robusto para encontrar una primera solución en VRPB
         search_params.first_solution_strategy = (
-            routing_enums_pb2.FirstSolutionStrategy.PARALLEL_CHEAPEST_INSERTION
+            routing_enums_pb2.FirstSolutionStrategy.SAVINGS
         )
         
         algo_map = {

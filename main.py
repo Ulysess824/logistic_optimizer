@@ -14,20 +14,29 @@ logger = logging.getLogger(__name__)
 # ======================================================================
 # 🔧 PARÁMETROS DE EJECUCIÓN — Modifica estos valores para configurar
 # ======================================================================
-N_CLIENTES = 1              # Máximo de clientes por ruta
+N_CLIENTES = 2              # Máximo de clientes por ruta
 VARIAS_PLANTAS = False      # True → permite recoger en >1 planta por ruta (MC-VRPB)
 MAX_PLANTAS_RUTA = 1        # Plantas máximas por ruta (solo si VARIAS_PLANTAS=True)
-MAX_CUSTOMERS_PER_PLANT = 4 # Clientes pre-seleccionados por planta (filtro DataManager)
+MAX_CUSTOMERS_PER_PLANT = 10 # Clientes pre-seleccionados por planta (filtro DataManager)
 THRESHOLD_KM = 100          # Umbral de desvío para filtro de retorno (km)
-MAX_RADIUS_KM = 50          # Radio máximo (km por carretera) desde la planta hacia el cliente
+MAX_RADIUS_KM = 100          # Aumentamos el radio para asegurar que Ciudad Real entre
 
 
 # Especificaciones de Camión (Tráiler estándar para bobinas de papel)
 TRUCK_SPECS = {
     "emissionType": "DIESEL",
     "heightCm": 400,        # Altura máxima: 4.0 metros
-    "weightKg": 40_000,      # Peso Máximo Autorizado: 40 toneladas
+    "weightKg": 40_000,     # Peso Máximo Autorizado: 40 toneladas
+    # --- POSIBLES FUTURAS IMPLEMENTACIONES PARA API DE RUTAS ---
+    # "trafficModel": "BEST_GUESS", # Considerar el tráfico real según hora de salida.
+    # "avoidTolls": True,           # Priorizar rutas sin peaje para reducir costes.
 }
+
+# Diccionario de clientes que es OBLIGATORIO visitar para cada planta.
+# Acepta tanto clientes que esten o no seleccionados previamente por el filtro kilométrico.
+# Formato: {"Nombre_Corto_Planta": ["Nombre_Del_Municipio_Cliente"]}
+# Ejemplo: {"Córdoba": ["El Carpio", "Montilla"]}
+# MANDATORY_CUSTOMERS = {"Alcalá": ["Ciudad Real"]}
 # ======================================================================
 
 
@@ -52,7 +61,7 @@ def run_optimization():
 
     # Inicializar Motor Geográfico
     from src.utils.geo import GeoUtils
-    geo_engine = GeoUtils(api_type="haversine")
+    geo_engine = GeoUtils(api_type="routes_api")
     geo_engine.set_truck_specs(**TRUCK_SPECS)
 
     # 3. Selección Inteligente de Clientes (Filtros Radio/Retorno via API)
@@ -65,8 +74,14 @@ def run_optimization():
     enriched_data = dm.get_optimized_locations(
         max_customers_per_plant=MAX_CUSTOMERS_PER_PLANT,
         threshold_km=THRESHOLD_KM,
-        max_radius_km=MAX_RADIUS_KM
+        max_radius_km=MAX_RADIUS_KM,
+        # mandatory_customers=MANDATORY_CUSTOMERS
     )
+
+    # Debug: Mostrar candidatos por planta
+    for plant in enriched_data['carton_plants']:
+        cust_list = [f"{c['name']} (OBL)" if c.get('obligatorio') else c['name'] for c in plant['customers']]
+        logger.info(f"Candidatos para {plant['name']}: {cust_list}")
 
     # 4. Resolver VRP
     solver = LogisticsSolver(enriched_data, geo_engine=geo_engine)

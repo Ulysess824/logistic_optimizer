@@ -10,12 +10,21 @@ venv/
 
 # Raw data (large files, not needed at runtime)
 data/raw/
+*.db
 
-# Generated outputs (re-generated on each run)
-# (User requested to upload these to GitHub)
+# Temporary and log files
+temp_*
+debug_*
+google_out.txt
+nb_out.txt
+err.txt
+out_table.html
+table_rendered.html
+logs/*.log
+
+# Generated outputs
 # outputs/results/*.json
 # outputs/results/*.png
-logs/*.log
 
 # VS Code / IDE
 .vscode/

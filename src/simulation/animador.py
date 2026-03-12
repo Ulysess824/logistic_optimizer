@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import numpy as np
 import pandas as pd
+import polyline
 
 
 class AnimadorLogistico:
@@ -12,6 +13,20 @@ class AnimadorLogistico:
         """
         self.df = df_resultados
         self.origen = origen
+
+        # Pre-decodificar polilíneas para optimizar la animación
+        for _, row in self.df.iterrows():
+            for tramo in row['tramos']:
+                if tramo.get('polyline'):
+                    try:
+                        # La API de Google devuelve (lat, lng), convertimos a (lon, lat) para matplotlib
+                        pts = polyline.decode(tramo['polyline'])
+                        tramo['decoded_path'] = [(p[1], p[0]) for p in pts]
+                    except Exception:
+                        tramo['decoded_path'] = None
+                else:
+                    tramo['decoded_path'] = None
+
         self.fig, self.ax = plt.subplots(figsize=(12, 9))
 
         # Mapa Iberia
@@ -106,8 +121,17 @@ class AnimadorLogistico:
                     duracion_viaje = tramo['t_llegada'] - t_anterior
                     prog = (t - t_anterior) / duracion_viaje if duracion_viaje > 0 else 1.0
 
-                    x_pos = tramo['lon_origen'] + (tramo['lon_destino'] - tramo['lon_origen']) * prog
-                    y_pos = tramo['lat_origen'] + (tramo['lat_destino'] - tramo['lat_origen']) * prog
+                    path = tramo.get('decoded_path')
+                    if path:
+                        # Si tenemos polilínea real, calculamos el punto según el progreso temporal
+                        # Asumimos velocidad constante sobre los puntos de la polilínea por simplicidad
+                        idx = int(prog * (len(path) - 1))
+                        x_pos, y_pos = path[idx]
+                    else:
+                        # Fallback a línea recta
+                        x_pos = tramo['lon_origen'] + (tramo['lon_destino'] - tramo['lon_origen']) * prog
+                        y_pos = tramo['lat_origen'] + (tramo['lat_destino'] - tramo['lat_origen']) * prog
+                    
                     x.append(x_pos)
                     y.append(y_pos)
                     break

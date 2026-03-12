@@ -4,21 +4,23 @@ import random
 from math import radians, cos, sin, asin, sqrt
 
 class TruckSimulated:
-    def __init__(self, origen, rutas, num_muelles=2, num_conductores=30,
-                 velocidad_kmh=80, tiempo_carga_h=0.5, camiones_por_ruta=None):
+    def __init__(self, origen, rutas, num_muelles=2, num_conductores=30, inicio_operacion_h = 6.5,
+                 velocidad_kmh=80, tiempo_carga_h=0.5, camiones_por_ruta=None, geo_utils=None):
         """
         origen: dict con {'lat', 'lng', 'name'}
         rutas: lista de rutas. Cada ruta es una lista de nodos (dict con 'lat','lng','name','type').
         camiones_por_ruta: lista de enteros que indica cuántos camiones asignar a cada ruta.
                            Si es None, se asigna 1 camión por ruta.
+        geo_utils: Instancia de GeoUtils para obtener distancias y polilíneas reales.
         """
         self.origen = origen
         self.rutas = rutas
         self.velocidad_kmh = velocidad_kmh
         self.tiempo_carga_h = tiempo_carga_h
         self.camiones_por_ruta = camiones_por_ruta
+        self.geo_utils = geo_utils
 
-        self.env = simpy.Environment(initial_time=6.0)
+        self.env = simpy.Environment(initial_time=inicio_operacion_h)
         self.muelles = simpy.Resource(self.env, capacity=num_muelles)
         self.conductores = simpy.Resource(self.env, capacity=num_conductores)
         self.log_viajes = []
@@ -57,11 +59,25 @@ class TruckSimulated:
             ubi_actual = self.origen
 
             for parada in paradas:
-                dist = self.haversine(
-                    ubi_actual["lng"], ubi_actual["lat"],
-                    parada["lng"], parada["lat"]
-                )
-                yield self.env.timeout((dist * 1.3) / self.velocidad_kmh)
+                # Intentar obtener duración real (segundos) de la cache
+                polyline = None
+                duration_h = None
+                if self.geo_utils:
+                    start = (ubi_actual["lat"], ubi_actual["lng"])
+                    end = (parada["lat"], parada["lng"])
+                    res = self.geo_utils.cache.get_route(start, end)
+                    if res:
+                        dist = res["distance_meters"] / 1000.0
+                        duration_h = res["duration_seconds"] / 3600.0
+                        polyline = res.get("polyline")
+                    else:
+                        dist = self.haversine(ubi_actual["lng"], ubi_actual["lat"], parada["lng"], parada["lat"]) * 1.3
+                else:
+                    dist = self.haversine(ubi_actual["lng"], ubi_actual["lat"], parada["lng"], parada["lat"]) * 1.3
+
+                # Tiempo de viaje: Real de Google o estimado por velocidad fija
+                t_viaje = duration_h if duration_h is not None else (dist / self.velocidad_kmh)
+                yield self.env.timeout(t_viaje)
                 t_llegada = self.env.now
 
                 yield self.env.timeout(self.tiempo_carga_h)
@@ -71,24 +87,38 @@ class TruckSimulated:
                     "nombre": parada["name"], "tipo": parada["type"],
                     "lon_origen": ubi_actual["lng"], "lat_origen": ubi_actual["lat"],
                     "lon_destino": parada["lng"], "lat_destino": parada["lat"],
-                    "t_llegada": t_llegada, "t_salida": t_salida
+                    "t_llegada": t_llegada, "t_salida": t_salida,
+                    "polyline": polyline
                 })
 
                 ubi_actual = parada
 
-            # Retorno al Origen
-            dist_retorno = self.haversine(
-                ubi_actual["lng"], ubi_actual["lat"],
-                self.origen["lng"], self.origen["lat"]
-            )
-            yield self.env.timeout((dist_retorno * 1.3) / self.velocidad_kmh)
+            # --- RETORNO AL ORIGEN ---
+            polyline_ret = None
+            duration_ret_h = None
+            if self.geo_utils:
+                start = (ubi_actual["lat"], ubi_actual["lng"])
+                end = (self.origen["lat"], self.origen["lng"])
+                res = self.geo_utils.cache.get_route(start, end)
+                if res:
+                    duration_ret_h = res["duration_seconds"] / 3600.0
+                    polyline_ret = res.get("polyline")
+                else:
+                    dist_retorno = self.haversine(ubi_actual["lng"], ubi_actual["lat"], self.origen["lng"], self.origen["lat"]) * 1.3
+                    duration_ret_h = (dist_retorno / self.velocidad_kmh)
+            else:
+                dist_retorno = self.haversine(ubi_actual["lng"], ubi_actual["lat"], self.origen["lng"], self.origen["lat"]) * 1.3
+                duration_ret_h = (dist_retorno / self.velocidad_kmh)
+
+            yield self.env.timeout(duration_ret_h)
             t_retorno_base = self.env.now
 
             tramos.append({
                 "nombre": "Retorno", "tipo": "retorno",
                 "lon_origen": ubi_actual["lng"], "lat_origen": ubi_actual["lat"],
                 "lon_destino": self.origen["lng"], "lat_destino": self.origen["lat"],
-                "t_llegada": t_retorno_base, "t_salida": t_retorno_base
+                "t_llegada": t_retorno_base, "t_salida": t_retorno_base,
+                "polyline": polyline_ret
             })
 
             self.log_viajes.append({
@@ -99,10 +129,10 @@ class TruckSimulated:
                 "tramos": tramos
             })
 
-    def ejecutar(self):
+    def ejecutar(self, desfase_hora=0.4):
         """
         Lanza los procesos de cada camión.
-        Todos los camiones llegan al depot al inicio del día (con pequeño jitter).
+        Todos los camiones llegan al depot al inicio del día (con un desfase aleatorio).
         Los Resources de SimPy (muelles, conductores) generan los cuellos de
         botella reales: solo N camiones pueden cargar a la vez.
         """
@@ -114,12 +144,12 @@ class TruckSimulated:
                 n = self.camiones_por_ruta[ruta_i] if ruta_i < len(self.camiones_por_ruta) else 1
                 for j in range(n):
                     camion_idx += 1
-                    # Pequeño jitter aleatorio (0-5 min) para que no lleguen exactamente a la vez
-                    jitter = random.uniform(0, 5 / 60)
+                    # Desfase aleatorio para distribuir llegadas y simular variabilidad
+                    jitter = random.uniform(0, desfase_hora)
                     todas_las_tareas.append((f"TRK-{camion_idx}", ruta, jitter))
         else:
             for i, ruta in enumerate(self.rutas):
-                jitter = random.uniform(0, 5 / 60)
+                jitter = random.uniform(0, desfase_hora)
                 todas_las_tareas.append((f"TRK-{i + 1}", ruta, jitter))
 
         # Mezclar el orden de llegada para que no siempre vayan en orden de ruta
