@@ -8,7 +8,7 @@ Bienvenido a **Logistics Optimizer**, un sistema avanzado en Python diseñado pa
 
 Actualmente, el proyecto cuenta con un sistema maduro, empaquetado y altamente visual que automatiza los procesos complejos de la cadena de suministro. Esto es lo que se ha logrado construir:
 
-1. **Motor de VRP Avanzado**: Usamos Google OR-Tools para calcular las mejores combinaciones posibles en escenarios complejos que involucran un origen principal (Ej. papelera central), nodos productivos (Ej. fábricas de procesado del cartón) y nodos finales (clientes). Incluye la capacidad de previsualizar los resultados numéricos rápidamente con el método `.summary()` (estilo `statsmodels`).
+1. **Motor de VRP de Alta Resiliencia**: Usamos Google OR-Tools con una arquitectura de **Restricciones Blandas (Disjunctions)**. Esto permite que el sistema maneje clientes obligatorios en escenarios geográficamente extremos sin fallar ni detenerse, priorizando siempre la viabilidad del negocio y la convergencia global de la flota.
 2. **Sistema de GPS Real (Compatible con Camiones)**: Integración precisa para recuperar distancias terrestres a través de la moderna **Google Routes API**, permitiendo perfiles de enrutamiento pesado (emisiones, altura, peso máximo). Posee un sistema de respaldo automático que hace estimaciones geográficas si no hay API disponible.
 3. **Smart Data Filtering (Filtros Inteligentes)**: El sistema automáticamente descarta ramificaciones inviables por distancia antes de saturar el motor matemático, asegurando mucha mayor rapidez computacional al descartar clientes que se alejan excesivamente en la ruta de retorno natural.
 4. **Dashboard Interactivo Profesional**: En lugar de simples planillas de texto, el proyecto emite un archivo HTML interactivo (`Presentacion_Logistica.html`) combinando Mapas satelitales (Folium), Grafos relacionales (Plotly), y tablas de KPIs matemáticos. Incluye un logo corporativo y una estética premium optimizada para presentaciones ejecutivas.
@@ -36,11 +36,12 @@ Ajusta las constantes en la parte superior:
 - `MANDATORY_CUSTOMERS`: (Opcional) Fuerza visitas a clientes específicos para plantas seleccionadas, ignorando filtros de distancia si es necesario.
 - `TRUCK_SPECS`: Define peso, altura y emisiones para que el cálculo de Google sea apto para vehículos pesados.
 
-### 3. Ejecuta el Motor
-Lanza el orquestador para generar los resultados y el reporte inicial:
+### 3. Ejecución One-Click
+El orquestador principal ahora coordina automáticamente todas las fases (Optimización + Simulación + Reporte):
 ```bash
 python main.py
 ```
+*Este comando genera las rutas, crea la animación GIF de la flota y actualiza el Dashboard final.*
 
 ### 4. Sincroniza el Dashboard o la Simulación
 Si solo deseas actualizar el diseño del HTML o volver a simular la flota con los resultados ya existentes (sin gastar créditos de API de nuevo):

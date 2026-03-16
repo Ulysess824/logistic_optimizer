@@ -67,32 +67,32 @@ class LogisticsSolver:
     # ------------------------------------------------------------------
     # Solver principal
     # ------------------------------------------------------------------
-    def solve(self, *, n_clientes=None, varias_plantas=False, max_plantas_ruta=None, metaheuristic='GUIDED_LOCAL_SEARCH'):
+    def solve(self, *, n_clientes=None, varias_plantas=False, max_plantas_ruta=None, 
+              metaheuristic='GUIDED_LOCAL_SEARCH', max_search_time=None):
         """Ejecuta el optimizador VRP.
 
         Args:
             n_clientes:      Nº máximo de clientes por ruta (None → DEFAULT_N_CLIENTES).
             varias_plantas:  Permitir que un vehículo visite >1 planta de cartón.
-            max_plantas_ruta: Plantas máximas por ruta si varias_plantas=True
-                              (None → DEFAULT_MAX_PLANTS_PER_ROUTE; ignorado si
-                               varias_plantas=False).
-            metaheuristic:   Algoritmo a usar (por defecto: 'GUIDED_LOCAL_SEARCH').
-                             Opciones comunes: 'GUIDED_LOCAL_SEARCH', 'SIMULATED_ANNEALING', 'TABU_SEARCH'.
+            max_plantas_ruta: Plantas máximas por ruta si varias_plantas=True.
+            metaheuristic:   Algoritmo a usar.
+            max_search_time: Tiempo máximo de búsqueda.
         """
         n_clientes = n_clientes or DEFAULT_N_CLIENTES
+        max_search_time = max_search_time or MAX_SEARCH_TIME
+
         if varias_plantas:
             max_plantas_ruta = max_plantas_ruta or DEFAULT_MAX_PLANTS_PER_ROUTE
-            # Asegurar que el default sea al menos 2 si se activa multi-planta
             if max_plantas_ruta < 2:
                 max_plantas_ruta = 2
         else:
-            max_plantas_ruta = 1  # VRPB clásico
+            max_plantas_ruta = 1
             
         self._last_solve_args = {
             "n_clientes": n_clientes,
             "varias_plantas": varias_plantas,
             "max_plantas_ruta": max_plantas_ruta,
-            "metaheuristic": metaheuristic
+            "metaheuristic": metaheuristic,
         }
 
         plant_indices = [i for i, n in enumerate(self.nodes) if n['type'] == 'carton_plant']
@@ -105,13 +105,13 @@ class LogisticsSolver:
         dist_matrix = self.distance_matrix.astype(int).tolist()
         num_plants = len(plant_indices)
 
-        # Nº de vehículos: con multi-planta necesitamos menos camiones
-        num_vehicles = (
-            math.ceil(num_plants / max_plantas_ruta)
-            if varias_plantas
-            else num_plants
-        )
+        num_vehicles = num_plants + 2
         depot_idx = 0
+
+        logger.info("Nodos parseados para optimizar: %d", len(self.nodes))
+        for i, n in enumerate(self.nodes):
+            if n['type'] == 'carton_plant':
+                logger.info(f"  [PLANTA] idx={i} id={n['id']} name={n['name']}")
 
         logger.info(
             "Modo: %s | max_plantas_ruta=%d | n_clientes=%d | vehículos=%d",
@@ -130,7 +130,7 @@ class LogisticsSolver:
 
         transit_cb = routing.RegisterTransitCallback(distance_callback)
         routing.SetArcCostEvaluatorOfAllVehicles(transit_cb)
-        routing.AddDimension(transit_cb, 0, DIST_LIMIT, True, 'Distance')
+        routing.AddDimension(transit_cb, 0, 8_000_000, True, 'Distance') # Limite amplio: 8000km
         dist_dim = routing.GetDimensionOrDie('Distance')
 
         # === DIMENSIÓN 2: Contador de Plantas por vehículo ===
@@ -151,78 +151,56 @@ class LogisticsSolver:
         routing.AddDimension(cust_cb, 0, n_clientes, True, 'CustomerCount')
 
         # === RESTRICCIONES ===
-
-        # R1: Eliminamos la restricción de que cada vehículo deba visitar al menos 1 planta.
-        # Ya que las plantas son obligatorias (R2 abajo), se visitarán igual. 
-        # Esto evita fallos si el solver prefiere usar menos vehículos o si la lógica de precedencia se complica.
+        # R1: Cada vehículo puede visitar al menos 1 planta (OPCIONAL)
         # for v in range(num_vehicles):
         #     routing.solver().Add(plant_dim.CumulVar(routing.End(v)) >= 1)
 
-        # R2: Todas las plantas son obligatorias
+        # R2: Todas las plantas son ABSOLUTAMENTE prioritarias
         for p_idx in plant_indices:
             p_node = manager.NodeToIndex(p_idx)
-            routing.solver().Add(routing.ActiveVar(p_node) == 1)
+            # Penalización de 1 Trillón para forzar visita
+            routing.AddDisjunction([p_node], 1_000_000_000_000)
 
         # R3: Clientes — vinculación a su planta padre + precedencia
         for c_idx in customer_indices:
             c_node = manager.NodeToIndex(c_idx)
             node = self.nodes[c_idx]
-
-            # Buscar la planta padre
             parent_id = node.get('parent_cp')
             p_idx = next((i for i, n in enumerate(self.nodes) if n['id'] == parent_id), None)
             p_node = manager.NodeToIndex(p_idx) if p_idx is not None else None
 
-            if node.get('obligatorio', False):
-                logger.info("Cliente OBLIGATORIO detectado en Solver: %s (vía planta %s)", node['name'], node.get('parent_cp'))
-                # Forzar visita
-                routing.solver().Add(routing.ActiveVar(c_node) == 1)
-                
-                # Forzar mismo vehículo que la planta padre e ir después de ella
-                if p_node is not None:
-                    routing.solver().Add(routing.VehicleVar(c_node) == routing.VehicleVar(p_node))
-                    routing.solver().Add(dist_dim.CumulVar(p_node) < dist_dim.CumulVar(c_node))
-            else:
-                # Si es opcional, vinculamos el vehículo solo si el cliente está activo
-                routing.AddDisjunction([c_node], 1_000_000)
-                if p_node is not None:
-                    # Si el cliente está activo, debe estar en el mismo vehículo que la planta
-                    # (ActiveVar(C) == 1) => (VehicleVar(C) == VehicleVar(P))
-                    routing.solver().Add(
-                        routing.ActiveVar(c_node).Var() <= (routing.VehicleVar(c_node) == routing.VehicleVar(p_node))
-                    )
-                    # Si el cliente está activo, debe ir después de la planta
-                    routing.solver().Add(
-                        routing.ActiveVar(c_node).Var() <= (dist_dim.CumulVar(p_node) < dist_dim.CumulVar(c_node))
-                    )
+            penalty = 1_000_000_000 if node.get('obligatorio', False) else 100_000_000
+            routing.AddDisjunction([c_node], penalty)
+
+            if p_node is not None:
+                routing.solver().Add(routing.ActiveVar(c_node).Var() <= (routing.VehicleVar(c_node) == routing.VehicleVar(p_node)))
+                routing.solver().Add(routing.ActiveVar(c_node).Var() <= (dist_dim.CumulVar(p_node) <= dist_dim.CumulVar(c_node)))
 
         # === BÚSQUEDA ===
         search_params = pywrapcp.DefaultRoutingSearchParameters()
-        # SAVINGS suele ser más robusto para encontrar una primera solución en VRPB
-        search_params.first_solution_strategy = (
-            routing_enums_pb2.FirstSolutionStrategy.SAVINGS
-        )
-        
-        algo_map = {
-            'GUIDED_LOCAL_SEARCH': routing_enums_pb2.LocalSearchMetaheuristic.GUIDED_LOCAL_SEARCH,
-            'SIMULATED_ANNEALING': routing_enums_pb2.LocalSearchMetaheuristic.SIMULATED_ANNEALING,
-            'TABU_SEARCH': routing_enums_pb2.LocalSearchMetaheuristic.TABU_SEARCH,
-            'GREEDY_DESCENT': routing_enums_pb2.LocalSearchMetaheuristic.GREEDY_DESCENT,
-        }
-        selected_metaheuristic = algo_map.get(metaheuristic, routing_enums_pb2.LocalSearchMetaheuristic.GUIDED_LOCAL_SEARCH)
-        search_params.local_search_metaheuristic = selected_metaheuristic
-        search_params.time_limit.seconds = MAX_SEARCH_TIME
+        search_params.first_solution_strategy = routing_enums_pb2.FirstSolutionStrategy.PARALLEL_CHEAPEST_INSERTION
+        search_params.local_search_metaheuristic = routing_enums_pb2.LocalSearchMetaheuristic.GUIDED_LOCAL_SEARCH
+        search_params.time_limit.seconds = max_search_time
 
-        logger.info("Iniciando optimización (%d vehículos, límite %ds, algoritmo: %s)...",
-                     num_vehicles, MAX_SEARCH_TIME, metaheuristic)
+        logger.info("Iniciando optimización (%d vehículos, límite %ds, algoritmo: %s)...", num_vehicles, max_search_time, metaheuristic)
+        
+        # Log de matriz para asegurar que no sea todo ceros
+        mat_min = np.min(self.distance_matrix[self.distance_matrix > 0]) if np.any(self.distance_matrix > 0) else 0
+        mat_max = np.max(self.distance_matrix)
+        logger.info(f"Estadísticas de Matriz: Min(>0)={mat_min:.1f}m, Max={mat_max:.1f}m")
+        
         solution = routing.SolveWithParameters(search_params)
 
         if solution:
+            status_code = routing.status()
+            logger.info(f"Solver terminó con éxito (status {status_code}).")
             routes = self._extract_routes(manager, routing, solution)
             self._last_routes = routes
             return routes
 
-        logger.warning("El solver no encontró solución con los parámetros actuales.")
+        status_code = routing.status()
+        status_map = {0: "NOT_SOLVED", 1: "SUCCESS", 2: "FAIL", 3: "FAIL_TIMEOUT", 4: "INVALID"}
+        logger.warning(f"El solver no encontró solución. Estado: {status_map.get(status_code, status_code)}")
         return None
 
     # ------------------------------------------------------------------

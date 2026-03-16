@@ -115,7 +115,7 @@ def main():
     print("\n⚙ Ejecutando simulación con rutas REALES (carretera)...")
     
     # Inicializamos GeoUtils para que el simulador pueda consultar polilíneas reales
-    geo_utils = GeoUtils(api_type="routes_api")
+    geo_utils = GeoUtils(api_type="osrm")
     geo_utils.set_truck_specs(**TRUCK_SPECS)
 
     simulador = TruckSimulated(
@@ -129,7 +129,7 @@ def main():
         tiempo_carga_h = (0.66 + 0.5), # 40 min de carga de bobinas + 30 min de atado de bobinas
         geo_utils=geo_utils) # Inyectamos GeoUtils para carreteras reales
         
-    df_resultados = simulador.ejecutar(desfase_hora=0.4)
+    df_resultados = simulador.ejecutar()
 
 
     # 4. Resumen
@@ -140,10 +140,11 @@ def main():
 
     # 5. Generar GIF
     print("\n🎬 Generando animación GIF...")
-    animador = AnimadorLogistico(df_resultados, origen)
+    # Cambia usar_rutas_reales=False si prefieres ver líneas rectas en lugar de carreteras
+    animador = AnimadorLogistico(df_resultados, origen, usar_rutas_reales=True)
     nombre_gif = os.path.join('outputs', 'simulacion_rutas_optimizadas.gif')
     os.makedirs('outputs', exist_ok=True)
-    animador.generar_gif(nombre_archivo=nombre_gif, fps=10)
+    animador.generar_gif(nombre_archivo=nombre_gif, fps=40)
     print(f"✅ Animación guardada en: {nombre_gif}")
 
 

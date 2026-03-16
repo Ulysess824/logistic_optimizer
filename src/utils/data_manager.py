@@ -1,6 +1,7 @@
 import json
 import logging
 import numpy as np
+import unicodedata
 import polars as pl
 from pathlib import Path
 from src.utils.geo import GeoUtils
@@ -15,6 +16,16 @@ class DataManager:
         self.carton_plants = carton_plants
         self.clients_file = Path(clients_file)
         self.geo = geo_utils if geo_utils else GeoUtils()
+
+    @staticmethod
+    def _normalize_text(s):
+        """Elimina acentos, convierte a minúsculas y limpia espacios."""
+        if not s:
+            return ""
+        return "".join(
+            c for c in unicodedata.normalize('NFD', str(s))
+            if unicodedata.category(c) != 'Mn'
+        ).lower().strip()
 
     # ------------------------------------------------------------------
     # Validación de un registro de cliente
@@ -102,24 +113,29 @@ class DataManager:
             df_candidates = df_temp.filter(pl.col("hav_dist") <= max_radius_km).sort("hav_dist").head(150)
             
             # --- MEJORA: Asegurar que los obligatorios se incluyan incluso si están lejos ---
-            # Normalizamos el nombre de la planta para el matching (ej: Smurfit Westrock Almería -> Almería)
-            p_name_norm = plant['name'].replace("Smurfit Westrock ", "").strip()
+            # Normalizamos el nombre de la planta para el matching
+            p_name_plain = self._normalize_text(plant['name'].replace("Smurfit Westrock ", ""))
+            
             mandatory_for_plant = []
             if mandatory_customers:
-                # Soporte para String (un solo cliente) o List (varios clientes)
-                m_custs = mandatory_customers.get(p_name_norm, [])
+                # Buscamos en el dict normalizando también sus llaves
+                norm_mandatory_dict = {self._normalize_text(k): v for k, v in mandatory_customers.items()}
+                m_custs = norm_mandatory_dict.get(p_name_plain, [])
                 mandatory_for_plant = [m_custs] if isinstance(m_custs, str) else m_custs
 
             if mandatory_for_plant:
-                # Buscamos clientes obligatorios en el dataframe original (sin filtrar por distancia todavía)
-                # Matching más robusto e insensible a mayúsculas/minúsculas
+                # Buscamos clientes obligatorios en el dataframe original
                 try:
-                    m_names_lower = [m.strip().lower() for m in mandatory_for_plant]
-                    df_mandatory = df_temp.filter(
-                        pl.col("name").str.strip_chars().str.to_lowercase().is_in(m_names_lower)
+                    m_names_plain = [self._normalize_text(m) for m in mandatory_for_plant]
+                    
+                    # Creamos una columna temporal normalizada para el filtro rápido
+                    df_temp = df_temp.with_columns(
+                        pl.col("name").map_elements(self._normalize_text, return_dtype=pl.String).alias("name_plain")
                     )
+                    
+                    df_mandatory = df_temp.filter(pl.col("name_plain").is_in(m_names_plain))
                     if not df_mandatory.is_empty():
-                        df_candidates = pl.concat([df_candidates, df_mandatory]).unique(subset=["lat", "lng"])
+                        df_candidates = pl.concat([df_candidates, df_mandatory.drop("name_plain")]).unique(subset=["lat", "lng"])
                 except Exception as e:
                     logger.warning("Error filtrando obligatorios para %s: %s", plant['name'], e)
             
@@ -143,7 +159,6 @@ class DataManager:
             
             real_dist_PM = matrix[0][1] / 1000.0  # Planta -> Mengíbar
             
-            mandatory_for_plant = mandatory_customers.get(p_name_norm, []) if mandatory_customers else []
             qualified_customers = []
             
             # Validamos los clientes (índices en la matriz del 2 en adelante)
@@ -154,16 +169,17 @@ class DataManager:
                 
                 is_mandatory = False
                 if mandatory_for_plant:
-                    # Matching más robusto (ignora mayúsculas/minúsculas y espacios)
-                    c_name_clean = cand['name'].strip().lower()
-                    m_names_clean = [m.strip().lower() for m in mandatory_for_plant]
-                    is_mandatory = c_name_clean in m_names_clean
+                    c_name_plain = self._normalize_text(cand['name'])
+                    m_names_plain = [self._normalize_text(m) for m in mandatory_for_plant]
+                    is_mandatory = c_name_plain in m_names_plain
                 
                 # --- EXCEPCIÓN VIP: Si es obligatorio, se salta los filtros de Radio y Desvío ---
                 if is_mandatory:
+                    logger.info("  -> Cliente '%s' reconocido como OBLIGATORIO para %s", cand['name'], plant['name'])
                     cand['detour'] = detour
                     cand['real_dist_km'] = real_dist_PC
                     cand['obligatorio'] = True
+                    cand['parent_cp'] = plant['id']  # ← necesario para que solver lo vincule
                     qualified_customers.append(cand)
                     continue
 
@@ -175,19 +191,24 @@ class DataManager:
                     cand['detour'] = detour
                     cand['real_dist_km'] = real_dist_PC
                     cand['obligatorio'] = False
+                    cand['parent_cp'] = plant['id']  # ← consistencia con obligatorios
                     qualified_customers.append(cand)
                     
             # --- FASE 3: Selección Final ---
-            # Aseguramos que los clientes obligatorios sí o sí entren en la lista (al principio)
+            # Aseguramos que los clientes obligatorios sí o sí entren en la lista.
             mandatories = [c for c in qualified_customers if c.get('obligatorio')]
             optionals = [c for c in qualified_customers if not c.get('obligatorio')]
             
             # Ordenamos los opcionales por menor desvío
             optionals.sort(key=lambda x: x['detour'])
             
-            # Juntamos respetando el límite por planta. Los obligatorios tienen prioridad.
-            combined = mandatories + optionals
-            eligible_customers = combined[:max_customers_per_plant]
+            # Los obligatorios tienen prioridad absoluta y NO cuentan para el límite 
+            # de "clientes opcionales" si el usuario quiere un máximo de N extras.
+            # Sin embargo, para ser fieles al espíritu de 'max_customers_per_plant',
+            # incluiremos todos los obligatorios y luego rellenaremos hasta el límite.
+            # Si ya hay más obligatorios que el límite, se quedan todos los obligatorios y 0 opcionales.
+            num_optionals_to_add = max(0, max_customers_per_plant - len(mandatories))
+            eligible_customers = mandatories + optionals[:num_optionals_to_add]
 
             new_plant = plant.copy()
             new_plant["customers"] = eligible_customers

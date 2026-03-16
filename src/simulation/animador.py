@@ -6,13 +6,15 @@ import polyline
 
 
 class AnimadorLogistico:
-    def __init__(self, df_resultados, origen):
+    def __init__(self, df_resultados, origen, usar_rutas_reales=True):
         """
         df_resultados: DataFrame resultante de simulador.ejecutar()
         origen: dict con {'lat', 'lng', 'name'}
+        usar_rutas_reales: Si es True, usa polilíneas de carretera. Si es False, usa líneas rectas.
         """
         self.df = df_resultados
         self.origen = origen
+        self.usar_rutas_reales = usar_rutas_reales
 
         # Pre-decodificar polilíneas para optimizar la animación
         for _, row in self.df.iterrows():
@@ -121,14 +123,21 @@ class AnimadorLogistico:
                     duracion_viaje = tramo['t_llegada'] - t_anterior
                     prog = (t - t_anterior) / duracion_viaje if duracion_viaje > 0 else 1.0
 
-                    path = tramo.get('decoded_path')
+                    path = tramo.get('decoded_path') if self.usar_rutas_reales else None
                     if path:
-                        # Si tenemos polilínea real, calculamos el punto según el progreso temporal
-                        # Asumimos velocidad constante sobre los puntos de la polilínea por simplicidad
-                        idx = int(prog * (len(path) - 1))
-                        x_pos, y_pos = path[idx]
+                        # Interpolación lineal para fluidez total
+                        f_idx = prog * (len(path) - 1)
+                        i0 = int(f_idx)
+                        i1 = min(i0 + 1, len(path) - 1)
+                        alpha = f_idx - i0
+                        
+                        p0 = path[i0]
+                        p1 = path[i1]
+                        
+                        x_pos = p0[0] + (p1[0] - p0[0]) * alpha
+                        y_pos = p0[1] + (p1[1] - p0[1]) * alpha
                     else:
-                        # Fallback a línea recta
+                        # Fallback a línea recta (Haversine-like direct movement in the simulation)
                         x_pos = tramo['lon_origen'] + (tramo['lon_destino'] - tramo['lon_origen']) * prog
                         y_pos = tramo['lat_origen'] + (tramo['lat_destino'] - tramo['lat_origen']) * prog
                     
@@ -165,20 +174,23 @@ class AnimadorLogistico:
 
         return self.puntos_camiones, self.texto_reloj, self.texto_stats
 
-    def generar_gif(self, nombre_archivo='outputs/simulacion_dinamica.gif', fps=10):
-        # Encontrar el tiempo en que el último camión regresa a la base
+    def generar_gif(self, nombre_archivo='outputs/simulacion_dinamica.gif', fps=40):
+        # Encontrar el tiempo en que el primer camión sale y el último camión regresa
+        t_min = self.df['t_salida_origen'].min() if not self.df.empty else 6.5
         t_max = self.df['t_retorno_base'].max() if not self.df.empty else 24.0
         
-        # Añadir un margen de 2 horas para que el GIF no se corte justo al llegar
-        t_final = t_max + 2.0
+        # Ajustar inicio para evitar segundos de camiones parados al principio
+        t_start = max(6.0, t_min - 0.2)
+        t_final = min(t_max + 0.5, 48.0) 
         
-        # Eliminamos el tope de 30h para permitir rutas de larga distancia (>1000km)
-        # que pueden tardar más de un día en completarse (con descansos y esperas).
-        tiempos = np.arange(6.0, t_final, 0.2)
+        # Paso de tiempo MUY fino para fluidez total: 0.02h = 1.2 min
+        # Con 40 FPS, 1 segundo de vídeo = 40 * 0.02h = 0.8h (~48 min). 
+        # Un día de 24h se ve en ~30 segundos.
+        tiempos = np.arange(t_start, t_final, 0.02)
         
         ani = animation.FuncAnimation(
             self.fig, self.actualizar, frames=tiempos,
-            interval=1000 / fps, blit=True
+            interval=1000 / fps, blit=False
         )
         ani.save(nombre_archivo, writer='pillow', fps=fps)
         plt.close()

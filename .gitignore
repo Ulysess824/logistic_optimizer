@@ -10,7 +10,9 @@ venv/
 
 # Raw data (large files, not needed at runtime)
 data/raw/
+data/osrm/
 *.db
+*.osrm*
 
 # Temporary and log files
 temp_*
@@ -21,10 +23,16 @@ err.txt
 out_table.html
 table_rendered.html
 logs/*.log
+*.txt
+!requirements.txt
 
 # Generated outputs
 # outputs/results/*.json
 # outputs/results/*.png
+outputs/maps/*.html
+
+# Backups
+src/engine/*_backup_*
 
 # VS Code / IDE
 .vscode/

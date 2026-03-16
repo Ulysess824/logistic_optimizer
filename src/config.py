@@ -23,6 +23,7 @@ LOGS_DIR = BASE_DIR / "logs"
 
 # Solver config
 MAX_SEARCH_TIME = 90          # Segundos máximos de búsqueda del solver
+OSRM_URL = os.getenv("OSRM_URL", "http://localhost:5000")
 DIST_LIMIT = 4_000_000        # Límite de distancia por vehículo (metros)
 DEFAULT_N_CLIENTES = 4        # Máximo de clientes por ruta (dimensión del solver)
 DEFAULT_MAX_PLANTS_PER_ROUTE = 1  # Plantas por ruta (1=VRPB clásico, >1=MC-VRPB)

@@ -1,6 +1,7 @@
 import json
 import logging
 from pathlib import Path
+import subprocess
 
 from src.engine.solver import LogisticsSolver
 from src.utils.visualizer import Visualizer
@@ -12,14 +13,16 @@ logger = logging.getLogger(__name__)
 
 
 # ======================================================================
-# 🔧 PARÁMETROS DE EJECUCIÓN — Modifica estos valores para configurar
+#  PARÁMETROS DE EJECUCIÓN — Modifica estos valores para configurar
 # ======================================================================
-N_CLIENTES = 2              # Máximo de clientes por ruta
-VARIAS_PLANTAS = False      # True → permite recoger en >1 planta por ruta (MC-VRPB)
-MAX_PLANTAS_RUTA = 1        # Plantas máximas por ruta (solo si VARIAS_PLANTAS=True)
-MAX_CUSTOMERS_PER_PLANT = 10 # Clientes pre-seleccionados por planta (filtro DataManager)
-THRESHOLD_KM = 100          # Umbral de desvío para filtro de retorno (km)
-MAX_RADIUS_KM = 100          # Aumentamos el radio para asegurar que Ciudad Real entre
+FORCED_GROUPS = []
+N_CLIENTES = 4              
+VARIAS_PLANTAS = False      
+MAX_PLANTAS_RUTA = 1        
+MAX_CUSTOMERS_PER_PLANT = 1
+THRESHOLD_KM = 100          
+MAX_RADIUS_KM = 100          
+MAX_SEARCH_TIME = 90        
 
 
 # Especificaciones de Camión (Tráiler estándar para bobinas de papel)
@@ -33,10 +36,12 @@ TRUCK_SPECS = {
 }
 
 # Diccionario de clientes que es OBLIGATORIO visitar para cada planta.
-# Acepta tanto clientes que esten o no seleccionados previamente por el filtro kilométrico.
+# Acepta tanto clientes que estén o no seleccionados previamente por el filtro kilométrico.
 # Formato: {"Nombre_Corto_Planta": ["Nombre_Del_Municipio_Cliente"]}
 # Ejemplo: {"Córdoba": ["El Carpio", "Montilla"]}
-# MANDATORY_CUSTOMERS = {"Alcalá": ["Ciudad Real"]}
+# Ejemplo de uso:
+MANDATORY_CUSTOMERS = {"Alcalá": ["Ciudad Real"]}
+PLANT_GROUPS = []
 # ======================================================================
 
 
@@ -59,9 +64,9 @@ def run_optimization():
     with open(plants_file, 'r', encoding='utf-8') as f:
         plants_data = json.load(f)
 
-    # Inicializar Motor Geográfico
+    # Inicializar Motor Geográfico (Haversine para máxima velocidad)
     from src.utils.geo import GeoUtils
-    geo_engine = GeoUtils(api_type="routes_api")
+    geo_engine = GeoUtils(api_type="haversine")
     geo_engine.set_truck_specs(**TRUCK_SPECS)
 
     # 3. Selección Inteligente de Clientes (Filtros Radio/Retorno via API)
@@ -75,7 +80,7 @@ def run_optimization():
         max_customers_per_plant=MAX_CUSTOMERS_PER_PLANT,
         threshold_km=THRESHOLD_KM,
         max_radius_km=MAX_RADIUS_KM,
-        # mandatory_customers=MANDATORY_CUSTOMERS
+        mandatory_customers=MANDATORY_CUSTOMERS,   # ← activo, edita el dict arriba
     )
 
     # Debug: Mostrar candidatos por planta
@@ -93,6 +98,7 @@ def run_optimization():
         n_clientes=N_CLIENTES,
         varias_plantas=VARIAS_PLANTAS,
         max_plantas_ruta=MAX_PLANTAS_RUTA,
+        max_search_time=MAX_SEARCH_TIME,
     )
 
     if routes:
@@ -137,7 +143,18 @@ def run_optimization():
         presentation_path = "outputs/Presentacion_Logistica.html"
         generate_dashboard(summary_json, output_json, presentation_path)
         
-        # 10. Log de resumen
+        # 10. Procesos Adicionales (Simulación y Refresco Final)
+        logger.info("Ejecutando procesos complementarios...")
+        try:
+            # Generamos la simulación (GIF) primero para que el dashboard lo muestre actualizado
+            subprocess.run(["python", "ejemplo_simulacion.py"], check=True)
+            # Refrescamos el dashboard una última vez para asegurar sincronización
+            subprocess.run(["python", "refresh_dashboard.py"], check=True)
+            logger.info("Simulación y Dashboard actualizados correctamente.")
+        except Exception as e:
+            logger.warning("No se pudo completar el proceso de simulación/refresco: %s", e)
+        
+        # 11. Log de resumen
         logger.info("=" * 60)
         logger.info("RESUMEN DE OPERACIÓN")
         logger.info("=" * 60)

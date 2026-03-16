@@ -66,17 +66,35 @@ class TruckSimulated:
                     start = (ubi_actual["lat"], ubi_actual["lng"])
                     end = (parada["lat"], parada["lng"])
                     res = self.geo_utils.cache.get_route(start, end)
+                    
                     if res:
                         dist = res["distance_meters"] / 1000.0
                         duration_h = res["duration_seconds"] / 3600.0
                         polyline = res.get("polyline")
+                        
+                        # Si no hay polilínea en caché (común con OSRM Table), la buscamos
+                        if not polyline:
+                            polyline = self.geo_utils.get_route_polyline(start, end)
                     else:
-                        dist = self.haversine(ubi_actual["lng"], ubi_actual["lat"], parada["lng"], parada["lat"]) * 1.3
+                        # Si no hay nada en caché, intentamos obtener la polilínea (que también guarda la ruta en caché)
+                        polyline = self.geo_utils.get_route_polyline(start, end)
+                        # Re-consultamos caché tras el fetch de polilínea
+                        res = self.geo_utils.cache.get_route(start, end)
+                        if res:
+                            dist = res["distance_meters"] / 1000.0
+                            duration_h = res["duration_seconds"] / 3600.0
+                        else:
+                            dist = self.haversine(ubi_actual["lng"], ubi_actual["lat"], parada["lng"], parada["lat"]) * 1.3
                 else:
                     dist = self.haversine(ubi_actual["lng"], ubi_actual["lat"], parada["lng"], parada["lat"]) * 1.3
 
-                # Tiempo de viaje: Real de Google o estimado por velocidad fija
-                t_viaje = duration_h if duration_h is not None else (dist / self.velocidad_kmh)
+                # Tiempo de viaje: Real de la API o estimado por velocidad fija
+                t_viaje = duration_h if (duration_h is not None and duration_h > 0) else (dist / self.velocidad_kmh)
+                
+                # Seguridad: si hay distancia pero t_viaje es casi 0, forzamos algo de tiempo para evitar "teletransporte"
+                if dist > 0.1 and t_viaje < 0.001:
+                    t_viaje = dist / self.velocidad_kmh
+                    
                 yield self.env.timeout(t_viaje)
                 t_llegada = self.env.now
 
@@ -96,20 +114,35 @@ class TruckSimulated:
             # --- RETORNO AL ORIGEN ---
             polyline_ret = None
             duration_ret_h = None
+            dist_retorno = 0.0 # Initialize dist_retorno for safety check
             if self.geo_utils:
                 start = (ubi_actual["lat"], ubi_actual["lng"])
                 end = (self.origen["lat"], self.origen["lng"])
                 res = self.geo_utils.cache.get_route(start, end)
                 if res:
+                    dist_retorno = res["distance_meters"] / 1000.0
                     duration_ret_h = res["duration_seconds"] / 3600.0
                     polyline_ret = res.get("polyline")
+                    if not polyline_ret:
+                        polyline_ret = self.geo_utils.get_route_polyline(start, end)
                 else:
-                    dist_retorno = self.haversine(ubi_actual["lng"], ubi_actual["lat"], self.origen["lng"], self.origen["lat"]) * 1.3
-                    duration_ret_h = (dist_retorno / self.velocidad_kmh)
+                    polyline_ret = self.geo_utils.get_route_polyline(start, end)
+                    res = self.geo_utils.cache.get_route(start, end)
+                    if res:
+                        dist_retorno = res["distance_meters"] / 1000.0
+                        duration_ret_h = res["duration_seconds"] / 3600.0
+                    else:
+                        dist_retorno = self.haversine(ubi_actual["lng"], ubi_actual["lat"], self.origen["lng"], self.origen["lat"]) * 1.3
             else:
                 dist_retorno = self.haversine(ubi_actual["lng"], ubi_actual["lat"], self.origen["lng"], self.origen["lat"]) * 1.3
-                duration_ret_h = (dist_retorno / self.velocidad_kmh)
+            
+            # Tiempo de retorno: Real de la API o estimado por velocidad fija
+            duration_ret_h = duration_ret_h if (duration_ret_h is not None and duration_ret_h > 0) else (dist_retorno / self.velocidad_kmh)
 
+            # Seguridad: si hay distancia pero duration_ret_h es casi 0, forzamos algo de tiempo para evitar "teletransporte"
+            if dist_retorno > 0.1 and duration_ret_h < 0.001:
+                duration_ret_h = dist_retorno / self.velocidad_kmh
+            
             yield self.env.timeout(duration_ret_h)
             t_retorno_base = self.env.now
 

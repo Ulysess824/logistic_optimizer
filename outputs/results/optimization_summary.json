@@ -1,10 +1,10 @@
 {
   "num_routes": 11,
-  "total_km": 8510.15,
-  "total_empty_km": 3662.31,
+  "total_km": 8513.15,
+  "total_empty_km": 3746.73,
   "distance_source": "Haversine (estimación)",
   "parameters": {
-    "n_clientes": 2,
+    "n_clientes": 4,
     "varias_plantas": false,
     "max_plantas_ruta": 1
   },
@@ -12,92 +12,87 @@
     {
       "route_id": 1,
       "plants": [
-        "Canovelles"
+        "Córdoba"
       ],
       "plant_ids": [
-        "CP_CANOVELLES"
+        "CP_CORDOBA"
       ],
       "num_plants": 1,
-      "num_customers": 2,
+      "num_customers": 1,
       "customers": [
-        "Barbera Del Valles",
-        "Roda De Bara"
+        "El Carpio"
       ],
-      "distance_km": 1316.35,
-      "empty_km": 573.25,
-      "num_stops": 5
+      "distance_km": 153.36,
+      "empty_km": 61.19,
+      "num_stops": 4
     },
     {
       "route_id": 2,
       "plants": [
-        "Vigo"
+        "Almeria"
       ],
       "plant_ids": [
-        "CP_VIGO"
+        "CP_ALMERIA"
       ],
       "num_plants": 1,
-      "num_customers": 2,
+      "num_customers": 1,
       "customers": [
-        "O Porriño",
-        "Salceda De Caselas"
+        "Guadix"
       ],
-      "distance_km": 1235.08,
-      "empty_km": 612.1,
-      "num_stops": 5
+      "distance_km": 333.16,
+      "empty_km": 95.82,
+      "num_stops": 4
     },
     {
       "route_id": 3,
       "plants": [
-        "Navarra"
+        "Huelva"
       ],
       "plant_ids": [
-        "CP_NAVARRA"
+        "CP_HUELVA"
       ],
       "num_plants": 1,
-      "num_customers": 2,
+      "num_customers": 1,
       "customers": [
-        "Beriain",
-        "Azagra"
+        "San Jose De La Rinconada"
       ],
-      "distance_km": 1129.53,
-      "empty_km": 507.75,
-      "num_stops": 5
+      "distance_km": 501.95,
+      "empty_km": 196.29,
+      "num_stops": 4
     },
     {
       "route_id": 4,
       "plants": [
-        "Celpack"
+        "Alcalá"
       ],
       "plant_ids": [
-        "CP_CELPACK"
+        "CP_ALCALA"
       ],
       "num_plants": 1,
-      "num_customers": 2,
+      "num_customers": 1,
       "customers": [
-        "S.João De Vêr Vfr",
-        "Seia"
+        "Ciudad Real"
       ],
-      "distance_km": 1056.03,
-      "empty_km": 434.55,
-      "num_stops": 5
+      "distance_km": 566.19,
+      "empty_km": 111.99,
+      "num_stops": 4
     },
     {
       "route_id": 5,
       "plants": [
-        "Burgos"
+        "Alicante"
       ],
       "plant_ids": [
-        "CP_BURGOS"
+        "CP_ALICANTE"
       ],
       "num_plants": 1,
-      "num_customers": 2,
+      "num_customers": 1,
       "customers": [
-        "Burgos",
-        "Gumiel Del Mercado"
+        "Aspe"
       ],
-      "distance_km": 976.18,
-      "empty_km": 411.55,
-      "num_stops": 5
+      "distance_km": 577.8,
+      "empty_km": 268.25,
+      "num_stops": 4
     },
     {
       "route_id": 6,
@@ -108,104 +103,98 @@
         "CP_VALENCIA"
       ],
       "num_plants": 1,
-      "num_customers": 2,
+      "num_customers": 1,
       "customers": [
-        "Aldaya",
         "Aldaya"
       ],
-      "distance_km": 668.79,
-      "empty_km": 333.19,
-      "num_stops": 5
+      "distance_km": 668.33,
+      "empty_km": 333.88,
+      "num_stops": 4
     },
     {
       "route_id": 7,
       "plants": [
-        "Alicante"
+        "Burgos"
       ],
       "plant_ids": [
-        "CP_ALICANTE"
+        "CP_BURGOS"
       ],
       "num_plants": 1,
-      "num_customers": 2,
+      "num_customers": 1,
       "customers": [
-        "Cieza",
-        "Cieza"
+        "Gumiel Del Mercado"
       ],
-      "distance_km": 577.9,
-      "empty_km": 210.07,
-      "num_stops": 5
+      "distance_km": 975.85,
+      "empty_km": 411.55,
+      "num_stops": 4
     },
     {
       "route_id": 8,
       "plants": [
-        "Alcalá"
+        "Celpack"
       ],
       "plant_ids": [
-        "CP_ALCALA"
+        "CP_CELPACK"
       ],
       "num_plants": 1,
-      "num_customers": 2,
+      "num_customers": 1,
       "customers": [
-        "Alcala De Henares",
-        "Chinchon"
+        "S.João De Vêr Vfr"
       ],
-      "distance_km": 561.26,
-      "empty_km": 242.25,
-      "num_stops": 5
+      "distance_km": 1055.99,
+      "empty_km": 520.67,
+      "num_stops": 4
     },
     {
       "route_id": 9,
       "plants": [
-        "Huelva"
+        "Navarra"
       ],
       "plant_ids": [
-        "CP_HUELVA"
+        "CP_NAVARRA"
       ],
       "num_plants": 1,
-      "num_customers": 2,
+      "num_customers": 1,
       "customers": [
-        "Brenes",
-        "Rosales, Los"
+        "Beriain"
       ],
-      "distance_km": 502.06,
-      "empty_km": 175.19,
-      "num_stops": 5
+      "distance_km": 1129.5,
+      "empty_km": 559.8,
+      "num_stops": 4
     },
     {
       "route_id": 10,
       "plants": [
-        "Almeria"
+        "Vigo"
       ],
       "plant_ids": [
-        "CP_ALMERIA"
+        "CP_VIGO"
       ],
       "num_plants": 1,
-      "num_customers": 2,
+      "num_customers": 1,
       "customers": [
-        "Albuñan",
-        "Albuñan"
+        "O Porriño"
       ],
-      "distance_km": 333.6,
-      "empty_km": 101.23,
-      "num_stops": 5
+      "distance_km": 1234.86,
+      "empty_km": 612.56,
+      "num_stops": 4
     },
     {
       "route_id": 11,
       "plants": [
-        "Córdoba"
+        "Canovelles"
       ],
       "plant_ids": [
-        "CP_CORDOBA"
+        "CP_CANOVELLES"
       ],
       "num_plants": 1,
-      "num_customers": 2,
+      "num_customers": 1,
       "customers": [
-        "Alcolea",
-        "El Carpio"
+        "Roda De Bara"
       ],
-      "distance_km": 153.37,
-      "empty_km": 61.19,
-      "num_stops": 5
+      "distance_km": 1316.16,
+      "empty_km": 574.71,
+      "num_stops": 4
     }
   ]
 }

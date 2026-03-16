@@ -27,7 +27,7 @@ logistics_optimizer/
 ├── src/                             # Código fuente principal
 │   ├── config.py                    # Variables de entorno y rutas.
 │   ├── engine/
-│   │   └── solver.py                # Contiene LogisticsSolver (OR-Tools).
+│   │   └── solver.py                # Contiene LogisticsSolver (OR-Tools) con lógica de Disjunctions (Soft Constraints).
 │   ├── simulation/
 │   │   ├── camion.py                # Clase TruckSimulated (SimPy). Usa duraciones reales de la caché.
 │   │   ├── animador.py              # Clase AnimadorLogistico (GIFs). Soporta polilíneas de carretera.
@@ -63,5 +63,4 @@ Si recibes la orden de agregar nuevas funciones, sigue estas pautas:
 - `googlemaps` (Geocoding y Routing clásico).
 - `polars` (Procesamiento de datos de alto rendimiento en DataManager).
 
-## 5. Estado Actual (Marzo 2026)
-El sistema es SOTA (State of the Art) en logística de backhauling. Utiliza **Google Routes API v2** con perfiles de camión pesados y una caché persistente en SQLite para optimizar costos. La simulación de flota es fiel a la realidad, utilizando tiempos de tráfico históricos y trazados de carretera reales cuando están disponibles en la caché.
+## 5. Estado Actual (Marzo 2027): El sistema es SOTA (State of the Art) en logística de backhauling. Utiliza **Google Routes API v2** con perfiles de camión pesados y una caché persistente en SQLite. La lógica de optimización se basa en **Disjunctions (Soft Constraints)** con penalizaciones diferenciadas para plantas y obligatorios, garantizando siempre una solución válida y permitiendo ejecuciones de orquestación única (Optimización + Simulación + Dashboard).

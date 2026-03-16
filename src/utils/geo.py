@@ -2,7 +2,7 @@ import logging
 import googlemaps
 import numpy as np
 import requests
-from src.config import GOOGLE_MAPS_API_KEY
+from src.config import GOOGLE_MAPS_API_KEY, OSRM_URL
 from src.utils.geo_cache import GeoCache
 
 logger = logging.getLogger(__name__)
@@ -11,8 +11,8 @@ logger = logging.getLogger(__name__)
 class GeoUtils:
     _api_disabled = False
 
-    def __init__(self, api_type="routes_api"):
-        """Inicializa GeoUtils con la API especificada ('routes_api', 'google_maps', o 'haversine')."""
+    def __init__(self, api_type="osrm"):
+        """Inicializa GeoUtils con la API especificada ('routes_api', 'google_maps', 'osrm' o 'haversine')."""
         self.gmaps = None
         self.api_type = api_type
         self.truck_specs = {}  # Para Routes API
@@ -72,6 +72,9 @@ class GeoUtils:
         if self.api_type == "routes_api":
             return self._calculate_distance_matrix_routes_api(nodes)
             
+        if self.api_type == "osrm":
+            return self._calculate_distance_matrix_osrm(nodes)
+            
         # Fallback a la implementación clásica (Distance Matrix v1)
         return self._calculate_distance_matrix_google_maps(nodes)
 
@@ -124,7 +127,7 @@ class GeoUtils:
         headers = {
             "Content-Type": "application/json",
             "X-Goog-Api-Key": GOOGLE_MAPS_API_KEY,
-            "X-Goog-FieldMask": "originIndex,destinationIndex,distanceMeters,status"
+            "X-Goog-FieldMask": "originIndex,destinationIndex,distanceMeters,duration,status"
         }
         
         try:
@@ -176,14 +179,21 @@ class GeoUtils:
                             if has_error:
                                  matrix[o_idx][d_idx] = self.haversine_distance(nodes[o_idx], nodes[d_idx])
                             else:
-                                val = dist if dist is not None else self.haversine_distance(nodes[o_idx], nodes[d_idx])
-                                matrix[o_idx][d_idx] = val
-                                # Guardar en caché
-                                self.cache.store_route(
-                                    (nodes[o_idx]['lat'], nodes[o_idx]['lng']),
-                                    (nodes[d_idx]['lat'], nodes[d_idx]['lng']),
-                                    val, duration=0, truck_specs=self.truck_specs
-                                )
+                                 # Parsear duración de Google (e.g. "123s" o "123.4s")
+                                 dur_str = element.get('duration', '0s')
+                                 try:
+                                     dur_val = float(dur_str.rstrip('s'))
+                                 except:
+                                     dur_val = 0
+                                     
+                                 val = dist if dist is not None else self.haversine_distance(nodes[o_idx], nodes[d_idx])
+                                 matrix[o_idx][d_idx] = val
+                                 # Guardar en caché
+                                 self.cache.store_route(
+                                     (nodes[o_idx]['lat'], nodes[o_idx]['lng']),
+                                     (nodes[d_idx]['lat'], nodes[d_idx]['lng']),
+                                     val, duration=dur_val, truck_specs=self.truck_specs
+                                 )
                     else:
                         if response.status_code in [403, 401] or "bill" in response.text.lower() or "not enabled" in response.text.lower():
                             logger.warning("Google Maps Billing/Auth/API no activo (Routes API). Usando Haversine.")
@@ -200,6 +210,73 @@ class GeoUtils:
         except Exception as e:
             logger.error(f"Excepción al llamar a Routes API: {e}")
             return self._fallback_haversine_matrix(nodes)
+
+    def _calculate_distance_matrix_osrm(self, nodes):
+        """Calcula distancias usando el servidor gratuito de OpenStreetMap (OSRM)."""
+        num_nodes = len(nodes)
+        matrix = np.zeros((num_nodes, num_nodes))
+        
+        # 1. Intentar llenar desde caché (Ignoramos truck_specs para OSM)
+        missing_pairs = []
+        for i in range(num_nodes):
+            for j in range(num_nodes):
+                if i == j:
+                    matrix[i][j] = 0
+                    continue
+                cached = self.cache.get_route(
+                    (nodes[i]['lat'], nodes[i]['lng']),
+                    (nodes[j]['lat'], nodes[j]['lng']),
+                    truck_specs={} # OSM ignora specs
+                )
+                if cached:
+                    matrix[i][j] = cached['distance_meters']
+                else:
+                    missing_pairs.append((i, j))
+
+        if not missing_pairs:
+            logger.info("Matriz OSM recuperada íntegramente de la caché.")
+            return matrix, True
+
+        # 2. Llamada a la API de OSRM (Table API)
+        # Formato: lon,lat;lon,lat...
+        coords_str = ";".join([f"{n['lng']},{n['lat']}" for n in nodes])
+        
+        # Intentar servidor local (OSRM_URL) o fallback al público
+        urls_to_try = [
+            f"{OSRM_URL}/table/v1/driving/{coords_str}?sources=all&destinations=all&annotations=distance,duration",
+            f"http://router.project-osrm.org/table/v1/driving/{coords_str}?sources=all&destinations=all&annotations=distance,duration"
+        ]
+
+        for url in urls_to_try:
+            try:
+                logger.info(f"Consultando OSRM en: {url}...")
+                response = requests.get(url, timeout=10)
+                if response.status_code == 200:
+                    data = response.json()
+                    if 'distances' in data and 'durations' in data:
+                        # OSRM devuelve una matriz [origen][destino]
+                        for i in range(num_nodes):
+                            for j in range(num_nodes):
+                                dist_val = data['distances'][i][j]
+                                dur_val = data['durations'][i][j]
+                                if dist_val is not None:
+                                    matrix[i][j] = dist_val
+                                    # Guardar en caché para futuras ejecuciones
+                                    if i != j:
+                                        self.cache.store_route(
+                                            (nodes[i]['lat'], nodes[i]['lng']),
+                                            (nodes[j]['lat'], nodes[j]['lng']),
+                                            dist_val, duration=dur_val, truck_specs={}
+                                        )
+                                else:
+                                    matrix[i][j] = self.haversine_distance(nodes[i], nodes[j])
+                        return matrix, True
+            except Exception as e:
+                logger.debug(f"Servidor OSRM {url} no disponible: {e}")
+                continue
+        
+        logger.warning(f"Ningún servidor OSRM respondió. Usando Haversine.")
+        return self._fallback_haversine_matrix(nodes)
             
     def _calculate_distance_matrix_google_maps(self, nodes):
         """
@@ -256,16 +333,19 @@ class GeoUtils:
     # ------------------------------------------------------------------
     def get_route_polyline(self, start_coords, end_coords):
         """Obtiene la geometría de la carretera entre dos puntos basándose en la API configurada."""
-        if GeoUtils._api_disabled or not GOOGLE_MAPS_API_KEY:
-            return None
-        
         # Check cache
         cached = self.cache.get_polyline(start_coords, end_coords, truck_specs=self.truck_specs)
         if cached:
             return cached
-            
-        if self.api_type == "routes_api":
+        
+        if self.api_type == 'haversine':
+            # En modo haversine, podemos devolver una línea recta opcionalmente
+            # o simplemente None para que el visualizador use líneas geodésicas.
+            return None
+        elif self.api_type == "routes_api":
             res = self._get_route_polyline_routes_api(start_coords, end_coords)
+        elif self.api_type == "osrm":
+            res = self._get_route_polyline_osrm(start_coords, end_coords)
         else:
             res = self._get_route_polyline_google_maps(start_coords, end_coords)
         
@@ -277,6 +357,9 @@ class GeoUtils:
         
     def _get_route_polyline_routes_api(self, start_coords, end_coords):
         """Obtiene polyline usando Routes API."""
+        if GeoUtils._api_disabled or not GOOGLE_MAPS_API_KEY:
+            return None
+            
         url = "https://routes.googleapis.com/directions/v2:computeRoutes"
         headers = {
             "Content-Type": "application/json",
@@ -323,4 +406,20 @@ class GeoUtils:
                 return result[0]['overview_polyline']['points']
         except Exception:
             return "BILLING_ERROR"
+        return None
+
+    def _get_route_polyline_osrm(self, start_coords, end_coords):
+        """Obtiene polyline usando OSRM."""
+        path = f"/route/v1/driving/{start_coords[1]},{start_coords[0]};{end_coords[1]},{end_coords[0]}?overview=full&geometries=polyline"
+        urls_to_try = [f"{OSRM_URL}{path}", f"http://router.project-osrm.org{path}"]
+
+        for url in urls_to_try:
+            try:
+                response = requests.get(url, timeout=5)
+                if response.status_code == 200:
+                    data = response.json()
+                    if "routes" in data and len(data["routes"]) > 0:
+                        return data["routes"][0].get("geometry")
+            except Exception:
+                continue
         return None
