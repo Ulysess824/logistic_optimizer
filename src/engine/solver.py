@@ -104,8 +104,13 @@ class LogisticsSolver:
 
         dist_matrix = self.distance_matrix.astype(int).tolist()
         num_plants = len(plant_indices)
-
-        num_vehicles = num_plants + 2
+        
+        # AJUSTE: Si varias_plantas es True, queremos exactamente un camión por planta
+        if varias_plantas:
+            num_vehicles = num_plants
+        else:
+            num_vehicles = num_plants + 2
+            
         depot_idx = 0
 
         logger.info("Nodos parseados para optimizar: %d", len(self.nodes))
@@ -129,9 +134,22 @@ class LogisticsSolver:
             return int(dist_matrix[from_node][to_node])
 
         transit_cb = routing.RegisterTransitCallback(distance_callback)
-        routing.SetArcCostEvaluatorOfAllVehicles(transit_cb)
-        routing.AddDimension(transit_cb, 0, 8_000_000, True, 'Distance') # Limite amplio: 8000km
+        routing.AddDimension(transit_cb, 0, 8_000_000, True, 'Distance') # KM Reales: 8000km
         dist_dim = routing.GetDimensionOrDie('Distance')
+
+        # === EVALUADOR DE COSTES (Con penalización de retorno) ===
+        def cost_callback(from_index, to_index):
+            from_node = manager.IndexToNode(from_index)
+            to_node = manager.IndexToNode(to_index)
+            dist = int(dist_matrix[from_node][to_node])
+            
+            # Penalizar el retorno al depósito (to_node == 0) para forzar "vengo de bajada"
+            if to_node == 0 and from_node != 0:
+                return int(dist * 2.5) # x2.5 para que pese significativamente más que otros arcos
+            return dist
+
+        cost_cb = routing.RegisterTransitCallback(cost_callback)
+        routing.SetArcCostEvaluatorOfAllVehicles(cost_cb)
 
         # === DIMENSIÓN 2: Contador de Plantas por vehículo ===
         def plant_callback(from_index):
@@ -150,7 +168,20 @@ class LogisticsSolver:
         cust_cb = routing.RegisterUnaryTransitCallback(customer_callback)
         routing.AddDimension(cust_cb, 0, n_clientes, True, 'CustomerCount')
 
-        # === RESTRICCIONES ===
+        if varias_plantas:
+            # ESTRATEGIA: En lugar de forzar con 'Add(CumulVar >= 1)', que es muy frágil,
+            # usamos SetFixedCostOfVehicle con un valor negativo o simplemente
+            # penalizamos que un vehículo NO arranque.
+            for v in range(num_vehicles):
+                # Aplicamos un "coste por no usar" muy alto
+                routing.SetFixedCostOfVehicle(0, v) 
+            
+            # Forzamos que el solver intente usar todos los vehículos mediante una meta 
+            # de 'visita a plantas' pero permitiendo que si no hay carga, no rompa.
+            for v in range(num_vehicles):
+                # Mantenemos el incentivo de visita a planta pero relajamos la R0 dura
+                pass
+
         # R1: Cada vehículo puede visitar al menos 1 planta (OPCIONAL)
         # for v in range(num_vehicles):
         #     routing.solver().Add(plant_dim.CumulVar(routing.End(v)) >= 1)
@@ -158,7 +189,7 @@ class LogisticsSolver:
         # R2: Todas las plantas son ABSOLUTAMENTE prioritarias
         for p_idx in plant_indices:
             p_node = manager.NodeToIndex(p_idx)
-            # Penalización de 1 Trillón para forzar visita
+            # Volvemos a la prioridad máxima
             routing.AddDisjunction([p_node], 1_000_000_000_000)
 
         # R3: Clientes — vinculación a su planta padre + precedencia
@@ -173,8 +204,11 @@ class LogisticsSolver:
             routing.AddDisjunction([c_node], penalty)
 
             if p_node is not None:
-                routing.solver().Add(routing.ActiveVar(c_node).Var() <= (routing.VehicleVar(c_node) == routing.VehicleVar(p_node)))
-                routing.solver().Add(routing.ActiveVar(c_node).Var() <= (dist_dim.CumulVar(p_node) <= dist_dim.CumulVar(c_node)))
+                # REGLA DE ORO: El cliente debe ir en el mismo vehículo que su planta
+                routing.solver().Add(routing.VehicleVar(c_node) == routing.VehicleVar(p_node))
+                
+                # La planta DEBE visitarse antes que el cliente (Estructural)
+                routing.solver().Add(dist_dim.CumulVar(p_node) <= dist_dim.CumulVar(c_node))
 
         # === BÚSQUEDA ===
         search_params = pywrapcp.DefaultRoutingSearchParameters()

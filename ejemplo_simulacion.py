@@ -144,7 +144,7 @@ def main():
     animador = AnimadorLogistico(df_resultados, origen, usar_rutas_reales=True)
     nombre_gif = os.path.join('outputs', 'simulacion_rutas_optimizadas.gif')
     os.makedirs('outputs', exist_ok=True)
-    animador.generar_gif(nombre_archivo=nombre_gif, fps=40)
+    animador.generar_gif(nombre_archivo=nombre_gif, fps=25)
     print(f"✅ Animación guardada en: {nombre_gif}")
 
 

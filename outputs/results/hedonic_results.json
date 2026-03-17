@@ -1,0 +1,135 @@
+{
+    "model_full": {
+        "summary": {
+            "rsquared": 0.310646133236381,
+            "rsquared_adj": 0.3106135733703067,
+            "fvalue": 9540.768150791979,
+            "f_pvalue": 0.0,
+            "n_obs": 190557,
+            "durbin_watson": 0.9524930998911327,
+            "breusch_pagan_p": 0.0
+        },
+        "coefficients": {
+            "const": 1.705447917460998,
+            "log_Distance": 0.4810818127405412,
+            "log_Pallets": 0.49581958454834685,
+            "Carr_TC ARMIÑO CARGO,S.L.": -0.1246675075150465,
+            "Carr_TC GRANXATRANS LOGISTICA,S.L.": 0.12715046404663777,
+            "Carr_TC HERRUZO GONZALEZ, JACINTO": 0.08113153304667806,
+            "Carr_TC TRANSPORTS J BONET, S.L.": -0.06487762223676931,
+            "Carr_TC TRANSROMAN S.L.": 0.14901802847929638,
+            "Type_TM Third-party_FTL/CTL": -0.4232261314601244,
+            "Type_TM Third-party_LTL": -0.8027829409146283
+        },
+        "pvalues": {
+            "const": 1.2275434121682465e-44,
+            "log_Distance": 0.0,
+            "log_Pallets": 0.0,
+            "Carr_TC ARMIÑO CARGO,S.L.": 1.4391597221990765e-15,
+            "Carr_TC GRANXATRANS LOGISTICA,S.L.": 2.646076382922816e-17,
+            "Carr_TC HERRUZO GONZALEZ, JACINTO": 5.7850173456346085e-05,
+            "Carr_TC TRANSPORTS J BONET, S.L.": 6.664794781018647e-05,
+            "Carr_TC TRANSROMAN S.L.": 6.301804148879183e-28,
+            "Type_TM Third-party_FTL/CTL": 0.0004698620604938321,
+            "Type_TM Third-party_LTL": 4.107942958804041e-11
+        },
+        "std_errors": {
+            "const": 0.12163875464145109,
+            "log_Distance": 0.002375403363425447,
+            "log_Pallets": 0.0041015607113110515,
+            "Carr_TC ARMIÑO CARGO,S.L.": 0.015617145055399123,
+            "Carr_TC GRANXATRANS LOGISTICA,S.L.": 0.015026017503843452,
+            "Carr_TC HERRUZO GONZALEZ, JACINTO": 0.020174429568218924,
+            "Carr_TC TRANSPORTS J BONET, S.L.": 0.0162680714074683,
+            "Carr_TC TRANSROMAN S.L.": 0.013600830927997253,
+            "Type_TM Third-party_FTL/CTL": 0.12101043426206294,
+            "Type_TM Third-party_LTL": 0.12162425133176764
+        },
+        "variables": [
+            "const",
+            "log_Distance",
+            "log_Pallets",
+            "Carr_TC ARMIÑO CARGO,S.L.",
+            "Carr_TC GRANXATRANS LOGISTICA,S.L.",
+            "Carr_TC HERRUZO GONZALEZ, JACINTO",
+            "Carr_TC TRANSPORTS J BONET, S.L.",
+            "Carr_TC TRANSROMAN S.L.",
+            "Type_TM Third-party_FTL/CTL",
+            "Type_TM Third-party_LTL"
+        ]
+    },
+    "model_base": {
+        "summary": {
+            "rsquared": 0.3095776298630055,
+            "rsquared_adj": 0.30956313676148706,
+            "fvalue": 21360.343710311136,
+            "f_pvalue": 0.0,
+            "n_obs": 190557,
+            "durbin_watson": 0.9518572262864508,
+            "breusch_pagan_p": 0.0
+        },
+        "coefficients": {
+            "const": 1.6854662578854778,
+            "log_Distance": 0.48305123618157436,
+            "log_Pallets": 0.49069075459230044,
+            "Type_TM Third-party_FTL/CTL": -0.3894910166656891,
+            "Type_TM Third-party_LTL": -0.7825480603547439
+        },
+        "pvalues": {
+            "const": 1.3865885712731129e-43,
+            "log_Distance": 0.0,
+            "log_Pallets": 0.0,
+            "Type_TM Third-party_FTL/CTL": 0.0012953322073648089,
+            "Type_TM Third-party_LTL": 1.2675268400854806e-10
+        },
+        "std_errors": {
+            "const": 0.12171796063372303,
+            "log_Distance": 0.002352370676204221,
+            "log_Pallets": 0.004080034373143371,
+            "Type_TM Third-party_FTL/CTL": 0.12107049271980325,
+            "Type_TM Third-party_LTL": 0.12167663821518554
+        },
+        "variables": [
+            "const",
+            "log_Distance",
+            "log_Pallets",
+            "Type_TM Third-party_FTL/CTL",
+            "Type_TM Third-party_LTL"
+        ]
+    },
+    "model_no_pallets": {
+        "summary": {
+            "rsquared": 0.2571706117538768,
+            "rsquared_adj": 0.2571589169069589,
+            "fvalue": 21990.079353771103,
+            "f_pvalue": 0.0,
+            "n_obs": 190557,
+            "durbin_watson": 0.9773710372140614,
+            "breusch_pagan_p": 0.0
+        },
+        "coefficients": {
+            "const": 2.6134263630153294,
+            "log_Distance": 0.5741503964602502,
+            "Type_TM Third-party_FTL/CTL": -0.2110881499734473,
+            "Type_TM Third-party_LTL": -1.328156784983866
+        },
+        "pvalues": {
+            "const": 1.8593459219297836e-95,
+            "log_Distance": 0.0,
+            "Type_TM Third-party_FTL/CTL": 0.09276120098333826,
+            "Type_TM Third-party_LTL": 6.33849252266302e-26
+        },
+        "std_errors": {
+            "const": 0.12599876274271804,
+            "log_Distance": 0.0023100495627920107,
+            "Type_TM Third-party_FTL/CTL": 0.12557167319596138,
+            "Type_TM Third-party_LTL": 0.12612207226135255
+        },
+        "variables": [
+            "const",
+            "log_Distance",
+            "Type_TM Third-party_FTL/CTL",
+            "Type_TM Third-party_LTL"
+        ]
+    }
+}

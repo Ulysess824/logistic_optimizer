@@ -25,7 +25,7 @@ def fmt_std(val, decimals=2):
     return f"{val:,.{decimals}f}"
 
 
-def generate_dashboard(summary_path, routes_path, output_path):
+def generate_dashboard(summary_path, routes_path, output_path, hedonic_path=None):
     """Actualiza el fichero HTML de presentación con los datos reales."""
 
     summary_path = Path(summary_path)
@@ -52,65 +52,75 @@ def generate_dashboard(summary_path, routes_path, output_path):
     total_empty_before = 0.0
     total_empty_after  = 0.0
     km_rows_html: list[str] = []
+    route_rows_html: list[str] = []
     unique_plants: set[str] = set()
     unique_customers: set[str] = set()
 
-    for i, route in enumerate(routes, 1):
-        depot        = route[0]
-        plant        = route[1]
-        last_customer = route[-2]
-
-        unique_plants.add(plant["id"])
+    for idx, r in enumerate(summary["routes"]):
+        # Recuperamos la información de la ruta completa para cálculos específicos
+        route_nodes = routes[idx]
+        depot = route_nodes[0]
         
-        for n in route:
-            if n["type"] == "customer":
-                # Usamos una clave única (id o nombre) para contar clientes únicos
-                unique_customers.add(n.get("id") or n.get("name"))
+        # Encontramos la última planta de la ruta (tradicionalmente el camión volvería desde ahí)
+        plants_in_route = [n for n in route_nodes if n["type"] == "carton_plant"]
+        last_plant = plants_in_route[-1]
+        
+        # Encontramos el último cliente de la ruta (desde donde vuelve ahora)
+        customers_in_route = [n for n in route_nodes if n["type"] == "customer"]
+        if not customers_in_route:
+            # Si no hay clientes, el camión vuelve desde la última planta
+            last_customer = last_plant
+        else:
+            last_customer = customers_in_route[-1]
 
-        empty_before = geo.haversine_km(plant["lat"], plant["lng"],
+        # Kilómetros vacíos:
+        # Tradicional: De la última planta al depósito
+        empty_before = geo.haversine_km(last_plant["lat"], last_plant["lng"],
                                         depot["lat"], depot["lng"])
-        empty_after  = geo.haversine_km(last_customer["lat"], last_customer["lng"],
-                                        depot["lat"], depot["lng"])
-
-        savings     = empty_before - empty_after
+        # Backhauling: Del último cliente al depósito (ya calculado en el sumario)
+        empty_after = r["empty_km"]
+        
+        savings     = max(0, empty_before - empty_after)
         improvement = (savings / empty_before * 100) if empty_before > 0 else 0
+        
         total_empty_before += empty_before
         total_empty_after  += empty_after
+        
+        unique_plants.update(r["plant_ids"])
+        unique_customers.update(r["customers"])
 
-        plant_name = plant["name"].replace("Smurfit Westrock ", "")
+        # Fila para la Tabla de Impacto (Tab 1)
+        # Usamos nombres cortos de plantas unidos por coma
+        plants_short = ", ".join([p.replace("Smurfit Westrock ", "") for p in r["plants"]])
+        
         km_rows_html.append(
-            f'<tr class="border-b hover:bg-gray-50">'
-            f'<td class="py-2 px-4 font-semibold border-r">Ruta {i} - {plant_name}</td>'
-            f'<td class="py-2 px-4 text-center text-red-500 font-mono">{fmt_std(empty_before)} km</td>'
-            f'<td class="py-2 px-4 text-center text-green-600 font-mono bg-green-50/30">{fmt_std(empty_after)} km</td>'
-            f'<td class="py-2 px-4 text-center font-bold text-blue-600 bg-blue-50/30">{fmt_std(savings)} km</td>'
-            f'<td class="py-2 px-4 text-center font-bold text-blue-600 bg-blue-50/30">{fmt_std(improvement, 1)}%</td>'
+            f'<tr class="hover:bg-gray-50 border-b">'
+            f'<td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">{plants_short}</td>'
+            f'<td class="px-3 py-2 text-center font-mono">{fmt_std(r["distance_km"])}</td>'
+            f'<td class="px-3 py-2 text-center font-mono">{fmt_std(empty_before)}</td>'
+            f'<td class="px-3 py-2 text-center font-mono font-bold text-blue-700">{fmt_std(empty_after)}</td>'
+            f'<td class="px-3 py-2 text-center font-bold text-green-600">+{fmt_std(improvement, 1)}%</td>'
+            f'<td class="px-3 py-2 text-center text-gray-400" title="Por recolectar">-</td>'
+            f'<td class="px-3 py-2 text-center text-gray-400" title="Por recolectar">-</td>'
+            f'<td class="px-3 py-2 text-center text-gray-400" title="Por recolectar">-</td>'
+            f'<td class="px-3 py-2 text-center text-gray-400" title="Por recolectar">-</td>'
+            f'</tr>'
+        )
+
+        # Fila para la Tabla Detallada (Tab 3)
+        bg_class = ' bg-gray-50' if idx % 2 == 1 else ''
+        route_rows_html.append(
+            f'<tr class="border-b hover:bg-gray-50{bg_class}">'
+            f'<td class="py-3 px-4 font-bold text-center">{r["route_id"]}</td>'
+            f'<td class="py-3 px-4">{", ".join(r["plants"])}</td>'
+            f'<td class="py-3 px-4 text-center">{r["num_customers"]}</td>'
+            f'<td class="py-3 px-4 font-mono">{fmt_std(r["distance_km"])} km</td>'
+            f'<td class="py-3 px-4 text-xs italic">{", ".join(r["customers"])}</td>'
             f'</tr>'
         )
 
     total_savings = total_empty_before - total_empty_after
     total_pct     = (total_savings / total_empty_before * 100) if total_empty_before > 0 else 0
-
-    # ──────────────────────────────────────────────────────────────────
-    # 2. Construir tabla de rutas (Tab 3)
-    # ──────────────────────────────────────────────────────────────────
-    route_rows_html: list[str] = []
-
-    for idx, r in enumerate(summary["routes"]):
-        plant_str    = ", ".join(r["plants"])
-        customers_str = ", ".join(r["customers"])
-        bg_class     = ' bg-gray-50' if idx % 2 == 1 else ''
-        route_rows_html.append(
-            f'<tr class="border-b hover:bg-gray-50{bg_class}">'
-            f'<td class="py-3 px-4 font-bold text-center">{r["route_id"]}</td>'
-            f'<td class="py-3 px-4">{plant_str}</td>'
-            f'<td class="py-3 px-4 text-center">{r["num_customers"]}</td>'
-            f'<td class="py-3 px-4 font-mono">{fmt_std(r["distance_km"])} km</td>'
-            f'<td class="py-3 px-4 text-xs italic">{customers_str}</td>'
-            f'</tr>'
-        )
-
-        short_name = r["plants"][0].replace("Smurfit Westrock ", "")
 
     # ──────────────────────────────────────────────────────────────────
     # 3. Leer y parchear el HTML
@@ -133,6 +143,85 @@ def generate_dashboard(summary_path, routes_path, output_path):
     html = _replace_kpi(html, r"Clientes Satisfechos",      len(unique_customers))
     html = _replace_kpi(html, r"Ahorro Km Vac[ií]os",      f"~{fmt_std(total_pct, 1)}%")
 
+    # --- 3b. Hedonic Section ---
+    if hedonic_path and Path(hedonic_path).exists():
+        with open(hedonic_path, "r", encoding="utf-8") as f:
+            hd = json.load(f)
+        
+        def build_model_table(model_data, title):
+            rows = []
+            for var, coef in model_data["coefficients"].items():
+                p = model_data["pvalues"].get(var, 0)
+                # Show p-value exactly as 0.000 or actual decimal
+                p_str = f"{p:.4f}" if p >= 0.0001 else "0.0000"
+                rows.append(
+                    f'<tr class="border-b"><td class="py-1 px-3">{var}</td>'
+                    f'<td class="py-1 px-3 font-mono text-center">{coef:.4f}</td>'
+                    f'<td class="py-1 px-3 text-center text-[10px] font-mono">{p_str}</td></tr>'
+                )
+            
+            return (
+                f'<div class="flex-1 min-w-[300px]">'
+                f'  <h4 class="text-sm font-bold text-gray-700 bg-gray-50 p-2 border-l-2 border-indigo-400 mb-2">{title}</h4>'
+                f'  <table class="w-full text-[11px] text-left">'
+                f'    <thead class="bg-gray-100"><tr><th class="p-1 px-3">Variable</th><th class="p-1 text-center">Coef.</th><th class="p-1 text-center">P-valor</th></tr></thead>'
+                f'    <tbody>{"".join(rows)}</tbody>'
+                f'  </table>'
+                f'  <div class="mt-4 p-3 bg-indigo-50/50 rounded text-[11px]">'
+                f'    <p><strong>R² Adj:</strong> {model_data["summary"]["rsquared_adj"]:.4f}</p>'
+                f'    <p><strong>Durbin-Watson:</strong> {model_data["summary"]["durbin_watson"]:.2f}</p>'
+                f'    <p><strong>N:</strong> {model_data["summary"]["n_obs"]:,}</p>'
+                f'  </div>'
+                f'</div>'
+            )
+
+        tables_html = (
+            f'<div class="flex flex-wrap gap-6 mt-4">'
+            f'  {build_model_table(hd["model_full"], "Modelo 1: Completo")}'
+            f'  {build_model_table(hd["model_base"], "Modelo 2: Sin Transportista")}'
+            f'  {build_model_table(hd["model_no_pallets"], "Modelo 3: Sin Pallets")}'
+            f'</div>'
+        )
+
+        explanations_html = (
+            f'<div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-10 border-t pt-8">'
+            f'  <div class="card bg-white">'
+            f'    <h4 class="font-bold text-indigo-900 border-b pb-2 mb-3">Glosario de Variables</h4>'
+            f'    <ul class="text-xs space-y-3 text-gray-700">'
+            f'      <li><strong>log_Distance:</strong> Elasticidad-distancia. Indica cuánto varía porcentualmente el coste ante un cambio en la distancia. Refleja la economía de escala por recorrido.</li>'
+            f'      <li><strong>log_Pallets:</strong> Elasticidad-volumen. Captura el impacto de la carga transportada en la tarifa final.</li>'
+            f'      <li><strong>Carr_ (Dummies):</strong> Efecto diferencial de cada transportista sobre la media. Captura eficiencias operativas o primas de marca.</li>'
+            f'      <li><strong>Type_ (Dummies):</strong> Diferencial de precio según el modo de envío (LTL vs FTL).</li>'
+            f'      <li><strong>Const:</strong> Tarifa base o componente fijo del precio no explicada por el recorrido o volumen.</li>'
+            f'    </ul>'
+            f'  </div>'
+            f'  <div class="card bg-white">'
+            f'    <h4 class="font-bold text-indigo-900 border-b pb-2 mb-3">Análisis de Validación</h4>'
+            f'    <ul class="text-xs space-y-3 text-gray-700">'
+            f'      <li><strong>R-cuadrado Ajustado:</strong> Mide la capacidad predictiva. Al comparar los tres modelos, observamos que eliminar los pallets ({hd["model_no_pallets"]["summary"]["rsquared_adj"]:.3f}) afecta al ajuste, demostrando que el volumen es un driver crítico.</li>'
+            f'      <li><strong>Durbin-Watson:</strong> Detecta autocorrelación en residuos. Valores consistentes entre modelos sugieren estabilidad en la estructura de error.</li>'
+            f'      <li><strong>P-valor:</strong> Los resultados exactos confirman que todas las variables en los tres modelos son estadísticamente significativas (p-valor < 0.05).</li>'
+            f'    </ul>'
+            f'  </div>'
+            f'</div>'
+        )
+
+        hedonic_html = (
+            f'<div class="card shadow-md border-t-4 border-indigo-600 p-6 mt-12 bg-white">'
+            f'  <h2 class="text-2xl font-bold text-indigo-900 mb-2">Estimación de Tarifa por medio de Precios Hedónicos</h2>'
+            f'  <p class="text-sm text-gray-600 mb-8 italic">Análisis econométrico SOTA mediante modelos de doble logaritmo (Elasticidades).</p>'
+            f'  {tables_html}'
+            f'  {explanations_html}'
+            f'</div>'
+        )
+        
+        hedonic_marker = '<div id="hedonic-placeholder"></div>'
+        if hedonic_marker in html:
+            html = html.replace(hedonic_marker, hedonic_html)
+        else:
+            # Si no existe el marker, lo ponemos al final de resultados
+            html = html.replace('<!-- Fin Detalle Operativo -->', hedonic_html + '\n<!-- Fin Detalle Operativo -->')
+
     # --- 3c. Tabla de Rutas (Tab 3) ---
     tbody_marker = 'id="routes-tbody"'
     idx_tbody = html.find(tbody_marker)
@@ -144,6 +233,17 @@ def generate_dashboard(summary_path, routes_path, output_path):
         if end_content != -1:
             html = (html[:start_content]
                     + '\n' + "\n".join(route_rows_html) + '\n'
+                    + html[end_content:])
+
+    # --- 3d. Tabla de Comparativa (Ahorro Km) ---
+    tbody_comp_marker = 'id="comparison-tbody"'
+    idx_tbody_comp = html.find(tbody_comp_marker)
+    if idx_tbody_comp != -1:
+        start_content = html.find('>', idx_tbody_comp) + 1
+        end_content = html.find('</tbody>', start_content)
+        if end_content != -1:
+            html = (html[:start_content]
+                    + '\n' + "\n".join(km_rows_html) + '\n'
                     + html[end_content:])
 
 

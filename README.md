@@ -11,8 +11,9 @@ Actualmente, el proyecto cuenta con un sistema maduro, empaquetado y altamente v
 1. **Motor de VRP de Alta Resiliencia**: Usamos Google OR-Tools con una arquitectura de **Restricciones Blandas (Disjunctions)**. Esto permite que el sistema maneje clientes obligatorios en escenarios geográficamente extremos sin fallar ni detenerse, priorizando siempre la viabilidad del negocio y la convergencia global de la flota.
 2. **Sistema de GPS Real (Compatible con Camiones)**: Integración precisa para recuperar distancias terrestres a través de la moderna **Google Routes API**, permitiendo perfiles de enrutamiento pesado (emisiones, altura, peso máximo). Posee un sistema de respaldo automático que hace estimaciones geográficas si no hay API disponible.
 3. **Smart Data Filtering (Filtros Inteligentes)**: El sistema automáticamente descarta ramificaciones inviables por distancia antes de saturar el motor matemático, asegurando mucha mayor rapidez computacional al descartar clientes que se alejan excesivamente en la ruta de retorno natural.
-4. **Dashboard Interactivo Profesional**: En lugar de simples planillas de texto, el proyecto emite un archivo HTML interactivo (`Presentacion_Logistica.html`) combinando Mapas satelitales (Folium), Grafos relacionales (Plotly), y tablas de KPIs matemáticos. Incluye un logo corporativo y una estética premium optimizada para presentaciones ejecutivas.
-5. **Simulación Dinámica de Flotas (SOTA)**: Módulo especializado (`src/simulation/`) que utiliza **SimPy** para modelar la operación real. A diferencia de modelos estáticos, esta simulación:
+4. **Dashboard Interactivo Profesional**: En lugar de simples planillas de texto, el proyecto emite un archivo HTML interactivo (`Presentacion_Logistica.html`) combinando Mapas satelitales (Folium), Grafos relacionales (Plotly), y tablas de KPIs matemáticos. **Incluye una sección de metodología con visualización interactiva de la lógica de filtros y elipse de desvío.**
+5. **Optimización Multi-Planta (Backhauling Avanzado)**: El solver ahora permite que un mismo vehículo visite múltiples plantas en su ruta de regreso, maximizando la consolidación de carga y reduciendo drásticamente la flota necesaria cuando se activa el modo `VARIAS_PLANTAS`.
+6. **Simulación Dinámica de Flotas (SOTA)**: Módulo especializado (`src/simulation/`) que utiliza **SimPy** para modelar la operación real. A diferencia de modelos estáticos, esta simulación:
     - Considera **tiempos de viaje reales** y **polilíneas de carretera** (vía caché de Google).
     - Modela cuellos de botella en **muelles de carga** y **disponibilidad de conductores**.
     - Incluye un parámetro de `desfase_hora` para simular la llegada aleatoria de camiones, evitando sincronizaciones artificiales.
@@ -64,7 +65,15 @@ graph TD
     F -- "Fórmula: (P→C + C→M) - P→M" --> G[Ranking de Eficiencia de Retorno]
     G --> H[Selección Top N por Planta]
     H --> I[Motor VRP (Google OR-Tools)]
+    I --> J[Resultados: Rutas Consolidadas Multi-Planta]
 ```
+
+### Visualización de la Lógica (Elipse de Desvío)
+Puedes ver una explicación visual e interactiva de cómo funcionan estos filtros ejecutando:
+```bash
+python visualizacion_filtros.py
+```
+Esto generará un mapa en `outputs/maps/visualizacion_logica_datamanager.html` mostrando el **círculo de radio** y la **elipse de desvío** (eficiencia de retorno).
 
 ### Explicación de los Filtros
 1. **Filtro de Última Milla (Radio Local):** Limita geográficamente la zona de actuación. Un camión que carga en una planta solo puede entregar a clientes en un radio de acción controlado (asfalto real), evitando que el motor sugiera cruzar el país para una entrega simple si no es estrictamente eficiente.

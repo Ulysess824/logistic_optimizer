@@ -172,7 +172,7 @@ class AnimadorLogistico:
             f"Retornados: {retornados}"
         )
 
-        return self.puntos_camiones, self.texto_reloj, self.texto_stats
+        return self.puntos_camiones, self.texto_reloj, self.texto_stats,
 
     def generar_gif(self, nombre_archivo='outputs/simulacion_dinamica.gif', fps=40):
         # Encontrar el tiempo en que el primer camión sale y el último camión regresa
@@ -183,14 +183,14 @@ class AnimadorLogistico:
         t_start = max(6.0, t_min - 0.2)
         t_final = min(t_max + 0.5, 48.0) 
         
-        # Paso de tiempo MUY fino para fluidez total: 0.02h = 1.2 min
-        # Con 40 FPS, 1 segundo de vídeo = 40 * 0.02h = 0.8h (~48 min). 
-        # Un día de 24h se ve en ~30 segundos.
-        tiempos = np.arange(t_start, t_final, 0.02)
+        # Paso de tiempo optimizado: 0.05h = 3 min
+        # Con 25 FPS, 1 segundo de vídeo = 25 * 0.05h = 1.25h. 
+        # Un día de 24h se ve en ~20 segundos.
+        tiempos = np.arange(t_start, t_final, 0.05)
         
         ani = animation.FuncAnimation(
             self.fig, self.actualizar, frames=tiempos,
-            interval=1000 / fps, blit=False
+            interval=1000 / fps, blit=True
         )
         ani.save(nombre_archivo, writer='pillow', fps=fps)
         plt.close()

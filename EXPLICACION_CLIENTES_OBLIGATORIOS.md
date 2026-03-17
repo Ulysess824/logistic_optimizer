@@ -41,7 +41,11 @@ Ahora, si el límite es 2 y hay 3 obligatorios, el sistema incluirá los 3 oblig
 | :--- | :--- |
 | `src/utils/data_manager.py` | Implementación de la lógica de prioridad absoluta y bypass de filtros. |
 | `main.py` | (Verificado) Listo para procesar el dict `MANDATORY_CUSTOMERS`. |
-| `src/engine/solver.py` | (Verificado) El solver ya fuerza la visita a cualquier nodo marcado como `obligatorio`. |
+
+### C. Restricción de Acoplamiento (Solver)
+Para que los clientes obligatorios funcionen físicamente, se ha reforzado el motor en `src/engine/solver.py` con la **Regla de Oro**:
+- `routing.solver().Add(routing.VehicleVar(c_node) == routing.VehicleVar(p_node))`
+Esto garantiza que el cliente obligatorio sea visitado **exactamente por el mismo vehículo** que realizó la carga en su planta, respetando la cadena de custodia de la mercancía.
 
 ## 4. Cómo Usarlo en `main.py`
 

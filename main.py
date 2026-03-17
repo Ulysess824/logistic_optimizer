@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 # ======================================================================
 FORCED_GROUPS = []
 N_CLIENTES = 4              
-VARIAS_PLANTAS = False      
+VARIAS_PLANTAS = False        
 MAX_PLANTAS_RUTA = 1        
 MAX_CUSTOMERS_PER_PLANT = 1
 THRESHOLD_KM = 100          
@@ -40,7 +40,10 @@ TRUCK_SPECS = {
 # Formato: {"Nombre_Corto_Planta": ["Nombre_Del_Municipio_Cliente"]}
 # Ejemplo: {"Córdoba": ["El Carpio", "Montilla"]}
 # Ejemplo de uso:
-MANDATORY_CUSTOMERS = {"Alcalá": ["Ciudad Real"]}
+MANDATORY_CUSTOMERS = {
+    "Alcalá": ["Madrid"], 
+    "Córdoba": ["Andujar"]
+    }
 PLANT_GROUPS = []
 # ======================================================================
 
@@ -49,8 +52,19 @@ def run_optimization():
     logger.info("=" * 60)
     logger.info("Logistics Optimizer — Inicio de ejecución")
     logger.info("=" * 60)
-    logger.info("Parámetros: n_clientes=%d | varias_plantas=%s | max_plantas_ruta=%d",
-                N_CLIENTES, VARIAS_PLANTAS, MAX_PLANTAS_RUTA)
+    # 0. Auto-Ajuste de Capacidad (N_CLIENTES)
+    # Calculamos cuántos clientes obligatorios tiene cada planta para no desbordar el solver
+    min_needed_capacity = 0
+    if MANDATORY_CUSTOMERS:
+        for p, custs in MANDATORY_CUSTOMERS.items():
+            num_mand = 1 if isinstance(custs, str) else len(custs)
+            min_needed_capacity = max(min_needed_capacity, num_mand)
+    
+    current_n_clientes = N_CLIENTES
+    if min_needed_capacity > current_n_clientes:
+        logger.warning("¡Capacidad insuficiente detectada! Ajustando N_CLIENTES de %d a %d para soportar carga obligatoria.", 
+                       current_n_clientes, min_needed_capacity)
+        current_n_clientes = min_needed_capacity
 
     # 1. Rutas de Archivos
     plants_file = DATA_DIR / "locations_smurfit.json"
@@ -95,7 +109,7 @@ def run_optimization():
 
     # 5. Ejecutar Optimización
     routes = solver.solve(
-        n_clientes=N_CLIENTES,
+        n_clientes=current_n_clientes,
         varias_plantas=VARIAS_PLANTAS,
         max_plantas_ruta=MAX_PLANTAS_RUTA,
         max_search_time=MAX_SEARCH_TIME,
@@ -179,6 +193,10 @@ def _build_summary(routes, solver):
     total_empty_km = 0
 
     for i, route in enumerate(routes):
+        customer_nodes = [n for n in route if n['type'] == 'customer']
+        if not customer_nodes:
+            continue
+
         dist_km = 0
         empty_km = 0
         for j in range(len(route) - 1):
@@ -189,10 +207,9 @@ def _build_summary(routes, solver):
                 empty_km += d
 
         plant_nodes = [n for n in route if n['type'] == 'carton_plant']
-        customer_nodes = [n for n in route if n['type'] == 'customer']
 
         route_summaries.append({
-            "route_id": i + 1,
+            "route_id": len(route_summaries) + 1,
             "plants": [p['name'] for p in plant_nodes],
             "plant_ids": [p['id'] for p in plant_nodes],
             "num_plants": len(plant_nodes),
@@ -206,7 +223,7 @@ def _build_summary(routes, solver):
         total_empty_km += empty_km
 
     return {
-        "num_routes": len(routes),
+        "num_routes": len(route_summaries),
         "total_km": round(total_km, 2),
         "total_empty_km": round(total_empty_km, 2),
         "distance_source": "GPS Real" if solver.is_real_road else "Haversine (estimación)",

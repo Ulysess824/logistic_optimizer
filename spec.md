@@ -48,6 +48,8 @@ Si recibes la orden de agregar nuevas funciones, sigue estas pautas:
 
 - **Cambio de Lógica o Restricciones del VRP:** Las reglas de ruteo y penalizaciones van en `src/engine/solver.py`.
 - **Preprocesamiento o Filtros de Datos:** `src/utils/data_manager.py`. Aquí se gestiona el filtrado Haversine inicial y la lógica de clientes obligatorios.
+
+## 4. Cómo Usarlo en `main.py`
 - **Geolocalización y Caché:** `src/utils/geo.py` maneja las peticiones a Google. La persistencia de rutas (distancia, duración, polilíneas) está en `data/geo_cache.db` vía `geo_cache.py`.
 - **Dashboard:** Se actualiza mediante `report_generator.py`. Las rutas para las tablas provienen de `outputs/results/optimized_routes.json`.
 - **Reglas del Usuario (IMPORTANTE):** 
@@ -63,4 +65,5 @@ Si recibes la orden de agregar nuevas funciones, sigue estas pautas:
 - `googlemaps` (Geocoding y Routing clásico).
 - `polars` (Procesamiento de datos de alto rendimiento en DataManager).
 
-## 5. Estado Actual (Marzo 2027): El sistema es SOTA (State of the Art) en logística de backhauling. Utiliza **Google Routes API v2** con perfiles de camión pesados y una caché persistente en SQLite. La lógica de optimización se basa en **Disjunctions (Soft Constraints)** con penalizaciones diferenciadas para plantas y obligatorios, garantizando siempre una solución válida y permitiendo ejecuciones de orquestación única (Optimización + Simulación + Dashboard).
+## 5. Estado Actual (Marzo 2027)
+El sistema es **SOTA (State of the Art)** en logística de backhauling. Utiliza **Google Routes API v2** con perfiles de camión pesados y una caché persistente en SQLite. La lógica de optimización se basa en **Disjunctions (Soft Constraints)** con penalizaciones diferenciadas, garantizando siempre una solución válida. Soporta optimización multi-planta (`VARIAS_PLANTAS`) y posee una herramienta de visualización geométrica para explicar la lógica de filtrado (elipse de desvío).

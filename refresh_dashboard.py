@@ -17,8 +17,9 @@ except ImportError:
 
 # Definimos las rutas de los archivos
 SUMMARY_JSON = os.path.join('outputs', 'results', 'optimization_summary.json')
-ROUTES_JSON  = os.path.join('outputs', 'results', 'optimized_routes.json')
-HTML_OUTPUT  = os.path.join('outputs', 'Presentacion_Logistica.html')
+ROUTES_JSON   = os.path.join('outputs', 'results', 'optimized_routes.json')
+HEDONIC_JSON  = os.path.join('outputs', 'results', 'hedonic_results.json')
+HTML_OUTPUT   = os.path.join('outputs', 'Presentacion_Logistica.html')
 
 def main():
     if not os.path.exists(SUMMARY_JSON) or not os.path.exists(ROUTES_JSON):
@@ -29,7 +30,7 @@ def main():
     logger.info("🔄 Sincronizando Dashboard HTML con los últimos resultados...")
     
     try:
-        generate_dashboard(SUMMARY_JSON, ROUTES_JSON, HTML_OUTPUT)
+        generate_dashboard(SUMMARY_JSON, ROUTES_JSON, HTML_OUTPUT, HEDONIC_JSON)
         logger.info(f"✅ Dashboard actualizado correctamente en: {HTML_OUTPUT}")
     except Exception as e:
         logger.error(f"❌ Error al actualizar el dashboard: {e}")
