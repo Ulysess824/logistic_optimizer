@@ -19,32 +19,32 @@ FORCED_GROUPS = []
 N_CLIENTES = 4              
 VARIAS_PLANTAS = False        
 MAX_PLANTAS_RUTA = 1        
-MAX_CUSTOMERS_PER_PLANT = 1
 THRESHOLD_KM = 100          
 MAX_RADIUS_KM = 100          
 MAX_SEARCH_TIME = 90        
 
+# Motor Geográfico: "haversine", "osrm", "google_maps" o "routes_api"
+API_TYPE = "haversine"
 
-# Especificaciones de Camión (Tráiler estándar para bobinas de papel)
+# Configuración personalizada de clientes por planta
+PLANT_CUSTOMER_LIMITS = None  # O usar un dict como en main_fast.py
+
+# Especificaciones de Camión
 TRUCK_SPECS = {
     "emissionType": "DIESEL",
-    "heightCm": 400,        # Altura máxima: 4.0 metros
-    "weightKg": 40_000,     # Peso Máximo Autorizado: 40 toneladas
-    # --- POSIBLES FUTURAS IMPLEMENTACIONES PARA API DE RUTAS ---
-    # "trafficModel": "BEST_GUESS", # Considerar el tráfico real según hora de salida.
-    # "avoidTolls": True,           # Priorizar rutas sin peaje para reducir costes.
+    "heightCm": 400,
+    "weightKg": 40_000,
 }
 
-# Diccionario de clientes que es OBLIGATORIO visitar para cada planta.
-# Acepta tanto clientes que estén o no seleccionados previamente por el filtro kilométrico.
-# Formato: {"Nombre_Corto_Planta": ["Nombre_Del_Municipio_Cliente"]}
-# Ejemplo: {"Córdoba": ["El Carpio", "Montilla"]}
-# Ejemplo de uso:
+# Diccionario de clientes OBLIGATORIOS
 MANDATORY_CUSTOMERS = {
     "Alcalá": ["Madrid"], 
     "Córdoba": ["Andujar"]
-    }
-PLANT_GROUPS = []
+}
+
+# Rutas de datos
+PLANTS_FILE = DATA_DIR / "locations_smurfit.json"
+CLIENTS_FILE = DATA_DIR / "cliente_ubi.json"
 # ======================================================================
 
 
@@ -67,8 +67,8 @@ def run_optimization():
         current_n_clientes = min_needed_capacity
 
     # 1. Rutas de Archivos
-    plants_file = DATA_DIR / "locations_smurfit.json"
-    clients_file = DATA_DIR / "cliente_ubi.json"
+    plants_file = PLANTS_FILE
+    clients_file = CLIENTS_FILE
 
     if not plants_file.exists() or not clients_file.exists():
         logger.error("Faltan archivos de datos en %s", DATA_DIR)
@@ -78,9 +78,9 @@ def run_optimization():
     with open(plants_file, 'r', encoding='utf-8') as f:
         plants_data = json.load(f)
 
-    # Inicializar Motor Geográfico (Haversine para máxima velocidad)
+    # Inicializar Motor Geográfico
     from src.utils.geo import GeoUtils
-    geo_engine = GeoUtils(api_type="haversine")
+    geo_engine = GeoUtils(api_type=API_TYPE)
     geo_engine.set_truck_specs(**TRUCK_SPECS)
 
     # 3. Selección Inteligente de Clientes (Filtros Radio/Retorno via API)
@@ -91,10 +91,11 @@ def run_optimization():
         geo_utils=geo_engine
     )
     enriched_data = dm.get_optimized_locations(
-        max_customers_per_plant=MAX_CUSTOMERS_PER_PLANT,
+        max_customers_per_plant=PLANT_CUSTOMER_LIMITS,
+        default_limit=current_n_clientes,
         threshold_km=THRESHOLD_KM,
         max_radius_km=MAX_RADIUS_KM,
-        mandatory_customers=MANDATORY_CUSTOMERS,   # ← activo, edita el dict arriba
+        mandatory_customers=MANDATORY_CUSTOMERS,
     )
 
     # Debug: Mostrar candidatos por planta

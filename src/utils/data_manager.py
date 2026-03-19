@@ -65,14 +65,15 @@ class DataManager:
     # ------------------------------------------------------------------
     # Selección inteligente de clientes (Filtro de Retorno)
     # ------------------------------------------------------------------
-    def get_optimized_locations(self, max_customers_per_plant=None, threshold_km=None, max_radius_km=None, mandatory_customers=None):
+    def get_optimized_locations(self, max_customers_per_plant=None, threshold_km=None, max_radius_km=None, mandatory_customers=None, default_limit=None):
         """
         Selecciona clientes mediante doble filtro:
         1. Filtro local (Haversine): Clientes dentro de max_radius_km.
         2. Filtro de desvío (API Real): Quedarse con los que supongan el menor desvío
            hacia Mengíbar usando distancias por carretera de la Google Routes API.
         """
-        max_customers_per_plant = max_customers_per_plant or DEFAULT_MAX_CUSTOMERS
+        fallback = default_limit or DEFAULT_MAX_CUSTOMERS
+        max_customers_per_plant = max_customers_per_plant if max_customers_per_plant is not None else fallback
         threshold_km = threshold_km or DEFAULT_THRESHOLD_KM
         max_radius_km = max_radius_km or 1000  # Default grande si no se especifica
         mandatory_customers = mandatory_customers or {}
@@ -195,6 +196,21 @@ class DataManager:
                     qualified_customers.append(cand)
                     
             # --- FASE 3: Selección Final ---
+            # Determinamos el límite para esta planta específica
+            current_limit = fallback
+            if isinstance(max_customers_per_plant, dict):
+                # Usamos el nombre normalizado para la búsqueda en el dict
+                # Buscamos coincidencias con nombres cortos (sin "Smurfit Westrock")
+                plant_key = self._normalize_text(plant['name'].replace("Smurfit Westrock ", ""))
+                # También permitimos la búsqueda por el nombre completo
+                full_plant_key = self._normalize_text(plant['name'])
+                
+                # Prioridad: nombre corto -> nombre completo -> global default
+                dict_norm = {self._normalize_text(k): v for k, v in max_customers_per_plant.items()}
+                current_limit = dict_norm.get(plant_key, dict_norm.get(full_plant_key, fallback))
+            elif isinstance(max_customers_per_plant, int):
+                current_limit = max_customers_per_plant
+
             # Aseguramos que los clientes obligatorios sí o sí entren en la lista.
             mandatories = [c for c in qualified_customers if c.get('obligatorio')]
             optionals = [c for c in qualified_customers if not c.get('obligatorio')]
@@ -202,12 +218,9 @@ class DataManager:
             # Ordenamos los opcionales por menor desvío
             optionals.sort(key=lambda x: x['detour'])
             
-            # Los obligatorios tienen prioridad absoluta y NO cuentan para el límite 
-            # de "clientes opcionales" si el usuario quiere un máximo de N extras.
-            # Sin embargo, para ser fieles al espíritu de 'max_customers_per_plant',
-            # incluiremos todos los obligatorios y luego rellenaremos hasta el límite.
-            # Si ya hay más obligatorios que el límite, se quedan todos los obligatorios y 0 opcionales.
-            num_optionals_to_add = max(0, max_customers_per_plant - len(mandatories))
+            # Los obligatorios tienen prioridad absoluta. 
+            # El límite se aplica al total de la ruta para esta planta.
+            num_optionals_to_add = max(0, current_limit - len(mandatories))
             eligible_customers = mandatories + optionals[:num_optionals_to_add]
 
             new_plant = plant.copy()

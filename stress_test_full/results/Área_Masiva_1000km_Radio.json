@@ -1,0 +1,17 @@
+{
+  "scenario_name": "Área Masiva (1000km Radio)",
+  "total_nodes": 67,
+  "total_routes": 11,
+  "total_time_s": 32.61,
+  "solver_time_s": 30.01,
+  "memory_diff_mb": 1.93,
+  "solution_found": true,
+  "parameters": {
+    "name": "Área Masiva (1000km Radio)",
+    "n_clientes": 5,
+    "max_customers_per_plant": 5,
+    "max_radius_km": 1000,
+    "varias_plantas": false,
+    "max_search_time": 30
+  }
+}

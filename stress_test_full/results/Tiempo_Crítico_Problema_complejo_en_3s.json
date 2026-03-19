@@ -1,0 +1,18 @@
+{
+  "scenario_name": "Tiempo Crítico (Problema complejo en 3s)",
+  "total_nodes": 122,
+  "total_routes": 0,
+  "total_time_s": 5.47,
+  "solver_time_s": 3.01,
+  "memory_diff_mb": -0.23,
+  "solution_found": false,
+  "parameters": {
+    "name": "Tiempo Crítico (Problema complejo en 3s)",
+    "n_clientes": 15,
+    "max_customers_per_plant": 10,
+    "max_radius_km": 400,
+    "varias_plantas": true,
+    "max_plantas_ruta": 2,
+    "max_search_time": 3
+  }
+}

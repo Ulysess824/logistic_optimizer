@@ -121,7 +121,7 @@ def main():
     simulador = TruckSimulated(
         origen=origen,
         rutas=rutas,
-        num_muelles=2,              # Cuello de botella real: solo 2 muelles de carga
+        num_muelles= 5,              # Cuello de botella real: solo 2 muelles de carga
         num_conductores=total_camiones,
         velocidad_kmh=80,
         inicio_operacion_h = 6.5,

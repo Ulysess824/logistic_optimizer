@@ -1,0 +1,18 @@
+{
+  "scenario_name": "Sobrecarga Multi-Planta (3 plantas/ruta)",
+  "total_nodes": 67,
+  "total_routes": 0,
+  "total_time_s": 42.61,
+  "solver_time_s": 40.01,
+  "memory_diff_mb": 0.95,
+  "solution_found": false,
+  "parameters": {
+    "name": "Sobrecarga Multi-Planta (3 plantas/ruta)",
+    "n_clientes": 10,
+    "max_customers_per_plant": 5,
+    "max_radius_km": 500,
+    "varias_plantas": true,
+    "max_plantas_ruta": 3,
+    "max_search_time": 40
+  }
+}

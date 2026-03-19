@@ -29,7 +29,7 @@ DEFAULT_N_CLIENTES = 4        # Máximo de clientes por ruta (dimensión del sol
 DEFAULT_MAX_PLANTS_PER_ROUTE = 1  # Plantas por ruta (1=VRPB clásico, >1=MC-VRPB)
 
 # Data Manager config
-DEFAULT_MAX_CUSTOMERS = 4     # Clientes máximos por planta (pre-filtro DataManager)
+DEFAULT_MAX_CUSTOMERS = 4     # Valor de respaldo si no se define N_CLIENTES o un dict
 DEFAULT_THRESHOLD_KM = 100    # Umbral de desvío en km para filtro de retorno
 
 # Create folders if they don't exist

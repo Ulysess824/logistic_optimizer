@@ -1,12 +1,12 @@
 {
   "num_routes": 11,
-  "total_km": 8559.19,
-  "total_empty_km": 3701.37,
+  "total_km": 8559.83,
+  "total_empty_km": 3745.11,
   "distance_source": "Haversine (Rápido)",
   "parameters": {
-    "n_clientes": 4,
+    "n_clientes": 1,
     "varias_plantas": false,
-    "max_plantas_ruta": 3
+    "max_plantas_ruta": 1
   },
   "routes": [
     {
@@ -18,13 +18,15 @@
         "CP_CORDOBA"
       ],
       "num_plants": 1,
-      "num_customers": 1,
+      "num_customers": 3,
       "customers": [
-        "El Carpio"
+        "Alcolea",
+        "El Carpio",
+        "Arjonilla"
       ],
-      "distance_km": 153.36,
-      "empty_km": 61.19,
-      "num_stops": 4
+      "distance_km": 153.41,
+      "empty_km": 26.79,
+      "num_stops": 6
     },
     {
       "route_id": 2,
@@ -54,10 +56,10 @@
       "num_plants": 1,
       "num_customers": 1,
       "customers": [
-        "Fuente Palmera"
+        "San Jose De La Rinconada"
       ],
-      "distance_km": 501.9,
-      "empty_km": 118.16,
+      "distance_km": 501.95,
+      "empty_km": 196.29,
       "num_stops": 4
     },
     {
@@ -69,13 +71,14 @@
         "CP_ALCALA"
       ],
       "num_plants": 1,
-      "num_customers": 1,
+      "num_customers": 2,
       "customers": [
+        "Chinchon",
         "Ciudad Real"
       ],
-      "distance_km": 566.19,
+      "distance_km": 566.73,
       "empty_km": 111.99,
-      "num_stops": 4
+      "num_stops": 5
     },
     {
       "route_id": 5,

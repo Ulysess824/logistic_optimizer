@@ -78,7 +78,17 @@ class LogisticsSolver:
             metaheuristic:   Algoritmo a usar.
             max_search_time: Tiempo máximo de búsqueda.
         """
-        n_clientes = n_clientes or DEFAULT_N_CLIENTES
+        # Calculamos el límite real de clientes basándonos en los datos recibidos
+        # para asegurar que ninguna ruta se vea truncada por el límite global.
+        max_custs_in_data = 0
+        for p in self.carton_plants:
+            n_cust = len(p.get('customers', []))
+            if n_cust > max_custs_in_data:
+                max_custs_in_data = n_cust
+        
+        # El límite final es el mayor entre lo pedido por el usuario y lo que viene en la data
+        n_clientes = max(n_clientes or 0, max_custs_in_data, DEFAULT_N_CLIENTES)
+        
         max_search_time = max_search_time or MAX_SEARCH_TIME
 
         if varias_plantas:

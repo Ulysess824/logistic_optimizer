@@ -1,0 +1,296 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stress Test Full Report - Logistics Optimizer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .glass {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900 font-sans">
+    <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+        <div class="mb-12 text-center text-gray-900">
+            <h1 class="text-4xl font-extrabold tracking-tight sm:text-5xl mb-4">
+                 Stress Test Full Report
+            </h1>
+            <p class="text-xl text-gray-600">Evaluación del modelo en situaciones extremas</p>
+        </div>
+
+        <!-- Dashboard Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+            <!-- Gráfico de Tiempos -->
+            <div class="glass p-6 rounded-2xl shadow-xl">
+                <h3 class="text-lg font-semibold mb-4">Tiempo Total de Ejecución (s)</h3>
+                <canvas id="timeChart"></canvas>
+            </div>
+            <!-- Gráfico de Nodos -->
+            <div class="glass p-6 rounded-2xl shadow-xl">
+                <h3 class="text-lg font-semibold mb-4">Complejidad (Nodos Procesados)</h3>
+                <canvas id="nodeChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Tabla de KPIs -->
+        <div class="glass rounded-2xl shadow-xl overflow-hidden mb-12">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Escenario</th>
+                        <th class="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Nodos</th>
+                        <th class="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Rutas</th>
+                        <th class="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Tiempo (s)</th>
+                        <th class="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Solución</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-100">
+                    
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">Baseline (Moderado)</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center">23</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center">11</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center font-bold text-indigo-600">11.07s</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center">
+                            <span class="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">
+                                ÉXITO
+                            </span>
+                        </td>
+                    </tr>
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">Alta Densidad (20 clientes/planta)</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center">232</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center">11</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center font-bold text-indigo-600">32.74s</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center">
+                            <span class="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">
+                                ÉXITO
+                            </span>
+                        </td>
+                    </tr>
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">Área Masiva (1000km Radio)</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center">67</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center">11</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center font-bold text-indigo-600">32.61s</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center">
+                            <span class="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">
+                                ÉXITO
+                            </span>
+                        </td>
+                    </tr>
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">Sobrecarga Multi-Planta (3 plantas/ruta)</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center">67</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center">0</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center font-bold text-indigo-600">42.61s</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center">
+                            <span class="px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700">
+                                FALLO
+                            </span>
+                        </td>
+                    </tr>
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">Tiempo Crítico (Problema complejo en 3s)</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center">122</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center">0</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center font-bold text-indigo-600">5.47s</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center">
+                            <span class="px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700">
+                                FALLO
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Detalles por Escenario -->
+        <div class="space-y-8">
+            <h2 class="text-2xl font-bold border-b border-gray-200 pb-2">Detalle de Pruebas</h2>
+            
+            <div class="glass p-8 rounded-2xl shadow-lg border-l-8 border-indigo-500">
+                <h3 class="text-xl font-bold mb-4">Baseline (Moderado)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="space-y-2">
+                        <p class="text-sm text-gray-500">Parámetros:</p>
+                        <ul class="text-xs space-y-1 font-mono bg-gray-50 p-3 rounded-lg border border-gray-100">
+                            <li>- name: Baseline (Moderado)</li><li>- n_clientes: 4</li><li>- max_customers_per_plant: 1</li><li>- max_radius_km: 100</li><li>- varias_plantas: False</li><li>- max_search_time: 10</li>
+                        </ul>
+                    </div>
+                    <div class="col-span-2 space-y-4">
+                        <p class="text-gray-700 leading-relaxed">
+                            Esta prueba evalúa la capacidad del modelo bajo condiciones de 
+                            <strong>baseline (moderado)</strong>. 
+                            Se procesaron 23 nodos en 11.07 segundos.
+                        </p>
+                        <div class="flex space-x-4">
+                            <div class="text-center p-4 bg-indigo-50 rounded-xl flex-1">
+                                <p class="text-xs text-indigo-600 font-bold uppercase mb-1">Carga Solver</p>
+                                <p class="text-2xl font-black text-indigo-800">10.01s</p>
+                            </div>
+                            <div class="text-center p-4 bg-emerald-50 rounded-xl flex-1">
+                                <p class="text-xs text-emerald-600 font-bold uppercase mb-1">Rutas</p>
+                                <p class="text-2xl font-black text-emerald-800">11</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="glass p-8 rounded-2xl shadow-lg border-l-8 border-indigo-500">
+                <h3 class="text-xl font-bold mb-4">Alta Densidad (20 clientes/planta)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="space-y-2">
+                        <p class="text-sm text-gray-500">Parámetros:</p>
+                        <ul class="text-xs space-y-1 font-mono bg-gray-50 p-3 rounded-lg border border-gray-100">
+                            <li>- name: Alta Densidad (20 clientes/planta)</li><li>- n_clientes: 20</li><li>- max_customers_per_plant: 20</li><li>- max_radius_km: 200</li><li>- varias_plantas: False</li><li>- max_search_time: 30</li>
+                        </ul>
+                    </div>
+                    <div class="col-span-2 space-y-4">
+                        <p class="text-gray-700 leading-relaxed">
+                            Esta prueba evalúa la capacidad del modelo bajo condiciones de 
+                            <strong>alta densidad (20 clientes/planta)</strong>. 
+                            Se procesaron 232 nodos en 32.74 segundos.
+                        </p>
+                        <div class="flex space-x-4">
+                            <div class="text-center p-4 bg-indigo-50 rounded-xl flex-1">
+                                <p class="text-xs text-indigo-600 font-bold uppercase mb-1">Carga Solver</p>
+                                <p class="text-2xl font-black text-indigo-800">30.01s</p>
+                            </div>
+                            <div class="text-center p-4 bg-emerald-50 rounded-xl flex-1">
+                                <p class="text-xs text-emerald-600 font-bold uppercase mb-1">Rutas</p>
+                                <p class="text-2xl font-black text-emerald-800">11</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="glass p-8 rounded-2xl shadow-lg border-l-8 border-indigo-500">
+                <h3 class="text-xl font-bold mb-4">Área Masiva (1000km Radio)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="space-y-2">
+                        <p class="text-sm text-gray-500">Parámetros:</p>
+                        <ul class="text-xs space-y-1 font-mono bg-gray-50 p-3 rounded-lg border border-gray-100">
+                            <li>- name: Área Masiva (1000km Radio)</li><li>- n_clientes: 5</li><li>- max_customers_per_plant: 5</li><li>- max_radius_km: 1000</li><li>- varias_plantas: False</li><li>- max_search_time: 30</li>
+                        </ul>
+                    </div>
+                    <div class="col-span-2 space-y-4">
+                        <p class="text-gray-700 leading-relaxed">
+                            Esta prueba evalúa la capacidad del modelo bajo condiciones de 
+                            <strong>área masiva (1000km radio)</strong>. 
+                            Se procesaron 67 nodos en 32.61 segundos.
+                        </p>
+                        <div class="flex space-x-4">
+                            <div class="text-center p-4 bg-indigo-50 rounded-xl flex-1">
+                                <p class="text-xs text-indigo-600 font-bold uppercase mb-1">Carga Solver</p>
+                                <p class="text-2xl font-black text-indigo-800">30.01s</p>
+                            </div>
+                            <div class="text-center p-4 bg-emerald-50 rounded-xl flex-1">
+                                <p class="text-xs text-emerald-600 font-bold uppercase mb-1">Rutas</p>
+                                <p class="text-2xl font-black text-emerald-800">11</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="glass p-8 rounded-2xl shadow-lg border-l-8 border-indigo-500">
+                <h3 class="text-xl font-bold mb-4">Sobrecarga Multi-Planta (3 plantas/ruta)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="space-y-2">
+                        <p class="text-sm text-gray-500">Parámetros:</p>
+                        <ul class="text-xs space-y-1 font-mono bg-gray-50 p-3 rounded-lg border border-gray-100">
+                            <li>- name: Sobrecarga Multi-Planta (3 plantas/ruta)</li><li>- n_clientes: 10</li><li>- max_customers_per_plant: 5</li><li>- max_radius_km: 500</li><li>- varias_plantas: True</li><li>- max_plantas_ruta: 3</li><li>- max_search_time: 40</li>
+                        </ul>
+                    </div>
+                    <div class="col-span-2 space-y-4">
+                        <p class="text-gray-700 leading-relaxed">
+                            Esta prueba evalúa la capacidad del modelo bajo condiciones de 
+                            <strong>sobrecarga multi-planta (3 plantas/ruta)</strong>. 
+                            Se procesaron 67 nodos en 42.61 segundos.
+                        </p>
+                        <div class="flex space-x-4">
+                            <div class="text-center p-4 bg-indigo-50 rounded-xl flex-1">
+                                <p class="text-xs text-indigo-600 font-bold uppercase mb-1">Carga Solver</p>
+                                <p class="text-2xl font-black text-indigo-800">40.01s</p>
+                            </div>
+                            <div class="text-center p-4 bg-emerald-50 rounded-xl flex-1">
+                                <p class="text-xs text-emerald-600 font-bold uppercase mb-1">Rutas</p>
+                                <p class="text-2xl font-black text-emerald-800">0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="glass p-8 rounded-2xl shadow-lg border-l-8 border-indigo-500">
+                <h3 class="text-xl font-bold mb-4">Tiempo Crítico (Problema complejo en 3s)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="space-y-2">
+                        <p class="text-sm text-gray-500">Parámetros:</p>
+                        <ul class="text-xs space-y-1 font-mono bg-gray-50 p-3 rounded-lg border border-gray-100">
+                            <li>- name: Tiempo Crítico (Problema complejo en 3s)</li><li>- n_clientes: 15</li><li>- max_customers_per_plant: 10</li><li>- max_radius_km: 400</li><li>- varias_plantas: True</li><li>- max_plantas_ruta: 2</li><li>- max_search_time: 3</li>
+                        </ul>
+                    </div>
+                    <div class="col-span-2 space-y-4">
+                        <p class="text-gray-700 leading-relaxed">
+                            Esta prueba evalúa la capacidad del modelo bajo condiciones de 
+                            <strong>tiempo crítico (problema complejo en 3s)</strong>. 
+                            Se procesaron 122 nodos en 5.47 segundos.
+                        </p>
+                        <div class="flex space-x-4">
+                            <div class="text-center p-4 bg-indigo-50 rounded-xl flex-1">
+                                <p class="text-xs text-indigo-600 font-bold uppercase mb-1">Carga Solver</p>
+                                <p class="text-2xl font-black text-indigo-800">3.01s</p>
+                            </div>
+                            <div class="text-center p-4 bg-emerald-50 rounded-xl flex-1">
+                                <p class="text-xs text-emerald-600 font-bold uppercase mb-1">Rutas</p>
+                                <p class="text-2xl font-black text-emerald-800">0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const labels = ["Baseline (Moderado)", "Alta Densidad (20 clientes/planta)", "\u00c1rea Masiva (1000km Radio)", "Sobrecarga Multi-Planta (3 plantas/ruta)", "Tiempo Cr\u00edtico (Problema complejo en 3s)"];
+        
+        new Chart(document.getElementById('timeChart'), {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Tiempo Total (s)',
+                    data: [11.07, 32.74, 32.61, 42.61, 5.47],
+                    backgroundColor: 'rgba(99, 102, 241, 0.8)',
+                    borderRadius: 8
+                }]
+            },
+            options: { responsive: true, plugins: { legend: { display: false } } }
+        });
+
+        new Chart(document.getElementById('nodeChart'), {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Nodos Totales',
+                    data: [23, 232, 67, 67, 122],
+                    borderColor: 'rgba(16, 185, 129, 1)',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: { responsive: true, plugins: { legend: { display: false } } }
+        });
+    </script>
+</body>
+</html>
+    

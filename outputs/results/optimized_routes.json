@@ -16,7 +16,20 @@
       "lat": 37.93214,
       "lng": -4.67292,
       "type": "carton_plant",
-      "matrix_idx": 5
+      "matrix_idx": 6
+    },
+    {
+      "id": "C_14610_ALC",
+      "name": "Alcolea",
+      "lat": 37.9323,
+      "lng": -4.6729,
+      "hav_dist": 0.017877448278461744,
+      "detour": 0.014774483638689162,
+      "real_dist_km": 0.017877448278461744,
+      "obligatorio": false,
+      "parent_cp": "CP_CORDOBA",
+      "type": "customer",
+      "matrix_idx": 8
     },
     {
       "id": "C_14620_EL ",
@@ -29,7 +42,20 @@
       "obligatorio": false,
       "parent_cp": "CP_CORDOBA",
       "type": "customer",
-      "matrix_idx": 6
+      "matrix_idx": 7
+    },
+    {
+      "id": "C_23750_ARJ",
+      "name": "Arjonilla",
+      "lat": 37.9735,
+      "lng": -4.1061,
+      "hav_dist": 49.91055128033142,
+      "detour": 0.025860701235771444,
+      "real_dist_km": 49.91055128033142,
+      "obligatorio": false,
+      "parent_cp": "CP_CORDOBA",
+      "type": "customer",
+      "matrix_idx": 9
     },
     {
       "name": "Mengíbar",
@@ -58,7 +84,7 @@
       "lat": 36.785126,
       "lng": -2.6657936,
       "type": "carton_plant",
-      "matrix_idx": 15
+      "matrix_idx": 18
     },
     {
       "id": "C_18500_GUA",
@@ -71,7 +97,7 @@
       "obligatorio": false,
       "parent_cp": "CP_ALMERIA",
       "type": "customer",
-      "matrix_idx": 16
+      "matrix_idx": 19
     },
     {
       "name": "Mengíbar",
@@ -100,20 +126,20 @@
       "lat": 37.3635,
       "lng": -6.543,
       "type": "carton_plant",
-      "matrix_idx": 7
+      "matrix_idx": 10
     },
     {
-      "id": "C_14120_FUE",
-      "name": "Fuente Palmera",
-      "lat": 37.7051,
-      "lng": -5.0999,
-      "hav_dist": 132.79387244169075,
-      "detour": 0.004759715839128376,
-      "real_dist_km": 132.79387244169075,
+      "id": "C_41300_SAN",
+      "name": "San Jose De La Rinconada",
+      "lat": 37.4843,
+      "lng": -5.9424,
+      "hav_dist": 54.71141645450383,
+      "detour": 0.057933115310078165,
+      "real_dist_km": 54.71141645450383,
       "obligatorio": false,
       "parent_cp": "CP_HUELVA",
       "type": "customer",
-      "matrix_idx": 8
+      "matrix_idx": 11
     },
     {
       "name": "Mengíbar",
@@ -143,6 +169,19 @@
       "lng": -3.35996,
       "type": "carton_plant",
       "matrix_idx": 1
+    },
+    {
+      "id": "C_28370_CHI",
+      "name": "Chinchon",
+      "lat": 40.1402,
+      "lng": -3.4227,
+      "hav_dist": 38.38242889107786,
+      "detour": 3.79352014192591e-05,
+      "real_dist_km": 38.38242889107786,
+      "obligatorio": false,
+      "parent_cp": "CP_ALCALA",
+      "type": "customer",
+      "matrix_idx": 3
     },
     {
       "id": "C_13001_CIU",
@@ -184,7 +223,7 @@
       "lat": 38.40289,
       "lng": -0.54019,
       "type": "carton_plant",
-      "matrix_idx": 3
+      "matrix_idx": 4
     },
     {
       "id": "C_03802_ALC",
@@ -197,7 +236,7 @@
       "obligatorio": true,
       "parent_cp": "CP_ALICANTE",
       "type": "customer",
-      "matrix_idx": 4
+      "matrix_idx": 5
     },
     {
       "name": "Mengíbar",
@@ -226,7 +265,7 @@
       "lat": 39.4796,
       "lng": -0.46162,
       "type": "carton_plant",
-      "matrix_idx": 13
+      "matrix_idx": 16
     },
     {
       "id": "C_46960_ALD",
@@ -239,7 +278,7 @@
       "obligatorio": false,
       "parent_cp": "CP_VALENCIA",
       "type": "customer",
-      "matrix_idx": 14
+      "matrix_idx": 17
     },
     {
       "name": "Mengíbar",
@@ -268,7 +307,7 @@
       "lat": 42.36921,
       "lng": -3.73705,
       "type": "carton_plant",
-      "matrix_idx": 9
+      "matrix_idx": 12
     },
     {
       "id": "C_09443_GUM",
@@ -281,7 +320,7 @@
       "obligatorio": false,
       "parent_cp": "CP_BURGOS",
       "type": "customer",
-      "matrix_idx": 10
+      "matrix_idx": 13
     },
     {
       "name": "Mengíbar",
@@ -310,7 +349,7 @@
       "lat": 40.9757657,
       "lng": -8.5772394,
       "type": "carton_plant",
-      "matrix_idx": 19
+      "matrix_idx": 22
     },
     {
       "id": "C_4520-621_S.J",
@@ -323,7 +362,7 @@
       "obligatorio": false,
       "parent_cp": "CP_CELPACK",
       "type": "customer",
-      "matrix_idx": 20
+      "matrix_idx": 23
     },
     {
       "name": "Mengíbar",
@@ -352,7 +391,7 @@
       "lat": 42.78831,
       "lng": -1.64541,
       "type": "carton_plant",
-      "matrix_idx": 11
+      "matrix_idx": 14
     },
     {
       "id": "C_31191_BER",
@@ -365,7 +404,7 @@
       "obligatorio": false,
       "parent_cp": "CP_NAVARRA",
       "type": "customer",
-      "matrix_idx": 12
+      "matrix_idx": 15
     },
     {
       "name": "Mengíbar",
@@ -394,7 +433,7 @@
       "lat": 42.13338299999999,
       "lng": -8.6215009,
       "type": "carton_plant",
-      "matrix_idx": 21
+      "matrix_idx": 24
     },
     {
       "id": "C_36475_O P",
@@ -407,7 +446,7 @@
       "obligatorio": false,
       "parent_cp": "CP_VIGO",
       "type": "customer",
-      "matrix_idx": 22
+      "matrix_idx": 25
     },
     {
       "name": "Mengíbar",
@@ -436,7 +475,7 @@
       "lat": 41.624792,
       "lng": 2.2745367,
       "type": "carton_plant",
-      "matrix_idx": 17
+      "matrix_idx": 20
     },
     {
       "id": "C_43883_ROD",
@@ -449,7 +488,7 @@
       "obligatorio": false,
       "parent_cp": "CP_CANOVELLES",
       "type": "customer",
-      "matrix_idx": 18
+      "matrix_idx": 21
     },
     {
       "name": "Mengíbar",

@@ -140,7 +140,10 @@ def generate_dashboard(summary_path, routes_path, output_path, hedonic_path=None
     html = _replace_kpi(html, r"Rutas Totales Generadas",  summary["num_routes"])
     html = _replace_kpi(html, r"Distancia Total \(km\)",    f'{fmt_std(summary["total_km"])} <br><span class="text-[10px] uppercase opacity-60">({summary.get("distance_source", "GPS Real")})</span>')
     html = _replace_kpi(html, r"Plantas Visitadas",         len(unique_plants))
-    html = _replace_kpi(html, r"Clientes Satisfechos",      len(unique_customers))
+    total_deliveries = sum(r["num_customers"] for r in summary["routes"])
+    html = _replace_kpi(html, r"Clientes Satisfechos",      total_deliveries)
+    # También actualizamos el label para que sea coherente
+    html = html.replace("Clientes Satisfechos", "Entregas Realizadas")
     html = _replace_kpi(html, r"Ahorro Km Vac[ií]os",      f"~{fmt_std(total_pct, 1)}%")
 
     # --- 3b. Hedonic Section ---

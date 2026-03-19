@@ -14,13 +14,22 @@ logger = logging.getLogger(__name__)
 # ======================================================================
 #  PARÁMETROS DE EJECUCIÓN — Modifica estos valores para configurar
 # ======================================================================
-N_CLIENTES = 4              
+N_CLIENTES = 1             
 VARIAS_PLANTAS = False        
-MAX_PLANTAS_RUTA = 3        
-MAX_CUSTOMERS_PER_PLANT = 1
-THRESHOLD_KM = 150          
-MAX_RADIUS_KM = 200          
-MAX_SEARCH_TIME = 90
+MAX_PLANTAS_RUTA = 1        
+THRESHOLD_KM = 100          
+MAX_RADIUS_KM = 100          
+MAX_SEARCH_TIME = 120
+
+# Motor Geográfico: "haversine", "osrm", "google_maps" o "routes_api"
+API_TYPE = "haversine"
+
+# Configuración personalizada de clientes por planta
+# Si una planta no aparece aquí, usará N_CLIENTES por defecto
+PLANT_CUSTOMER_LIMITS = { 
+    "Alcalá": 2,
+    "Córdoba": 3
+}
 
 TRUCK_SPECS = {
     "emissionType": "DIESEL",
@@ -32,6 +41,10 @@ MANDATORY_CUSTOMERS = {
     "Alcalá": ["Ciudad Real"], 
     "Alicante": ["Alcoy/Alcoi"]
 }
+
+# Rutas de datos
+PLANTS_FILE = DATA_DIR / "locations_smurfit.json"
+CLIENTS_FILE = DATA_DIR / "cliente_ubi.json"
 # ======================================================================
 
 def run_fast_optimization():
@@ -51,8 +64,8 @@ def run_fast_optimization():
         logger.warning("Auto-ajustando N_CLIENTES a %d para carga obligatoria.", current_n_clientes)
 
     # 1. Rutas de Archivos
-    plants_file = DATA_DIR / "locations_smurfit.json"
-    clients_file = DATA_DIR / "cliente_ubi.json"
+    plants_file = PLANTS_FILE
+    clients_file = CLIENTS_FILE
 
     # 2. Cargar Plantas
     with open(plants_file, 'r', encoding='utf-8') as f:
@@ -60,7 +73,7 @@ def run_fast_optimization():
 
     # Inicializar Motor Geográfico
     from src.utils.geo import GeoUtils
-    geo_engine = GeoUtils(api_type="haversine")
+    geo_engine = GeoUtils(api_type=API_TYPE)
     geo_engine.set_truck_specs(**TRUCK_SPECS)
 
     # 3. Selección de Clientes
@@ -71,8 +84,10 @@ def run_fast_optimization():
         geo_utils=geo_engine
     )
 
+    # 1. Cargar y filtrar localizaciones
     enriched_data = dm.get_optimized_locations(
-        max_customers_per_plant=MAX_CUSTOMERS_PER_PLANT,
+        max_customers_per_plant=PLANT_CUSTOMER_LIMITS, 
+        default_limit=current_n_clientes,
         threshold_km=THRESHOLD_KM,
         max_radius_km=MAX_RADIUS_KM,
         mandatory_customers=MANDATORY_CUSTOMERS,
