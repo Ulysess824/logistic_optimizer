@@ -10,7 +10,7 @@ Actualmente, el proyecto cuenta con un sistema maduro, empaquetado y altamente v
 
 1. **Motor de VRP de Alta Resiliencia**: Usamos Google OR-Tools con una arquitectura de **Restricciones Blandas (Disjunctions)**. Esto permite que el sistema maneje clientes obligatorios en escenarios geográficamente extremos sin fallar ni detenerse, priorizando siempre la viabilidad del negocio y la convergencia global de la flota.
 2. **Sistema de GPS Real (Compatible con Camiones)**: Integración precisa para recuperar distancias terrestres a través de la moderna **Google Routes API**, permitiendo perfiles de enrutamiento pesado (emisiones, altura, peso máximo). Posee un sistema de respaldo automático que hace estimaciones geográficas si no hay API disponible.
-3. **Smart Data Filtering (Filtros Inteligentes)**: El sistema automáticamente descarta ramificaciones inviables por distancia antes de saturar el motor matemático, asegurando mucha mayor rapidez computacional al descartar clientes que se alejan excesivamente en la ruta de retorno natural.
+3. **Smart Data Filtering y Capacidad Física**: El sistema descarta ramificaciones inviables por distancia antes de saturar el motor y aplica **Restricciones Duras de BIN-PACKING (Pallets)**. Un camión descarta inteligentemente clientes si su demanda supera la capacidad paramétrica del tráiler (ej. 35 Pallets).
 4. **Dashboard Interactivo Profesional**: En lugar de simples planillas de texto, el proyecto emite un archivo HTML interactivo (`Presentacion_Logistica.html`) combinando Mapas satelitales (Folium), Grafos relacionales (Plotly), y tablas de KPIs matemáticos. **Incluye una sección de metodología con visualización interactiva de la lógica de filtros y elipse de desvío.**
 5. **Optimización Multi-Planta (Backhauling Avanzado)**: El solver ahora permite que un mismo vehículo visite múltiples plantas en su ruta de regreso, maximizando la consolidación de carga y reduciendo drásticamente la flota necesaria cuando se activa el modo `VARIAS_PLANTAS`.
 6. **Simulación Dinámica de Flotas (SOTA)**: Módulo especializado (`src/simulation/`) que utiliza **SimPy** para modelar la operación real. A diferencia de modelos estáticos, esta simulación:
@@ -32,22 +32,29 @@ El modelo espera archivos en la carpeta `data/`:
 
 ### 2. Configura las Reglas en `main.py`
 Ajusta las constantes en la parte superior:
-- `N_CLIENTES`: Capacidad del camión (clientes por ruta).
+- `N_CLIENTES`: Límite máximo de clientes por ruta.
+- `MAX_PALLETS`: Límite de capacidad física total (suma de demanda_pallets) por camión.
 - `THRESHOLD_KM`: Desvío máximo permitido para aceptar un cliente en la ruta de retorno.
 - `MANDATORY_CUSTOMERS`: (Opcional) Fuerza visitas a clientes específicos para plantas seleccionadas, ignorando filtros de distancia si es necesario.
 - `TRUCK_SPECS`: Define peso, altura y emisiones para que el cálculo de Google sea apto para vehículos pesados.
 
-### 3. Ejecución One-Click
-El orquestador principal ahora coordina automáticamente todas las fases (Optimización + Simulación + Reporte):
+### 3. Ejecución de Alto Rendimiento (Recomendado)
+Para evaluar la flota real y obtener métricas de ahorro (ROI), ejecuta:
+```bash
+python main_fast_fleet.py
+```
+*Este comando sincroniza con el Excel de camiones, calcula el ahorro de kilómetros muertos y genera el dashboard interactivo.*
+
+### 4. Ejecución del Ciclo Completo (Con Animación)
+Si deseas coordinar Optimización + Simulación + Reporte con GIF animado:
 ```bash
 python main.py
 ```
-*Este comando genera las rutas, crea la animación GIF de la flota y actualiza el Dashboard final.*
 
 ### 4. Sincroniza el Dashboard o la Simulación
 Si solo deseas actualizar el diseño del HTML o volver a simular la flota con los resultados ya existentes (sin gastar créditos de API de nuevo):
 * **Actualizar Dashboard:** `python refresh_dashboard.py`
-* **Nueva Simulación:** `python ejemplo_simulacion.py` (Genera el GIF `outputs/simulacion_rutas_optimizadas.gif`).
+* **Nueva Simulación (GIF):** `python ejecutar_simulacion.py` (Genera la animación `outputs/simulacion_rutas_optimizadas.gif` con los datos actuales de pallets y flota).
 
 ---
 
@@ -90,3 +97,37 @@ Si al ejecutar el optimizador observas que la procedencia de las distancias menc
 3. La configuración masiva matricial de la ruta (`computeRouteMatrix`) ha sido rechazada porque contiene atributos locales no procesables por los servidores de Google. (Para evitar detenciones el código actual *sanitiza* los atributos de vehículos como peso y altura hacia características aceptadas como tipo de emisión `emissionType: DIESEL`, enviando solo parámetros estables).
 
 **Diseño de Alta Disponibilidad:** Hemos programado el código (`src/utils/geo.py`) asumiendo que las APIs pueden caerse. Si cualquiera de estos problemas asalta el cálculo de ruta, **el modelo no tirará un error que detenga el programa**. Instantáneamente tomará nota, bajará a su núcleo offline alternativo (`Haversine distance`), y te trazará las rutas matemáticamente en línea recta sin detener la ejecución de optimización.
+
+---
+
+## 📊 Guía de Estructura de Datos (Estándar GSIM)
+
+Para garantizar la interoperabilidad, trazabilidad y correcta interpretación de la información logística en un entorno empresarial, los datos de entrada de este proyecto se han documentado alineándose con el **Modelo Genérico de Información Estadística (GSIM)**.
+
+### 1. Grupo de Conceptos (Concept Group)
+Define el significado y la unidad funcional de la información manejada por el algoritmo:
+- **Punto de Origen (Depot - Mengíbar)**: Base central donde inician y terminan todas las rutas (Paper Plant).
+- **Planta de Carga (Cartonera)**: Hub intermedio inter-conectado donde el camión se abastece de producto para cliente final antes de iniciar la distribución de retorno (Backhauling).
+- **Demanda Física (Pallets)**: Unidad de medida estándar de capacidad volumétrica/peso. 
+- **Apilamiento (`remontar`)**: Característica física del producto que permite duplicar la eficiencia espacial del camión si el valor es positivo.
+
+### 2. Grupo de Estructuras (Structure Group)
+Define cómo se organizan sintácticamente los conjuntos de datos (Datasets):
+* **`locations_smurfit.json` (Dataset Estructural)**:
+  Contiene diccionarios estáticos que definen la infraestructura operativa total.
+  *Variables Identificadoras*: `id` (Código único GSIM), `name` (Etiqueta descriptiva).
+  *Variables de Medida*: `lat` / `lng` (Coordenadas geodésicas absolutas WGS84).
+* **`demanda_simulada.json` (Dataset Transaccional)**:
+  Estructura relacional de llave-valor agrupada por micro-territorios (Código Postal).
+  *Variables de Medida Central*: `demanda_pallets` / `n_pallets` (Carga), `municipio_destino`.
+
+### 3. Grupo de Intercambio (Exchange Group)
+Define el flujo técnico de entrada y salida de información:
+- **Ingesta de Datos (Input)**: Lectura pasiva de JSON y diccionarios inyectados (`FLOTA_POR_PLANTA`).
+- **Canal de Intercambio Externo**: Solicitudes API HTTP asíncronas hacia servidores topológicos (OSRM / Google Routes) transmutando las coordenadas puras en matrices de distancia terrestre.
+- **Provisión de Información (Outputs)**: Consolidación de un log transaccional de desvíos técnicos (`logs/descartados_motivos.log`) y cuadros de mando analíticos (`.html`).
+
+### 4. Grupo de Negocio (Business Group)
+La gobernanza general orientada al objetivo logístico del modelo:
+- **Regla Estricta (Hard Constraint)**: Bin-packing restrictivo aplicado sobre la suma marginal de la variable `demanda_pallets` respecto a `MAX_PALLETS` del tráiler.
+- **Regla Blanda (Soft Constraint)**: Minimización de métrica monetaria penalizando el exceso de kilómetros totales en rutas de transporte.

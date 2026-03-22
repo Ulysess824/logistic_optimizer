@@ -80,11 +80,20 @@ class GeoUtils:
 
     def _fallback_haversine_matrix(self, nodes):
         num_nodes = len(nodes)
-        matrix = np.zeros((num_nodes, num_nodes))
-        logger.info("Calculando matriz de distancias con Haversine (línea recta)...")
-        for i in range(num_nodes):
-            for j in range(num_nodes):
-                matrix[i][j] = self.haversine_distance(nodes[i], nodes[j])
+        logger.info("Calculando matriz de distancias con Haversine vectorizado (%d nodos)...", num_nodes)
+        
+        lats = np.array([n['lat'] for n in nodes])
+        lngs = np.array([n['lng'] for n in nodes])
+        
+        # Broadcasting: cada fila i contra cada columna j
+        lat1 = np.radians(lats[:, None])
+        lat2 = np.radians(lats[None, :])
+        dlat = lat2 - lat1
+        dlon = np.radians(lngs[None, :] - lngs[:, None])
+        
+        a = np.sin(dlat / 2) ** 2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon / 2) ** 2
+        matrix = 6371000 * 2 * np.arctan2(np.sqrt(a), np.sqrt(1 - a))  # En metros
+        
         return matrix, False
 
     def _calculate_distance_matrix_routes_api(self, nodes):

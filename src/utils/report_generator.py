@@ -9,13 +9,19 @@ dinámicamente el HTML de la presentación, actualizando:
   3. Tabla detallada de rutas (Tab 3)
   4. Datos del gráfico Chart.js (barra de distancias)
 """
+import os
+import sys
+
+# Corregir el PATH para evitar colisiones con paquetes 'src' instalados en el sistema
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
 
 import json
 import re
 import logging
 from pathlib import Path
 from src.utils.geo import GeoUtils
-
 logger = logging.getLogger(__name__)
 
 
@@ -286,7 +292,7 @@ def generate_dashboard(summary_path, routes_path, output_path, hedonic_path=None
         f'</div>'
         f'</div>'
         f'<div>'
-        f'<p class="text-lg font-mono bg-blue-800 px-4 py-2 rounded">v1.2</p>'
+        f'<p class="text-lg font-mono bg-blue-800 px-4 py-2 rounded">v5.2</p>'
         f'</div>'
         f'</header>'
     )
@@ -309,6 +315,57 @@ def generate_dashboard(summary_path, routes_path, output_path, hedonic_path=None
     html = html.replace("</header>\n    Ahorro", "</header>")
     html = html.replace("</header> Ahorro", "</header>")
     html = html.replace("</header>Ahorro", "</header>")
+
+    # --- 3i. Inserción de Nueva Visualización de Estrategia de Ordenamiento ---
+    sorting_visual_html = """
+    <!-- Nueva Sección: Estrategia de Selección (Sorting) -->
+    <div class="grid grid-cols-1 gap-6 mb-6 mt-6">
+        <div class="card bg-white border-t-4 border-orange-500 shadow-md">
+            <h2 class="text-xl font-bold text-gray-800 mb-2">Estrategia de Selección: Lejanía vs Desvío</h2>
+            <p class="text-sm text-gray-600 mb-4">Análisis de cómo el parámetro <b>SORTING_STRATEGY</b> determina qué cliente se prioriza una vez superados los filtros geográficos.</p>
+            <div class="h-[500px] w-full border rounded overflow-hidden shadow-inner bg-gray-50">
+                <iframe src="maps/visualizacion_sorting_strategy.html" class="w-full h-full border-0"></iframe>
+            </div>
+            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-gray-500">
+                <div class="p-2 bg-orange-50 rounded border-l-4 border-orange-400">
+                    <strong>Estrategia Clásica (Detour):</strong> Selecciona al cliente que menos kilómetros extra añade a la ruta directa.
+                </div>
+                <div class="p-2 bg-green-50 rounded border-l-4 border-green-400">
+                    <strong>Estrategia Backhauling Eficiente:</strong> Selecciona al cliente que esté más lejos de la planta y más cerca de la base, maximizando la utilidad del retorno.
+                </div>
+            </div>
+        </div>
+    </div>
+    """
+    
+    # Aseguramos que el módulo de metodología modular esté presente
+    metodologia_modular_html = """
+    <!-- Módulo Independiente: Fundamentos Matemáticos y de Negocio -->
+    <div class="grid grid-cols-1 gap-6 mb-6">
+        <div class="card bg-white border-t-4 border-indigo-700 shadow-md">
+            <div class="h-[750px] w-full bg-white rounded overflow-hidden shadow-inner font-sans">
+                <iframe src="maps/explicacion_metodologia.html" class="w-full h-full border-0"></iframe>
+            </div>
+        </div>
+    </div>
+    """
+    
+    if 'maps/explicacion_metodologia.html' not in html:
+        # Lo insertamos al principio de la pestaña metodología
+        html = html.replace('<div id="metodologia" class="tab-content transition-opacity duration-300">', 
+                            '<div id="metodologia" class="tab-content transition-opacity duration-300">\n' + metodologia_modular_html)
+
+    # Lo insertamos dentro de la sección de metodología para que no aparezca en todas las pestañas
+    if 'maps/visualizacion_sorting_strategy.html' not in html:
+        # El final de la metodología se marca con un cierre de div antes de Tab 3
+        # Buscamos '<!-- Tab 3: Resultados -->' y retrocedemos hasta el div previo
+        pattern = r"(\s+</div>\n)(\s+<!-- Tab 3: Resultados -->)"
+        if re.search(pattern, html):
+            html = re.sub(pattern, r"\1" + sorting_visual_html + r"\2", html)
+        else:
+             # Fallback: lo insertamos antes del comentario de Tab 3 si el patrón falla
+             html = html.replace('<!-- Tab 3: Resultados -->', sorting_visual_html + '\n<!-- Tab 3: Resultados -->')
+    
 
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(html)

@@ -8,20 +8,30 @@ import polyline
 class AnimadorLogistico:
     def __init__(self, df_resultados, origen, usar_rutas_reales=True):
         """
-        df_resultados: DataFrame resultante de simulador.ejecutar()
-        origen: dict con {'lat', 'lng', 'name'}
-        usar_rutas_reales: Si es True, usa polilíneas de carretera. Si es False, usa líneas rectas.
+        Genera una animacion GIF de los camiones sobre un mapa de la
+        Peninsula Iberica.
+
+        Parametros
+        ----------
+        df_resultados : pd.DataFrame
+            DataFrame resultante de TruckSimulated.ejecutar().
+            Columnas esperadas: id, destino_principal, t_salida_origen,
+            t_retorno_base, tramos, pallets_cargados, max_pallets, pct_uso,
+            planta, plant_id.
+        origen : dict
+            Depot central con claves 'lat', 'lng', 'name'.
+        usar_rutas_reales : bool
+            True = polilineas de carretera. False = lineas rectas.
         """
         self.df = df_resultados
         self.origen = origen
         self.usar_rutas_reales = usar_rutas_reales
 
-        # Pre-decodificar polilíneas para optimizar la animación
+        # Pre-decodificar polilineas para optimizar la animacion
         for _, row in self.df.iterrows():
             for tramo in row['tramos']:
                 if tramo.get('polyline'):
                     try:
-                        # La API de Google devuelve (lat, lng), convertimos a (lon, lat) para matplotlib
                         pts = polyline.decode(tramo['polyline'])
                         tramo['decoded_path'] = [(p[1], p[0]) for p in pts]
                     except Exception:
@@ -35,13 +45,13 @@ class AnimadorLogistico:
         self.ax.set_xlim(-10, 5)
         self.ax.set_ylim(35.5, 44.5)
         self.ax.set_facecolor('#f0f4f8')
-        self.ax.set_title("Simulación Logística · Flotas Diarias", fontsize=14, weight='bold')
+        self.ax.set_title("Simulacion Logistica - Flotas Diarias", fontsize=14, weight='bold')
 
         # 1. Dibujar Origen
         self.ax.plot(origen['lng'], origen['lat'], 'g^', markersize=12,
                      label=f"Depot: {origen.get('name', 'Depot')}", zorder=6)
 
-        # Recopilar nodos para el mapa estático
+        # Recopilar nodos para el mapa estatico
         nodos_planta_lon, nodos_planta_lat, nombres_planta = [], [], []
         nodos_cliente_lon, nodos_cliente_lat = [], []
         seen_plantas = set()
@@ -72,11 +82,11 @@ class AnimadorLogistico:
             self.ax.scatter(nodos_cliente_lon, nodos_cliente_lat,
                             marker='s', color='orange', s=25, alpha=0.5, label='Clientes', zorder=4)
 
-        # Elementos dinámicos
+        # Elementos dinamicos
         self.puntos_camiones = self.ax.scatter([], [], c='crimson', s=50,
                                                edgecolors='black', zorder=7)
 
-        # Panel de información (fondo semi-transparente)
+        # Panel de informacion (fondo semi-transparente)
         props = dict(boxstyle='round,pad=0.5', facecolor='white', alpha=0.85, edgecolor='#ccc')
         self.texto_reloj = self.ax.text(
             0.02, 0.97, '', transform=self.ax.transAxes,
@@ -86,17 +96,36 @@ class AnimadorLogistico:
             0.02, 0.88, '', transform=self.ax.transAxes,
             fontsize=10, va='top', bbox=props
         )
+        # Panel de carga / pallets
+        self.texto_pallets = self.ax.text(
+            0.02, 0.72, '', transform=self.ax.transAxes,
+            fontsize=9, va='top', bbox=props
+        )
 
         self.ax.legend(loc='lower right', fontsize=9)
 
         # Contadores acumulativos
         self.total_camiones = len(self.df)
 
+        # Calcular estadisticas de pallets
+        if 'pallets_cargados' in self.df.columns and 'max_pallets' in self.df.columns:
+            self.total_pallets = int(self.df['pallets_cargados'].sum())
+            max_p = self.df['max_pallets'].iloc[0] if len(self.df) > 0 else 35
+            self.capacidad_total = int(self.total_camiones * max_p)
+            self.pct_uso_global = round(
+                (self.total_pallets / self.capacidad_total) * 100, 1
+            ) if self.capacidad_total > 0 else 0.0
+        else:
+            self.total_pallets = 0
+            self.capacidad_total = 0
+            self.pct_uso_global = 0.0
+
     def calcular_posicion_activa(self, t):
         x, y = [], []
         en_ruta = 0
         salidos = 0
         retornados = 0
+        pallets_en_ruta = 0
 
         for _, v in self.df.iterrows():
             tramos = v['tramos']
@@ -109,11 +138,12 @@ class AnimadorLogistico:
             if t >= t_llegada_origen:
                 retornados += 1
 
-            # Si aún no salió o ya retornó, no dibujar
+            # Si aun no salio o ya retorno, no dibujar
             if t < t_salida_origen or t > t_llegada_origen:
                 continue
 
             en_ruta += 1
+            pallets_en_ruta += v.get('pallets_cargados', 0)
 
             # Buscar tramo activo
             t_anterior = t_salida_origen
@@ -125,22 +155,20 @@ class AnimadorLogistico:
 
                     path = tramo.get('decoded_path') if self.usar_rutas_reales else None
                     if path:
-                        # Interpolación lineal para fluidez total
                         f_idx = prog * (len(path) - 1)
                         i0 = int(f_idx)
                         i1 = min(i0 + 1, len(path) - 1)
                         alpha = f_idx - i0
-                        
+
                         p0 = path[i0]
                         p1 = path[i1]
-                        
+
                         x_pos = p0[0] + (p1[0] - p0[0]) * alpha
                         y_pos = p0[1] + (p1[1] - p0[1]) * alpha
                     else:
-                        # Fallback a línea recta (Haversine-like direct movement in the simulation)
                         x_pos = tramo['lon_origen'] + (tramo['lon_destino'] - tramo['lon_origen']) * prog
                         y_pos = tramo['lat_origen'] + (tramo['lat_destino'] - tramo['lat_origen']) * prog
-                    
+
                     x.append(x_pos)
                     y.append(y_pos)
                     break
@@ -152,10 +180,10 @@ class AnimadorLogistico:
 
                 t_anterior = tramo['t_salida']
 
-        return x, y, salidos, en_ruta, retornados
+        return x, y, salidos, en_ruta, retornados, pallets_en_ruta
 
     def actualizar(self, frame):
-        x, y, salidos, en_ruta, retornados = self.calcular_posicion_activa(frame)
+        x, y, salidos, en_ruta, retornados, pallets_en_ruta = self.calcular_posicion_activa(frame)
 
         if x and y:
             self.puntos_camiones.set_offsets(np.c_[x, y])
@@ -172,22 +200,26 @@ class AnimadorLogistico:
             f"Retornados: {retornados}"
         )
 
-        return self.puntos_camiones, self.texto_reloj, self.texto_stats,
+        self.texto_pallets.set_text(
+            f"Pallets en ruta: {pallets_en_ruta}\n"
+            f"Total dia: {self.total_pallets}/{self.capacidad_total} P\n"
+            f"Uso global: {self.pct_uso_global}%"
+        )
+
+        return self.puntos_camiones, self.texto_reloj, self.texto_stats, self.texto_pallets,
 
     def generar_gif(self, nombre_archivo='outputs/simulacion_dinamica.gif', fps=40):
-        # Encontrar el tiempo en que el primer camión sale y el último camión regresa
+        # Encontrar el tiempo en que el primer camion sale y el ultimo regresa
         t_min = self.df['t_salida_origen'].min() if not self.df.empty else 6.5
         t_max = self.df['t_retorno_base'].max() if not self.df.empty else 24.0
-        
+
         # Ajustar inicio para evitar segundos de camiones parados al principio
         t_start = max(6.0, t_min - 0.2)
-        t_final = min(t_max + 0.5, 48.0) 
-        
-        # Paso de tiempo optimizado: 0.05h = 3 min
-        # Con 25 FPS, 1 segundo de vídeo = 25 * 0.05h = 1.25h. 
-        # Un día de 24h se ve en ~20 segundos.
+        t_final = min(t_max + 0.5, 48.0)
+
+        # Paso de tiempo: 0.05h = 3 min
         tiempos = np.arange(t_start, t_final, 0.05)
-        
+
         ani = animation.FuncAnimation(
             self.fig, self.actualizar, frames=tiempos,
             interval=1000 / fps, blit=True

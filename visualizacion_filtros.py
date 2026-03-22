@@ -46,121 +46,159 @@ def get_ellipse_points(lat_p, lon_p, lat_d, lon_d, threshold_km, n_points=100):
 
 def create_visual_explanation():
     # 1. COORDENADAS REALES
-    # Mengíbar (Depósito Central)
     depot = {"name": "Mengíbar (DEPOT)", "lat": 37.98148, "lng": -3.80058}
-    # Alcalá de Henares (Planta de Cartón)
-    plant = {"name": "Alcalá (PLANTA)", "lat": 40.48205, "lng": -3.35996}
+    
+    plants = [
+        {"name": "Alcalá", "lat": 40.48205, "lng": -3.35996, "color": "blue"},
+        {"name": "Vigo", "lat": 42.13338, "lng": -8.62150, "color": "purple"},
+        {"name": "Canovelles", "lat": 41.62479, "lng": 2.27453, "color": "darkred"}
+    ]
     
     # PARÁMETROS DEL DATAMANAGER
-    max_radius_km = 120    # Restricción 1: Radio desde la planta
-    threshold_km = 40      # Restricción 2: Desvío máximo hacia el depósito
+    max_radius_km = 200    # Restricción 1: Radio desde la planta
+    threshold_km = 60      # Restricción 2: Desvío máximo hacia el depósito
     
     # 2. INICIALIZAR MAPA
-    m = folium.Map(location=[39.2, -3.5], zoom_start=7, tiles="cartodbpositron")
+    m = folium.Map(location=[39.2, -3.5], zoom_start=6, tiles="cartodbpositron")
     
-    # 3. DIBUJAR RESTRICCIÓN 1: EL RADIO (Círculo)
-    folium.Circle(
-        location=[plant['lat'], plant['lng']],
-        radius=max_radius_km * 1000,
-        color='blue',
-        fill=True,
-        fill_opacity=0.1,
-        weight=2,
-        popup=f"RESTRICCIÓN 1: Radio Máximo ({max_radius_km}km)<br>Solo clientes 'cerca' de la planta."
-    ).add_to(m)
-    
-    # 4. DIBUJAR RESTRICCIÓN 2: EL DESVÍO (Elipse)
-    # Matemáticamente, los puntos con desvío constante d1+d2 = K forman una elipse.
-    ellipse_pts = get_ellipse_points(plant['lat'], plant['lng'], depot['lat'], depot['lng'], threshold_km)
-    folium.Polygon(
-        locations=ellipse_pts,
-        color='green',
-        fill=True,
-        fill_opacity=0.1,
-        weight=2,
-        popup=f"RESTRICCIÓN 2: Zona de Desvío ({threshold_km}km)<br>Cualquier punto fuera de aquí añade demasiados km al retorno."
-    ).add_to(m)
-    
-    # 5. MARCADORES PRINCIPALES
+    # Depot Marker (Always visible)
     folium.Marker(
         [depot['lat'], depot['lng']], 
         popup="DEPÓSITO FINAL (Mengíbar)", 
         icon=folium.Icon(color='black', icon='home', prefix='fa')
     ).add_to(m)
-    
-    folium.Marker(
-        [plant['lat'], plant['lng']], 
-        popup="PLANTA DE ORIGEN (Alcalá)", 
-        icon=folium.Icon(color='blue', icon='industry', prefix='fa')
-    ).add_to(m)
-    
-    # Línea directa Planta -> Depósito
-    folium.PolyLine(
-        [[plant['lat'], plant['lng']], [depot['lat'], depot['lng']]], 
-        color='gray', weight=2, dash_array='10, 10', opacity=0.6,
-        popup="Ruta Directa (Camión vacío)"
-    ).add_to(m)
-    
-    # 6. SIMULAR CLIENTES PARA EJEMPLO
-    np.random.seed(10)
-    samples = 60
-    # Clientes aleatorios en un área amplia
-    lats = plant['lat'] + (np.random.rand(samples) - 0.4) * 4
-    lngs = plant['lng'] + (np.random.rand(samples) - 0.5) * 6
-    
-    for i in range(samples):
-        d_p_c = haversine(plant['lat'], plant['lng'], lats[i], lngs[i])
-        d_c_d = haversine(lats[i], lngs[i], depot['lat'], depot['lng'])
-        d_p_d = haversine(plant['lat'], plant['lng'], depot['lat'], depot['lng'])
-        
-        detour = (d_p_c + d_c_d) - d_p_d
-        
-        in_radius = d_p_c <= max_radius_km
-        in_detour = detour <= threshold_km
-        
-        # Color según cumplimiento
-        if in_radius and in_detour:
-            color = 'green'
-            status = "ACEPTADO (Cumple ambas)"
-        elif in_radius:
-            color = 'orange'
-            status = "RECHAZADO: Desvío alto (Se aleja de la ruta al depósito)"
-        elif in_detour:
-            color = 'purple'
-            status = "RECHAZADO: Muy lejos de la planta"
-        else:
-            color = 'red'
-            status = "RECHAZADO: Fuera de ambos límites"
-            
-        folium.CircleMarker(
-            [lats[i], lngs[i]],
-            radius=4,
-            color=color,
-            fill=True,
-            popup=f"Cliente {i}<br>Dist. Planta: {d_p_c:.1f}km<br>Desvío: {detour:.1f}km<br><b>{status}</b>"
-        ).add_to(m)
 
-    # 7. LEYENDA (HTML)
-    legend_html = '''
+    from folium.plugins import FastMarkerCluster, MarkerCluster
+    
+    # 3. CARGAR CLIENTES REALES
+    import json
+    clients_data = []
+    try:
+        with open('data/cliente_ubi.json', 'r', encoding='utf-8') as f:
+            raw_data = json.load(f)
+            for zip_code, points in raw_data.items():
+                for p in points:
+                    clients_data.append({
+                        "lat": p["latitude"],
+                        "lng": p["longitude"],
+                        "name": p.get("municipio_destino", "Desconocido")
+                    })
+    except Exception as e:
+        print(f"Error cargando clientes reales: {e}")
+        clients_data = []
+
+    # 4. CAPA GLOBAL DE CLIENTES (MarkerCluster para rendimiento)
+    global_cluster = MarkerCluster(name="Todos los Clientes (Cluster)").add_to(m)
+    for c in clients_data:
+        folium.CircleMarker(
+            [c['lat'], c['lng']], 
+            radius=2, 
+            color='gray', 
+            fill=True, 
+            opacity=0.4,
+            popup=f"<b>{c['name']}</b>"
+        ).add_to(global_cluster)
+
+    # 5. PROCESAR CADA PLANTA
+    for p_info in plants:
+        group = folium.FeatureGroup(name=f"Evaluación: {p_info['name']}")
+        p_lat, p_lng = p_info['lat'], p_info['lng']
+        p_color = p_info['color']
+        
+        # Marcador de Planta
+        folium.Marker(
+            [p_lat, p_lng], 
+            popup=f"PLANTA: {p_info['name']}", 
+            icon=folium.Icon(color=p_color, icon='industry', prefix='fa')
+        ).add_to(group)
+        
+        # Filtro 1: Radio
+        folium.Circle(
+            location=[p_lat, p_lng],
+            radius=max_radius_km * 1000,
+            color=p_color,
+            fill=True,
+            fill_opacity=0.08,
+            weight=1,
+            popup=f"Radio {max_radius_km}km ({p_info['name']})"
+        ).add_to(group)
+        
+        # Filtro 2: Elipse de Desvío
+        ellipse_pts = get_ellipse_points(p_lat, p_lng, depot['lat'], depot['lng'], threshold_km)
+        folium.Polygon(
+            locations=ellipse_pts,
+            color='green',
+            fill=True,
+            fill_opacity=0.12,
+            weight=2,
+            popup=f"Zona de Eficiencia ({p_info['name']} -> Mengíbar)"
+        ).add_to(group)
+        
+        # Línea de retorno directo
+        folium.PolyLine(
+            [[p_lat, p_lng], [depot['lat'], depot['lng']]], 
+            color=p_color, weight=1, dash_array='5, 5', opacity=0.4
+        ).add_to(group)
+        
+        # Filtrar clientes reales que caen dentro de los criterios de esta planta
+        # Limitamos el renderizado de EVALUACIÓN a los aceptados + algunos fallos cercanos para no saturar
+        for c in clients_data:
+            c_lat, c_lng = c['lat'], c['lng']
+            d_p_c = haversine(p_lat, p_lng, c_lat, c_lng)
+            
+            # Solo evaluamos individualmente si está en un entorno razonable de la planta
+            if d_p_c < max_radius_km * 1.5:
+                d_c_d = haversine(c_lat, c_lng, depot['lat'], depot['lng'])
+                d_p_d = haversine(p_lat, p_lng, depot['lat'], depot['lng'])
+                detour = (d_p_c + d_c_d) - d_p_d
+                
+                in_radius = d_p_c <= max_radius_km
+                in_detour = detour <= threshold_km
+                
+                if in_radius and in_detour:
+                    color, status = 'green', "ACEPTADO"
+                    # Renderizamos todos los aceptados
+                    folium.CircleMarker(
+                        [c_lat, c_lng], radius=3, color=color, fill=True, fill_opacity=0.8,
+                        popup=f"<b>{c['name']}</b><br>Status: <b>{status}</b><br>Desvío: {detour:.1f}km"
+                    ).add_to(group)
+                elif in_radius or in_detour:
+                    # Renderizamos una fracción de los fallos parciales para ver la lógica sin colapsar
+                    import random
+                    if random.random() < 0.1: # 10% de los descartados parciales
+                        color = 'orange' if in_radius else 'purple'
+                        status = "RECHAZADO (Desvío)" if in_radius else "RECHAZADO (Radio)"
+                        folium.CircleMarker(
+                            [c_lat, c_lng], radius=2, color=color, fill=True, fill_opacity=0.5,
+                            popup=f"<b>{c['name']}</b><br>Status: <b>{status}</b><br>Desvío: {detour:.1f}km"
+                        ).add_to(group)
+
+        group.add_to(m)
+
+    # 4. CONTROLES Y LEYENDA
+    folium.LayerControl().add_to(m)
+    
+    legend_html = f'''
      <div style="position: fixed; 
-     bottom: 50px; left: 50px; width: 300px; height: 180px; 
-     border:2px solid grey; z-index:9999; font-size:14px;
-     background-color: white; padding: 10px; opacity: 0.9;">
-     <b>Lógica de Selección DataManager</b><br>
-     <i class="fa fa-circle" style="color:green"></i> Aceptado (En Radio y Bajo Desvío)<br>
-     <i class="fa fa-circle" style="color:orange"></i> Rechazado: Desvío excesivo<br>
-     <i class="fa fa-circle" style="color:red"></i> Rechazado: Fuera de radio<br>
-     <i class="fa fa-circle" style="color:purple"></i> Rechazado: Lejos de planta<br>
-     <hr>
-     <b>Azul:</b> Filtro Geográfico (Radio)<br>
-     <b>Verde:</b> Filtro de Eficiencia (Elipse de Desvío)
+     bottom: 50px; left: 50px; width: 320px; height: 210px; 
+     border:2px solid grey; z-index:9999; font-size:12px;
+     background-color: white; padding: 10px; opacity: 0.95; border-radius: 8px;">
+     <b style="color: #1e3a8a;">Análisis Multi-Planta de Clientes</b><br>
+     <i class="fa fa-circle" style="color:green"></i> Potencial Aceptado<br>
+     <i class="fa fa-circle" style="color:orange"></i> Descartado: Retorno Ineficiente<br>
+     <i class="fa fa-circle" style="color:purple"></i> Descartado: Exceso Dist. Planta<br>
+     <i class="fa fa-circle" style="color:red"></i> Descartado: Punto Inviable<br>
+     <hr style="margin: 5px 0;">
+     <b>Límite Geográfico:</b> Radio Circunferencia<br>
+     <b>Límite Eficiencia:</b> Elipse de Desvío<br>
+     <p style="font-size: 10px; color: #666; margin-top:5px;">ℹ️ Cada planta tiene su propia capa con clientes de ejemplo.<br>Activa/Desactiva capas arriba a la derecha.</p>
      </div>
      '''
     m.get_root().html.add_child(folium.Element(legend_html))
 
     out_file = "outputs/maps/visualizacion_logica_datamanager.html"
     m.save(out_file)
-    print(f"Mapa interactivo generado: {out_file}")
+    print(f"Mapa interactivo multi-planta generado: {out_file}")
 
 if __name__ == "__main__":
     create_visual_explanation()

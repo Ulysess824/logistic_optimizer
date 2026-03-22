@@ -55,28 +55,45 @@ class DataManager:
             )
             return None
 
+        # Lógica de Remontar y agrupación
+        n_pallets = int(dest.get('n_pallets', dest.get('demanda_pallets', 0)))
+        remontar = int(dest.get('remontar', 0))
+        if remontar == 1:
+            # Si se puede remontar, el número de huecos que ocupa en el camión es la mitad.
+            eff_pallets = n_pallets // 2
+        else:
+            eff_pallets = n_pallets
+            
         return {
             "id": f"C_{zip_code}_{dest['municipio_destino'][:3]}".upper(),
             "name": dest['municipio_destino'],
             "lat": lat,
-            "lng": lng
+            "lng": lng,
+            "demanda_pallets": eff_pallets,
+            "n_pallets_original": n_pallets,
+            "remontar": remontar
         }
 
     # ------------------------------------------------------------------
     # Selección inteligente de clientes (Filtro de Retorno)
     # ------------------------------------------------------------------
-    def get_optimized_locations(self, max_customers_per_plant=None, threshold_km=None, max_radius_km=None, mandatory_customers=None, default_limit=None):
+    def get_optimized_locations(self, max_customers_per_plant=None, threshold_km=None, max_radius_km=None, mandatory_customers=None, sorting_strategy="detour", default_limit=None, max_pallets=None):
         """
         Selecciona clientes mediante doble filtro:
         1. Filtro local (Haversine): Clientes dentro de max_radius_km.
         2. Filtro de desvío (API Real): Quedarse con los que supongan el menor desvío
            hacia Mengíbar usando distancias por carretera de la Google Routes API.
+        
+        Args:
+            max_pallets: Capacidad máxima del camión. Si un envío excede este valor,
+                         se particiona automáticamente en envíos parciales.
         """
         fallback = default_limit or DEFAULT_MAX_CUSTOMERS
         max_customers_per_plant = max_customers_per_plant if max_customers_per_plant is not None else fallback
         threshold_km = threshold_km or DEFAULT_THRESHOLD_KM
         max_radius_km = max_radius_km or 1000  # Default grande si no se especifica
         mandatory_customers = mandatory_customers or {}
+        self._max_pallets = max_pallets  # Guardar para validación pre-solver
 
         logger.info("Procesando clientes de %s (Radio Max: %skm)...", self.clients_file.name, max_radius_km)
 
@@ -93,6 +110,33 @@ class DataManager:
         if not flattened_clients:
             logger.error("No se encontraron clientes válidos.")
             return {"paper_plant": self.paper_plant, "carton_plants": []}
+
+        # --- VALIDACIÓN PRE-SOLVER: Partición de envíos sobredimensionados ---
+        if max_pallets and max_pallets > 0:
+            partitioned = []
+            for client in flattened_clients:
+                dem = client['demanda_pallets']
+                if dem > max_pallets:
+                    # Partir en envíos que quepan en un solo camión
+                    part_num = 1
+                    remaining = dem
+                    while remaining > 0:
+                        chunk = min(remaining, max_pallets)
+                        part = dict(client)
+                        part['id'] = f"{client['id']}_P{part_num}"
+                        part['demanda_pallets'] = chunk
+                        part['envio_parcial'] = True
+                        part['envio_original_pallets'] = dem
+                        partitioned.append(part)
+                        remaining -= chunk
+                        part_num += 1
+                    logger.info(
+                        "Envio '%s' (%d pallets) excede capacidad de %d. Particionado en %d envios.",
+                        client['name'], dem, max_pallets, part_num - 1
+                    )
+                else:
+                    partitioned.append(client)
+            flattened_clients = partitioned
 
         df_clients = pl.DataFrame(flattened_clients).unique(subset=["lat", "lng"])
         logger.info("Clientes únicos en base de datos: %d", len(df_clients))
@@ -179,6 +223,7 @@ class DataManager:
                     logger.info("  -> Cliente '%s' reconocido como OBLIGATORIO para %s", cand['name'], plant['name'])
                     cand['detour'] = detour
                     cand['real_dist_km'] = real_dist_PC
+                    cand['real_dist_CM'] = real_dist_CM
                     cand['obligatorio'] = True
                     cand['parent_cp'] = plant['id']  # ← necesario para que solver lo vincule
                     qualified_customers.append(cand)
@@ -191,6 +236,7 @@ class DataManager:
                 if detour <= threshold_km:
                     cand['detour'] = detour
                     cand['real_dist_km'] = real_dist_PC
+                    cand['real_dist_CM'] = real_dist_CM
                     cand['obligatorio'] = False
                     cand['parent_cp'] = plant['id']  # ← consistencia con obligatorios
                     qualified_customers.append(cand)
@@ -215,8 +261,13 @@ class DataManager:
             mandatories = [c for c in qualified_customers if c.get('obligatorio')]
             optionals = [c for c in qualified_customers if not c.get('obligatorio')]
             
-            # Ordenamos los opcionales por menor desvío
-            optionals.sort(key=lambda x: x['detour'])
+            # Evaluamos el criterio de optimización escogido para los opcionales
+            if sorting_strategy == "far_plant_close_depot":
+                # Priorizar los más lejanos a la planta pero cercanos al depot
+                optionals.sort(key=lambda x: x.get('real_dist_CM', 0) - x.get('real_dist_km', 0))
+            else:
+                # Comportamiento por defecto ("detour"): menor desvío global
+                optionals.sort(key=lambda x: x.get('detour', float('inf')))
             
             # Los obligatorios tienen prioridad absoluta. 
             # El límite se aplica al total de la ruta para esta planta.

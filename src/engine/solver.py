@@ -23,13 +23,21 @@ class LogisticsSolver:
       - max_plantas_ruta: Límite de plantas por ruta cuando varias_plantas=True.
     """
 
-    def __init__(self, data: Dict[str, Any], geo_engine=None):
+    def __init__(self, data: Dict[str, Any], geo_engine=None, precomputed_matrix=None):
         self.data = data
         self.paper_plant = data['paper_plant']
         self.carton_plants = data['carton_plants']
         self.nodes = self._parse_locations(self.data)
         self.geo = geo_engine if geo_engine else GeoUtils()
-        self.distance_matrix, self.is_real_road = self.geo.calculate_distance_matrix(self.nodes)
+        
+        if precomputed_matrix is not None:
+            self.distance_matrix = precomputed_matrix
+            self.is_real_road = True
+            logger.info("Matriz de distancias inyectada externamente (%dx%d). Salto de recalculo OSRM.", 
+                        precomputed_matrix.shape[0], precomputed_matrix.shape[1])
+        else:
+            self.distance_matrix, self.is_real_road = self.geo.calculate_distance_matrix(self.nodes)
+        
         self._last_solve_args = {}
         self._last_routes = None
 
@@ -68,7 +76,8 @@ class LogisticsSolver:
     # Solver principal
     # ------------------------------------------------------------------
     def solve(self, *, n_clientes=None, varias_plantas=False, max_plantas_ruta=None, 
-              metaheuristic='GUIDED_LOCAL_SEARCH', max_search_time=None):
+              metaheuristic='GUIDED_LOCAL_SEARCH', max_search_time=None, max_pallets_ruta=None,
+              flota_por_planta: Dict[str, int] = None):
         """Ejecuta el optimizador VRP.
 
         Args:
@@ -77,6 +86,8 @@ class LogisticsSolver:
             max_plantas_ruta: Plantas máximas por ruta si varias_plantas=True.
             metaheuristic:   Algoritmo a usar.
             max_search_time: Tiempo máximo de búsqueda.
+            max_pallets_ruta: Límite físico opcional (Bin-packing).
+            flota_por_planta: Dict con número de camiones específicos por ID de planta.
         """
         # Calculamos el límite real de clientes basándonos en los datos recibidos
         # para asegurar que ninguna ruta se vea truncada por el límite global.
@@ -86,9 +97,8 @@ class LogisticsSolver:
             if n_cust > max_custs_in_data:
                 max_custs_in_data = n_cust
         
-        # El límite final es el mayor entre lo pedido por el usuario y lo que viene en la data
+        # El límite final es el mayor entre lo pedido y lo que viene en la data
         n_clientes = max(n_clientes or 0, max_custs_in_data, DEFAULT_N_CLIENTES)
-        
         max_search_time = max_search_time or MAX_SEARCH_TIME
 
         if varias_plantas:
@@ -102,39 +112,89 @@ class LogisticsSolver:
             "n_clientes": n_clientes,
             "varias_plantas": varias_plantas,
             "max_plantas_ruta": max_plantas_ruta,
+            "max_pallets_ruta": max_pallets_ruta,
             "metaheuristic": metaheuristic,
+            "uso_flota_dedicada": bool(flota_por_planta)
         }
 
-        plant_indices = [i for i, n in enumerate(self.nodes) if n['type'] == 'carton_plant']
-        customer_indices = [i for i, n in enumerate(self.nodes) if n['type'] == 'customer']
+        plant_indices_orig = [i for i, n in enumerate(self.nodes) if n['type'] == 'carton_plant']
 
-        if not plant_indices:
+        if not plant_indices_orig:
             logger.error("No se detectaron plantas de cartón válidas.")
             return None
 
-        dist_matrix = self.distance_matrix.astype(int).tolist()
-        num_plants = len(plant_indices)
+        num_plants_orig = len(plant_indices_orig)
         
-        # AJUSTE: Si varias_plantas es True, queremos exactamente un camión por planta
-        if varias_plantas:
-            num_vehicles = num_plants
-        else:
-            num_vehicles = num_plants + 2
-            
-        depot_idx = 0
-
-        logger.info("Nodos parseados para optimizar: %d", len(self.nodes))
+        # === NUEVO: RECONSTRUCCIÓN DINÁMICA DE NODOS (MUELLES VIRTUALES) ===
+        current_nodes = []
+        original_to_new_idx = {}
+        new_row_cols = []
+        
         for i, n in enumerate(self.nodes):
-            if n['type'] == 'carton_plant':
-                logger.info(f"  [PLANTA] idx={i} id={n['id']} name={n['name']}")
+            new_n = dict(n)
+            new_n['original_matrix_idx'] = new_n.get('matrix_idx', i)
+            new_n['matrix_idx'] = len(current_nodes)
+            original_to_new_idx[i] = new_n['matrix_idx']
+            current_nodes.append(new_n)
+            new_row_cols.append(i)
+
+        plant_to_vehicles = {}
+        plant_to_clones = {}
+        num_vehicles = 0
+        
+        if flota_por_planta:
+            for p_idx_orig in plant_indices_orig:
+                p_id = self.nodes[p_idx_orig]['id']
+                count = flota_por_planta.get(p_id, 1)
+                
+                plant_to_vehicles[p_id] = list(range(num_vehicles, num_vehicles + count))
+                num_vehicles += count
+                
+                clones_for_plant = []
+                # El Muelle 1 es el nodo original
+                orig_new_idx = original_to_new_idx[p_idx_orig]
+                clones_for_plant.append(orig_new_idx)
+                
+                # Muelle 2, 3... (Clones perfectos)
+                for v in range(1, count):
+                    clone = dict(self.nodes[p_idx_orig])
+                    clone['original_matrix_idx'] = clone.get('matrix_idx', p_idx_orig)
+                    clone['matrix_idx'] = len(current_nodes)
+                    clone['id'] = f"{p_id}_clone_{v}"
+                    clone['name'] = f"{clone['name']} (Muelle {v+1})"
+                    clones_for_plant.append(clone['matrix_idx'])
+                    current_nodes.append(clone)
+                    new_row_cols.append(p_idx_orig)
+                
+                plant_to_clones[p_id] = clones_for_plant
+                
+            varias_plantas = False
+            idxs = np.array(new_row_cols)
+            current_matrix = self.distance_matrix[idxs][:, idxs]
+            
+        else:
+            if varias_plantas:
+                num_vehicles = num_plants_orig
+            else:
+                num_vehicles = num_plants_orig + 2
+                
+            current_matrix = self.distance_matrix
+            for p_idx_orig in plant_indices_orig:
+                p_id = self.nodes[p_idx_orig]['id']
+                plant_to_clones[p_id] = [original_to_new_idx[p_idx_orig]]
+
+        dist_matrix = current_matrix.astype(int).tolist()
+        depot_idx = 0
+        manager = pywrapcp.RoutingIndexManager(len(dist_matrix), num_vehicles, depot_idx)
+
+        logger.info("Nodos parseados para optimizar (con muelles virtuales): %d", len(current_nodes))
 
         logger.info(
             "Modo: %s | max_plantas_ruta=%d | n_clientes=%d | vehículos=%d",
-            "MC-VRPB (multi-planta)" if varias_plantas else "VRPB (clásico)",
+            "FLOTA ESPECÍFICA (Clonación de Nodos)" if flota_por_planta else ("MC-VRPB" if varias_plantas else "VRPB Clásico"),
             max_plantas_ruta, n_clientes, num_vehicles,
         )
 
-        manager = pywrapcp.RoutingIndexManager(len(dist_matrix), num_vehicles, depot_idx)
         routing = pywrapcp.RoutingModel(manager)
 
         # === DIMENSIÓN 1: Distancia ===
@@ -164,7 +224,7 @@ class LogisticsSolver:
         # === DIMENSIÓN 2: Contador de Plantas por vehículo ===
         def plant_callback(from_index):
             node_idx = manager.IndexToNode(from_index)
-            return 1 if self.nodes[node_idx]['type'] == 'carton_plant' else 0
+            return 1 if current_nodes[node_idx]['type'] == 'carton_plant' else 0
 
         plant_cb = routing.RegisterUnaryTransitCallback(plant_callback)
         routing.AddDimension(plant_cb, 0, max_plantas_ruta, True, 'PlantCount')
@@ -173,10 +233,28 @@ class LogisticsSolver:
         # === DIMENSIÓN 3: Contador de Clientes por vehículo ===
         def customer_callback(from_index):
             node_idx = manager.IndexToNode(from_index)
-            return 1 if self.nodes[node_idx]['type'] == 'customer' else 0
+            return 1 if current_nodes[node_idx]['type'] == 'customer' else 0
 
         cust_cb = routing.RegisterUnaryTransitCallback(customer_callback)
         routing.AddDimension(cust_cb, 0, n_clientes, True, 'CustomerCount')
+
+        # === DIMENSIÓN 4: Capacidad Física Acumulada (Volumen/Pallets) ===
+        if max_pallets_ruta is not None:
+            def demand_callback(from_index):
+                node_idx = manager.IndexToNode(from_index)
+                if current_nodes[node_idx]['type'] == 'customer':
+                    return int(current_nodes[node_idx].get('demanda_pallets', 0))
+                return 0
+
+            demand_cb = routing.RegisterUnaryTransitCallback(demand_callback)
+            capacities = [int(max_pallets_ruta)] * num_vehicles
+            routing.AddDimensionWithVehicleCapacity(
+                demand_cb,
+                0,  # null capacity slack
+                capacities,  # vehicle maximum capacities
+                True,  # start cumul to zero
+                'PalletsCapacity'
+            )
 
         if varias_plantas:
             # ESTRATEGIA: En lugar de forzar con 'Add(CumulVar >= 1)', que es muy frágil,
@@ -196,29 +274,53 @@ class LogisticsSolver:
         # for v in range(num_vehicles):
         #     routing.solver().Add(plant_dim.CumulVar(routing.End(v)) >= 1)
 
-        # R2: Todas las plantas son ABSOLUTAMENTE prioritarias
-        for p_idx in plant_indices:
-            p_node = manager.NodeToIndex(p_idx)
-            # Volvemos a la prioridad máxima
-            routing.AddDisjunction([p_node], 1_000_000_000_000)
+        # R2: Todas las plantas/muelles son de visita obligatoria para su vehículo
+        for p_id, clones in plant_to_clones.items():
+            for clon_idx in clones:
+                c_node = manager.NodeToIndex(clon_idx)
+                # OBLIGATORIO: El muelle debe ser visitado
+                routing.AddDisjunction([c_node], 1_000_000_000_000)
+            
+            if flota_por_planta:
+                veh_list = plant_to_vehicles.get(p_id, [])
+                for i, clon_idx in enumerate(clones):
+                    if i < len(veh_list):
+                        veh_id = veh_list[i]
+                        c_node = manager.NodeToIndex(clon_idx)
+                        routing.solver().Add(routing.VehicleVar(c_node) == veh_id)
 
-        # R3: Clientes — vinculación a su planta padre + precedencia
-        for c_idx in customer_indices:
+        # R3: Clientes — vinculación a camiones correctos y precedencias
+        for c_idx, node in enumerate(current_nodes):
+            if node['type'] != 'customer':
+                continue
+            
             c_node = manager.NodeToIndex(c_idx)
-            node = self.nodes[c_idx]
             parent_id = node.get('parent_cp')
-            p_idx = next((i for i, n in enumerate(self.nodes) if n['id'] == parent_id), None)
-            p_node = manager.NodeToIndex(p_idx) if p_idx is not None else None
-
+            
             penalty = 1_000_000_000 if node.get('obligatorio', False) else 100_000_000
             routing.AddDisjunction([c_node], penalty)
 
-            if p_node is not None:
-                # REGLA DE ORO: El cliente debe ir en el mismo vehículo que su planta
-                routing.solver().Add(routing.VehicleVar(c_node) == routing.VehicleVar(p_node))
-                
-                # La planta DEBE visitarse antes que el cliente (Estructural)
-                routing.solver().Add(dist_dim.CumulVar(p_node) <= dist_dim.CumulVar(c_node))
+            is_active = routing.ActiveVar(c_node)
+            
+            if flota_por_planta:
+                allowed_vehicles = plant_to_vehicles.get(parent_id, [])
+                if allowed_vehicles:
+                    routing.solver().Add(
+                        routing.solver().Sum([routing.VehicleVar(c_node) == v for v in allowed_vehicles]) == is_active
+                    )
+                    
+                    for i, veh_id in enumerate(allowed_vehicles):
+                        if i < len(plant_to_clones[parent_id]):
+                            clon_node = manager.NodeToIndex(plant_to_clones[parent_id][i])
+                            is_in_veh = (routing.VehicleVar(c_node) == veh_id)
+                            # Precedencia
+                            routing.solver().Add(dist_dim.CumulVar(clon_node) * is_in_veh <= dist_dim.CumulVar(c_node) * is_in_veh)
+            else:
+                clones = plant_to_clones.get(parent_id, [])
+                if clones:
+                    p_node = manager.NodeToIndex(clones[0])
+                    routing.solver().Add(is_active * routing.VehicleVar(c_node) == is_active * routing.VehicleVar(p_node))
+                    routing.solver().Add(dist_dim.CumulVar(p_node) * is_active <= dist_dim.CumulVar(c_node) * is_active)
 
         # === BÚSQUEDA ===
         search_params = pywrapcp.DefaultRoutingSearchParameters()
@@ -235,36 +337,53 @@ class LogisticsSolver:
         
         solution = routing.SolveWithParameters(search_params)
 
+        # ====== NUEVO: GESTIÓN DE DROP LOGGER AUTOMÁTICA ======
+        # Importación interior rápida para evitar ciclos si fuera necesario
+        from src.engine.drop_logger import DropLogger
+        drop_logger = DropLogger()
+        drop_logger.track_nodes(self.nodes)
+
         if solution:
             status_code = routing.status()
             logger.info(f"Solver terminó con éxito (status {status_code}).")
-            routes = self._extract_routes(manager, routing, solution)
+            routes = self._extract_routes(manager, routing, solution, current_nodes)
             self._last_routes = routes
+            
+            # Generar el log y anclarlo como propiedad pública del solver
+            self.drop_log_path = drop_logger.log_dropped_nodes(routes, max_pallets_ruta)
+            
             return routes
 
         status_code = routing.status()
         status_map = {0: "NOT_SOLVED", 1: "SUCCESS", 2: "FAIL", 3: "FAIL_TIMEOUT", 4: "INVALID"}
         logger.warning(f"El solver no encontró solución. Estado: {status_map.get(status_code, status_code)}")
+        self.drop_log_path = drop_logger.log_dropped_nodes([], max_pallets_ruta) # Todos descartados
         return None
 
     # ------------------------------------------------------------------
     # Extracción de rutas de la solución
     # ------------------------------------------------------------------
-    def _extract_routes(self, manager, routing, solution):
+    def _extract_routes(self, manager, routing, solution, current_nodes):
         all_routes = []
         for vehicle_id in range(routing.vehicles()):
             index = routing.Start(vehicle_id)
             route = []
+                
             while not routing.IsEnd(index):
                 node_idx = manager.IndexToNode(index)
-                route.append(self.nodes[node_idx])
+                node_data = dict(current_nodes[node_idx])
+                node_data['matrix_idx'] = node_data.get('original_matrix_idx', node_data['matrix_idx'])
+                route.append(node_data)
                 index = solution.Value(routing.NextVar(index))
+                
             # Nodo final (Depósito)
             node_idx = manager.IndexToNode(index)
-            route.append(self.nodes[node_idx])
+            node_data = dict(current_nodes[node_idx])
+            node_data['matrix_idx'] = node_data.get('original_matrix_idx', node_data['matrix_idx'])
+            route.append(node_data)
 
-            # Solo incluir rutas con al menos 1 parada intermedia
-            if len(route) > 2:
+            # Filtrar: solo conservar rutas que lleven al menos un cliente
+            if any(n['type'] == 'customer' for n in route):
                 all_routes.append(route)
 
         logger.info("Solución encontrada: %d rutas activas.", len(all_routes))

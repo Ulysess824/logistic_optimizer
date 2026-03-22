@@ -1,0 +1,81 @@
+
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Dashboard Optimización Logística</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <style>
+            body { background-color: #f4f6f9; }
+            .nav-tabs { margin-bottom: 20px; }
+            .card { border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+            iframe { width: 100%; height: 75vh; border: none; border-radius: 8px; }
+            .stats-number { font-size: 2rem; font-weight: bold; color: #0d6efd; }
+            .table-container { background: white; padding: 20px; border-radius: 8px; }
+        </style>
+    </head>
+    <body class="container-fluid py-4">
+        <h1 class="mb-4">Dashboard de Optimización de Flota</h1>
+        
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card p-3 text-center">
+                    <div class="text-muted">Ahorro Total en Km Vacíos (Backhauling)</div>
+                    <div class="stats-number text-success">2583.99 km</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card p-3 text-center">
+                    <div class="text-muted">Distancia Total Recorrida</div>
+                    <div class="stats-number">11296.35 km</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card p-3 text-center">
+                    <div class="text-muted">Total de Camiones/Subrutas</div>
+                    <div class="stats-number text-primary">11</div>
+                </div>
+            </div>
+        </div>
+
+        <ul class="nav nav-tabs" id="dashboardTabs" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active" id="map-tab" data-bs-toggle="tab" data-bs-target="#map" type="button">Mapa de Rutas</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" id="stats-tab" data-bs-toggle="tab" data-bs-target="#stats" type="button">Tablas de Subrutas</button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="dashboardTabsContent">
+            <div class="tab-pane fade show active" id="map" role="tabpanel">
+                <div class="card p-2">
+                    <iframe src="mapa_flota_dedicada_folium.html"></iframe>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="stats" role="tabpanel">
+                <div class="table-container shadow-sm">
+                    <table class="table table-hover table-striped">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Ruta #</th>
+                                <th>Planta Origen</th>
+                                <th>Nº Clientes</th>
+                                <th>Carga (Pallets Eff.)</th>
+                                <th>Distancia (km)</th>
+                                <th>Ahorro Km Vacíos (km)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>1</td><td>Alcalá</td><td>1</td><td>24</td><td>668.05</td><td class='text-success fw-bold'>+142.7 km</td></tr><tr><td>2</td><td>Alicante</td><td>2</td><td>35</td><td>847.69</td><td class='text-success fw-bold'>+313.07 km</td></tr><tr><td>3</td><td>Córdoba</td><td>1</td><td>23</td><td>210.41</td><td class='text-success fw-bold'>+181.83 km</td></tr><tr><td>4</td><td>Huelva</td><td>2</td><td>29</td><td>618.19</td><td class='text-success fw-bold'>+382.05 km</td></tr><tr><td>5</td><td>Burgos</td><td>2</td><td>23</td><td>1137.98</td><td class='text-success fw-bold'>+374.01 km</td></tr><tr><td>6</td><td>Navarra</td><td>1</td><td>24</td><td>1375.88</td><td class='text-success fw-bold'>+354.12 km</td></tr><tr><td>7</td><td>Valencia</td><td>1</td><td>26</td><td>853.29</td><td class='text-success fw-bold'>+0.13 km</td></tr><tr><td>8</td><td>Almeria</td><td>1</td><td>32</td><td>516.06</td><td class='text-success fw-bold'>+306.05 km</td></tr><tr><td>9</td><td>Canovelles</td><td>2</td><td>33</td><td>1614.35</td><td class='text-success fw-bold'>+388.77 km</td></tr><tr><td>10</td><td>Celpack</td><td>1</td><td>35</td><td>1664.14</td><td class='text-success fw-bold'>+0 km</td></tr><tr><td>11</td><td>Vigo</td><td>2</td><td>24</td><td>1790.3</td><td class='text-success fw-bold'>+141.27 km</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
+    </html>
+    
