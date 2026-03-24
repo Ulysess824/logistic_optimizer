@@ -1,0 +1,18 @@
+{
+  "scenario_name": "TRANS-IBERIA (2000km Radio)",
+  "total_nodes": 122,
+  "total_routes": 4,
+  "total_time_s": 167.22,
+  "solver_time_s": 45.01,
+  "memory_diff_mb": -92.32,
+  "solution_found": true,
+  "parameters": {
+    "name": "TRANS-IBERIA (2000km Radio)",
+    "n_clientes": 10,
+    "max_customers_per_plant": 10,
+    "max_radius_km": 2000,
+    "varias_plantas": true,
+    "max_plantas_ruta": 3,
+    "max_search_time": 45
+  }
+}

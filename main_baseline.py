@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 # =====================================================================
 def generate_logistics_dashboard(routes, solver, output_path="logistics_dashboard_pallets.html",
                                  map_iframe_src="mapa_flota_dedicada_folium.html",
-                                 max_pallets=35, flota_por_planta=None):
+                                 max_pallets=35, flota_por_planta=None, summary_data=None):
     """Genera un dashboard HTML con pestanas (Mapa y Estadisticas) premium."""
     matrix = solver.distance_matrix
     depot_idx = 0
@@ -62,6 +62,13 @@ def generate_logistics_dashboard(routes, solver, output_path="logistics_dashboar
         raw_id = planta_node.get('id', '')
         plant_id_clean = raw_id.split('_clone_')[0] if '_clone_' in raw_id else raw_id
 
+        # Extraer CO2 del summary si existe
+        co2_emissions = 0
+        if summary_data:
+            match = next((s for s in summary_data['routes'] if s['route_id'] == i + 1), None)
+            if match:
+                co2_emissions = match.get('co2_emissions_kg', 0)
+
         route_stats.append({
             "id": i + 1,
             "planta": planta_node['name'].upper().replace(' (MUELLE 2)', '').replace(' (MUELLE 3)', ''),
@@ -71,7 +78,8 @@ def generate_logistics_dashboard(routes, solver, output_path="logistics_dashboar
             "pct_uso": min(pct_uso, 100.0),
             "secuencia": " &rarr; ".join(seq),
             "dist_km": round(d_ruta_km, 2),
-            "ahorro_km": round(ahorro_km, 2)
+            "ahorro_km": round(ahorro_km, 2),
+            "co2_kg": co2_emissions
         })
 
     # Agrupar por planta
@@ -120,6 +128,7 @@ def generate_logistics_dashboard(routes, solver, output_path="logistics_dashboar
                 <td class="align-middle" style="min-width: 150px;">{progreso_html}</td>
                 <td class="align-middle">{r['dist_km']} km</td>
                 <td class="align-middle text-success fw-bold">+{r['ahorro_km']} km</td>
+                <td class="align-middle text-danger fw-bold">{r['co2_kg']} kg</td>
                 <td class="align-middle">{estado}</td>
             </tr>
             '''
@@ -168,6 +177,7 @@ def generate_logistics_dashboard(routes, solver, output_path="logistics_dashboar
                                 <th>Carga (Utilizacion Real)</th>
                                 <th>Distancia (km)</th>
                                 <th>Ahorro Km Vacios</th>
+                                <th>Emisiones CO2</th>
                                 <th>Estado de Ruta</th>
                             </tr>
                         </thead>
@@ -188,7 +198,7 @@ def generate_logistics_dashboard(routes, solver, output_path="logistics_dashboar
 
 
 # =====================================================================
-#              PARAMETROS DE EJECUCION — Modifica estos valores
+#              PARAMETROS DE EJECUCION 
 # =====================================================================
 
 # 1. Archivos de datos
@@ -200,8 +210,8 @@ MAX_PALLETS = 35                # Capacidad maxima por camion (Bin-packing)
 THRESHOLD_KM_DETOUR = 50       # Desvio maximo permitido para backhauling
 MAX_RADIUS_KM = 200      
       # Radio maximo de busqueda alrededor de la planta
-N_CANDIDATOS_PLANTA = 30       # Candidatos por planta (fuerza uso de multiples camiones)
-MAX_SEARCH_TIME = 30            # Tiempo maximo de busqueda del solver (s)
+N_CANDIDATOS_PLANTA = 1       # Solo un cliente por planta para escenario base
+MAX_SEARCH_TIME = 120            # Tiempo maximo de busqueda del solver (s)
 SORTING_STRATEGY = "far_plant_close_depot"
 
 # Motor Geografico: "haversine", "osrm", "google_maps" o "routes_api"
@@ -216,24 +226,21 @@ TRUCK_SPECS = {
 
 # 3. Configuracion de Flota por Planta (ID de planta: Numero de camiones)
 FLOTA_POR_PLANTA = {
-        "CP_CELPACK": 3,
-        "CP_ALCALA": 4,
-        "CP_ALICANTE": 5,
-        "CP_ALMERIA": 5,
-        "CP_BURGOS": 4,
-        "CP_CANOVELLES": 2,
-        "CP_CORDOBA": 3,
-        "CP_NAVARRA": 2,
-        "CP_HUELVA": 5,
-        "CP_VALENCIA": 3,
-        "CP_VIGO": 2
+        "CP_CELPACK": 1,
+        "CP_ALCALA": 1,
+        "CP_ALICANTE": 1,
+        "CP_ALMERIA": 1,
+        "CP_BURGOS": 1,
+        "CP_CANOVELLES": 1,
+        "CP_CORDOBA": 1,
+        "CP_NAVARRA": 1,
+        "CP_HUELVA": 1,
+        "CP_VALENCIA": 1,
+        "CP_VIGO": 1
 }
 
 # 4. Clientes OBLIGATORIOS
-MANDATORY_CUSTOMERS = {
-    "Alcala": ["Ciudad Real"],
-    "Cordoba": ["Andujar"]
-}
+MANDATORY_CUSTOMERS = {}
 
 # 5. Configuracion personalizada de clientes por planta
 PLANT_CUSTOMER_LIMITS = None  # O dict con {"CP_ALCALA": 6, ...}
@@ -262,6 +269,7 @@ def _build_summary(routes, solver):
         dist_km = 0
         empty_km = 0
         route_co2_kg = 0
+        
         current_load_kg = 0
         
         for j in range(len(route) - 1):
@@ -271,7 +279,7 @@ def _build_summary(routes, solver):
             
             # Determinar carga actual ANTES de viajar a n2
             if n1['type'] == 'depot':
-                # Tramo Mengibar -> Planta de Cartón (LLeno de papel para backhaul)
+                # Tramo Mengibar -> Planta de Cartón (LLeno de papel)
                 current_load_kg = PAPER_LOAD_KG
             elif n1['type'] == 'carton_plant':
                 # Tramo Planta -> Primer Cliente (LLeno de pallets de esta ruta)
@@ -414,14 +422,14 @@ def main():
         print(f"=> Se ha exportado el reporte de descartes a: {solver.drop_log_path}")
 
     # 6. Guardar rutas detalladas
-    output_json = RESULTS_DIR / "optimized_routes.json"
+    output_json = RESULTS_DIR / "baseline_routes.json"
     with open(output_json, 'w', encoding='utf-8') as f:
         json.dump(routes, f, indent=2, ensure_ascii=False)
     print(f"=> Rutas detalladas guardadas en: {output_json}")
 
     # 7. Generar y guardar resumen de KPIs
     summary = _build_summary(routes, solver)
-    summary_json = RESULTS_DIR / "optimization_summary.json"
+    summary_json = RESULTS_DIR / "baseline_summary.json"
     with open(summary_json, 'w', encoding='utf-8') as f:
         json.dump(summary, f, indent=2, ensure_ascii=False)
     print(f"=> Resumen KPIs guardado en: {summary_json}")
@@ -481,22 +489,23 @@ def main():
             except Exception:
                 folium.PolyLine([[start_n['lat'], start_n['lng']], [end_n['lat'], end_n['lng']]], color=color_actual, weight=5, opacity=0.8, dash_array='5, 10').add_to(mapa)
 
-    output_map_html = "mapa_flota_dedicada_folium.html"
+    output_map_html = "outputs/maps/mapa_rutas_baseline.html"
     mapa.save(output_map_html)
     print(f"=> Mapa de Rutas geolocalizadas: {output_map_html}")
 
     # 10. Dashboard de Eficiencia por Planta
-    output_dashboard = "logistics_dashboard_pallets.html"
-    generate_logistics_dashboard(routes, solver, output_path=output_dashboard, map_iframe_src=output_map_html, max_pallets=MAX_PALLETS, flota_por_planta=flota_final)
+    output_dashboard = "logistics_dashboard_baseline.html"
+    generate_logistics_dashboard(routes, solver, output_path=output_dashboard, map_iframe_src=output_map_html, 
+                                 max_pallets=MAX_PALLETS, flota_por_planta=flota_final, summary_data=summary)
     print(f"=> Tablero Interactivo (Eficiencia + Mapa): {output_dashboard}")
 
     # 11. Actualizar Presentacion HTML (Dashboard Global Modular)
     presentation_path = "outputs/Presentacion_Logistica.html"
     try:
-        generate_dashboard(summary_json, output_json, presentation_path)
-        print(f"=> Presentacion (Modular) actualizada: {presentation_path}")
+        generate_dashboard(summary_json, output_json, presentation_path, is_baseline=True)
+        print(f"=> Presentacion (Modular - Baseline) actualizada: {presentation_path}")
     except Exception as e:
-        logger.warning("No se pudo actualizar la Presentacion Modular: %s", e)
+        logger.warning("No se pudo actualizar la Presentacion Modular (Baseline): %s", e)
 
     # 12. Resumen en consola
     print("\n" + "=" * 70)

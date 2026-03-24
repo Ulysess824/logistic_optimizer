@@ -1,0 +1,224 @@
+
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Dashboard Inteligente de Flota</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <style>
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+            .table tbody tr:hover { background-color: #f1f5f9; }
+            .border-end { border-right: 3px solid #dee2e6 !important; }
+            .nav-tabs .nav-link { color: #495057; font-weight: 500; }
+            .nav-tabs .nav-link.active { color: #0d6efd; border-bottom: 3px solid #0d6efd; }
+            table { box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        </style>
+    </head>
+    <body class="container-fluid py-4 bg-light">
+        <h2 class="mb-4 text-primary fw-bold">Resumen de Flota y Backhauling</h2>
+
+        <ul class="nav nav-tabs mb-3 border-0" id="dashboardTabs" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active bg-white border border-bottom-0 shadow-sm" id="map-tab" data-bs-toggle="tab" data-bs-target="#map" type="button">Visor Geografico de Rutas</button>
+            </li>
+            <li class="nav-item ms-2">
+                <button class="nav-link bg-white border border-bottom-0 shadow-sm" id="stats-tab" data-bs-toggle="tab" data-bs-target="#stats" type="button">Eficiencia por Planta</button>
+            </li>
+        </ul>
+
+        <div class="tab-content bg-white border p-3 rounded shadow-sm" id="dashboardTabsContent">
+            <div class="tab-pane fade show active" id="map" role="tabpanel">
+                <iframe src="outputs/maps/mapa_rutas_baseline.html" style="width: 100%; height: 75vh; border: none; border-radius: 8px; background: #eaebed;"></iframe>
+            </div>
+            <div class="tab-pane fade" id="stats" role="tabpanel">
+                <div class="table-responsive">
+                    <table class="table table-bordered text-center align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Planta de Origen</th>
+                                <th>ID Ruta</th>
+                                <th class="text-start">Hoja de Ruta de Reparto</th>
+                                <th>Carga (Utilizacion Real)</th>
+                                <th>Distancia (km)</th>
+                                <th>Ahorro Km Vacios</th>
+                                <th>Emisiones CO2</th>
+                                <th>Estado de Ruta</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td rowspan="1" class="align-middle border-end bg-light"><b>ALCALÁ</b><br><span class="badge bg-secondary mt-1">1/1 camiones</span></td>
+                <td class="align-middle text-nowrap">Camion #1</td>
+                <td class="align-middle text-start" style="font-size: 0.9em;">PP &rarr; Alcalá &rarr; Villarrubia De Los Ojos &rarr; PP</td>
+                <td class="align-middle" style="min-width: 150px;">
+                <div class="progress" style="height: 24px;" title="62.9%">
+                    <div class="progress-bar bg-warning text-dark fw-bold" style="width: 62.857142857142854%">
+                        22/35 P
+                    </div>
+                </div>
+            </td>
+                <td class="align-middle">691.37 km</td>
+                <td class="align-middle text-success fw-bold">+336.26 km</td>
+                <td class="align-middle text-danger fw-bold">822.2 kg</td>
+                <td class="align-middle">Mejorable</td>
+            </tr>
+            <tr><td rowspan="1" class="align-middle border-end bg-light"><b>ALICANTE</b><br><span class="badge bg-secondary mt-1">1/1 camiones</span></td>
+                <td class="align-middle text-nowrap">Camion #2</td>
+                <td class="align-middle text-start" style="font-size: 0.9em;">PP &rarr; Alicante &rarr; Moratalla &rarr; PP</td>
+                <td class="align-middle" style="min-width: 150px;">
+                <div class="progress" style="height: 24px;" title="48.6%">
+                    <div class="progress-bar bg-danger text-dark fw-bold" style="width: 48.57142857142857%">
+                        17/35 P
+                    </div>
+                </div>
+            </td>
+                <td class="align-middle">835.02 km</td>
+                <td class="align-middle text-success fw-bold">+316.85 km</td>
+                <td class="align-middle text-danger fw-bold">992.84 kg</td>
+                <td class="align-middle">Baja Carga</td>
+            </tr>
+            <tr><td rowspan="1" class="align-middle border-end bg-light"><b>CÓRDOBA</b><br><span class="badge bg-secondary mt-1">1/1 camiones</span></td>
+                <td class="align-middle text-nowrap">Camion #3</td>
+                <td class="align-middle text-start" style="font-size: 0.9em;">PP &rarr; Córdoba &rarr; Jabalquinto &rarr; PP</td>
+                <td class="align-middle" style="min-width: 150px;">
+                <div class="progress" style="height: 24px;" title="85.7%">
+                    <div class="progress-bar bg-success text-dark fw-bold" style="width: 85.71428571428571%">
+                        30/35 P
+                    </div>
+                </div>
+            </td>
+                <td class="align-middle">223.63 km</td>
+                <td class="align-middle text-success fw-bold">+197.59 km</td>
+                <td class="align-middle text-danger fw-bold">272.04 kg</td>
+                <td class="align-middle">Optima</td>
+            </tr>
+            <tr><td rowspan="1" class="align-middle border-end bg-light"><b>HUELVA</b><br><span class="badge bg-secondary mt-1">1/1 camiones</span></td>
+                <td class="align-middle text-nowrap">Camion #4</td>
+                <td class="align-middle text-start" style="font-size: 0.9em;">PP &rarr; Huelva &rarr; Cordoba &rarr; PP</td>
+                <td class="align-middle" style="min-width: 150px;">
+                <div class="progress" style="height: 24px;" title="62.9%">
+                    <div class="progress-bar bg-warning text-dark fw-bold" style="width: 62.857142857142854%">
+                        22/35 P
+                    </div>
+                </div>
+            </td>
+                <td class="align-middle">646.17 km</td>
+                <td class="align-middle text-success fw-bold">+381.74 km</td>
+                <td class="align-middle text-danger fw-bold">769.28 kg</td>
+                <td class="align-middle">Mejorable</td>
+            </tr>
+            <tr><td rowspan="1" class="align-middle border-end bg-light"><b>BURGOS</b><br><span class="badge bg-secondary mt-1">1/1 camiones</span></td>
+                <td class="align-middle text-nowrap">Camion #5</td>
+                <td class="align-middle text-start" style="font-size: 0.9em;">PP &rarr; Burgos &rarr; Castillejo De Robledo &rarr; PP</td>
+                <td class="align-middle" style="min-width: 150px;">
+                <div class="progress" style="height: 24px;" title="80.0%">
+                    <div class="progress-bar bg-success text-dark fw-bold" style="width: 80.0%">
+                        28/35 P
+                    </div>
+                </div>
+            </td>
+                <td class="align-middle">1149.33 km</td>
+                <td class="align-middle text-success fw-bold">+232.75 km</td>
+                <td class="align-middle text-danger fw-bold">1357.81 kg</td>
+                <td class="align-middle">Optima</td>
+            </tr>
+            <tr><td rowspan="1" class="align-middle border-end bg-light"><b>NAVARRA</b><br><span class="badge bg-secondary mt-1">1/1 camiones</span></td>
+                <td class="align-middle text-nowrap">Camion #6</td>
+                <td class="align-middle text-start" style="font-size: 0.9em;">PP &rarr; Navarra &rarr; Milagro &rarr; PP</td>
+                <td class="align-middle" style="min-width: 150px;">
+                <div class="progress" style="height: 24px;" title="54.3%">
+                    <div class="progress-bar bg-warning text-dark fw-bold" style="width: 54.285714285714285%">
+                        19/35 P
+                    </div>
+                </div>
+            </td>
+                <td class="align-middle">1385.92 km</td>
+                <td class="align-middle text-success fw-bold">+138.05 km</td>
+                <td class="align-middle text-danger fw-bold">1632.27 kg</td>
+                <td class="align-middle">Mejorable</td>
+            </tr>
+            <tr><td rowspan="1" class="align-middle border-end bg-light"><b>VALENCIA</b><br><span class="badge bg-secondary mt-1">1/1 camiones</span></td>
+                <td class="align-middle text-nowrap">Camion #7</td>
+                <td class="align-middle text-start" style="font-size: 0.9em;">PP &rarr; Valencia &rarr; Hellin &rarr; PP</td>
+                <td class="align-middle" style="min-width: 150px;">
+                <div class="progress" style="height: 24px;" title="37.1%">
+                    <div class="progress-bar bg-danger text-dark fw-bold" style="width: 37.142857142857146%">
+                        13/35 P
+                    </div>
+                </div>
+            </td>
+                <td class="align-middle">869.95 km</td>
+                <td class="align-middle text-success fw-bold">+384.37 km</td>
+                <td class="align-middle text-danger fw-bold">1028.66 kg</td>
+                <td class="align-middle">Baja Carga</td>
+            </tr>
+            <tr><td rowspan="1" class="align-middle border-end bg-light"><b>ALMERIA</b><br><span class="badge bg-secondary mt-1">1/1 camiones</span></td>
+                <td class="align-middle text-nowrap">Camion #8</td>
+                <td class="align-middle text-start" style="font-size: 0.9em;">PP &rarr; Almeria &rarr; Villanueva De La Reina &rarr; PP</td>
+                <td class="align-middle" style="min-width: 150px;">
+                <div class="progress" style="height: 24px;" title="80.0%">
+                    <div class="progress-bar bg-success text-dark fw-bold" style="width: 80.0%">
+                        28/35 P
+                    </div>
+                </div>
+            </td>
+                <td class="align-middle">536.96 km</td>
+                <td class="align-middle text-success fw-bold">+511.54 km</td>
+                <td class="align-middle text-danger fw-bold">657.02 kg</td>
+                <td class="align-middle">Optima</td>
+            </tr>
+            <tr><td rowspan="1" class="align-middle border-end bg-light"><b>CANOVELLES</b><br><span class="badge bg-secondary mt-1">1/1 camiones</span></td>
+                <td class="align-middle text-nowrap">Camion #9</td>
+                <td class="align-middle text-start" style="font-size: 0.9em;">PP &rarr; Canovelles &rarr; Caspe &rarr; PP</td>
+                <td class="align-middle" style="min-width: 150px;">
+                <div class="progress" style="height: 24px;" title="51.4%">
+                    <div class="progress-bar bg-warning text-dark fw-bold" style="width: 51.42857142857142%">
+                        18/35 P
+                    </div>
+                </div>
+            </td>
+                <td class="align-middle">1694.71 km</td>
+                <td class="align-middle text-success fw-bold">+421.28 km</td>
+                <td class="align-middle text-danger fw-bold">1978.94 kg</td>
+                <td class="align-middle">Mejorable</td>
+            </tr>
+            <tr><td rowspan="1" class="align-middle border-end bg-light"><b>CELPACK</b><br><span class="badge bg-secondary mt-1">1/1 camiones</span></td>
+                <td class="align-middle text-nowrap">Camion #10</td>
+                <td class="align-middle text-start" style="font-size: 0.9em;">PP &rarr; Celpack &rarr; Castelo Branco &rarr; PP</td>
+                <td class="align-middle" style="min-width: 150px;">
+                <div class="progress" style="height: 24px;" title="74.3%">
+                    <div class="progress-bar bg-warning text-dark fw-bold" style="width: 74.28571428571429%">
+                        26/35 P
+                    </div>
+                </div>
+            </td>
+                <td class="align-middle">1591.55 km</td>
+                <td class="align-middle text-success fw-bold">+386.5 km</td>
+                <td class="align-middle text-danger fw-bold">1858.65 kg</td>
+                <td class="align-middle">Mejorable</td>
+            </tr>
+            <tr><td rowspan="1" class="align-middle border-end bg-light"><b>VIGO</b><br><span class="badge bg-secondary mt-1">1/1 camiones</span></td>
+                <td class="align-middle text-nowrap">Camion #11</td>
+                <td class="align-middle text-start" style="font-size: 0.9em;">PP &rarr; Vigo &rarr; Chaves &rarr; PP</td>
+                <td class="align-middle" style="min-width: 150px;">
+                <div class="progress" style="height: 24px;" title="62.9%">
+                    <div class="progress-bar bg-warning text-dark fw-bold" style="width: 62.857142857142854%">
+                        22/35 P
+                    </div>
+                </div>
+            </td>
+                <td class="align-middle">1813.33 km</td>
+                <td class="align-middle text-success fw-bold">+298.5 km</td>
+                <td class="align-middle text-danger fw-bold">2135.85 kg</td>
+                <td class="align-middle">Mejorable</td>
+            </tr>
+            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
+    </html>
+    

@@ -1,89 +1,90 @@
 [
   {
-    "scenario_name": "Baseline (Moderado)",
-    "total_nodes": 23,
+    "scenario_name": "ULTRA-DENSIDAD (100 clientes/planta)",
+    "total_nodes": 1014,
     "total_routes": 11,
-    "total_time_s": 11.07,
-    "solver_time_s": 10.01,
-    "memory_diff_mb": 12.37,
+    "total_time_s": 428.51,
+    "solver_time_s": 60.12,
+    "memory_diff_mb": 155.84,
     "solution_found": true,
     "parameters": {
-      "name": "Baseline (Moderado)",
-      "n_clientes": 4,
-      "max_customers_per_plant": 1,
-      "max_radius_km": 100,
-      "varias_plantas": false,
-      "max_search_time": 10
-    }
-  },
-  {
-    "scenario_name": "Alta Densidad (20 clientes/planta)",
-    "total_nodes": 232,
-    "total_routes": 11,
-    "total_time_s": 32.74,
-    "solver_time_s": 30.01,
-    "memory_diff_mb": 5.68,
-    "solution_found": true,
-    "parameters": {
-      "name": "Alta Densidad (20 clientes/planta)",
-      "n_clientes": 20,
-      "max_customers_per_plant": 20,
-      "max_radius_km": 200,
-      "varias_plantas": false,
-      "max_search_time": 30
-    }
-  },
-  {
-    "scenario_name": "Área Masiva (1000km Radio)",
-    "total_nodes": 67,
-    "total_routes": 11,
-    "total_time_s": 32.61,
-    "solver_time_s": 30.01,
-    "memory_diff_mb": 1.93,
-    "solution_found": true,
-    "parameters": {
-      "name": "Área Masiva (1000km Radio)",
-      "n_clientes": 5,
-      "max_customers_per_plant": 5,
-      "max_radius_km": 1000,
-      "varias_plantas": false,
-      "max_search_time": 30
-    }
-  },
-  {
-    "scenario_name": "Sobrecarga Multi-Planta (3 plantas/ruta)",
-    "total_nodes": 67,
-    "total_routes": 0,
-    "total_time_s": 42.61,
-    "solver_time_s": 40.01,
-    "memory_diff_mb": 0.95,
-    "solution_found": false,
-    "parameters": {
-      "name": "Sobrecarga Multi-Planta (3 plantas/ruta)",
-      "n_clientes": 10,
-      "max_customers_per_plant": 5,
+      "name": "ULTRA-DENSIDAD (100 clientes/planta)",
+      "n_clientes": 50,
+      "max_customers_per_plant": 100,
       "max_radius_km": 500,
+      "varias_plantas": false,
+      "max_search_time": 60
+    }
+  },
+  {
+    "scenario_name": "TRANS-IBERIA (2000km Radio)",
+    "total_nodes": 122,
+    "total_routes": 4,
+    "total_time_s": 167.22,
+    "solver_time_s": 45.01,
+    "memory_diff_mb": -92.32,
+    "solution_found": true,
+    "parameters": {
+      "name": "TRANS-IBERIA (2000km Radio)",
+      "n_clientes": 10,
+      "max_customers_per_plant": 10,
+      "max_radius_km": 2000,
       "varias_plantas": true,
       "max_plantas_ruta": 3,
-      "max_search_time": 40
+      "max_search_time": 45
     }
   },
   {
-    "scenario_name": "Tiempo Crítico (Problema complejo en 3s)",
-    "total_nodes": 122,
-    "total_routes": 0,
-    "total_time_s": 5.47,
-    "solver_time_s": 3.01,
-    "memory_diff_mb": -0.23,
-    "solution_found": false,
+    "scenario_name": "FULL PACK (FTL forzado 35 pallets)",
+    "total_nodes": 232,
+    "total_routes": 11,
+    "total_time_s": 164.31,
+    "solver_time_s": 30.02,
+    "memory_diff_mb": 31.93,
+    "solution_found": true,
     "parameters": {
-      "name": "Tiempo Crítico (Problema complejo en 3s)",
-      "n_clientes": 15,
-      "max_customers_per_plant": 10,
-      "max_radius_km": 400,
+      "name": "FULL PACK (FTL forzado 35 pallets)",
+      "n_clientes": 10,
+      "max_customers_per_plant": 20,
+      "max_radius_km": 300,
+      "extreme_demand": true,
+      "varias_plantas": false,
+      "max_search_time": 30
+    }
+  },
+  {
+    "scenario_name": "MULTI-PLANTA TOTAL (11 plantas/ruta)",
+    "total_nodes": 67,
+    "total_routes": 1,
+    "total_time_s": 179.28,
+    "solver_time_s": 60.01,
+    "memory_diff_mb": 18.23,
+    "solution_found": true,
+    "parameters": {
+      "name": "MULTI-PLANTA TOTAL (11 plantas/ruta)",
+      "n_clientes": 30,
+      "max_customers_per_plant": 5,
+      "max_radius_km": 600,
       "varias_plantas": true,
-      "max_plantas_ruta": 2,
-      "max_search_time": 3
+      "max_plantas_ruta": 11,
+      "max_search_time": 60
+    }
+  },
+  {
+    "scenario_name": "LIMIT-TIME (Complejidad en 2s)",
+    "total_nodes": 562,
+    "total_routes": 11,
+    "total_time_s": 219.76,
+    "solver_time_s": 2.04,
+    "memory_diff_mb": -7.48,
+    "solution_found": true,
+    "parameters": {
+      "name": "LIMIT-TIME (Complejidad en 2s)",
+      "n_clientes": 20,
+      "max_customers_per_plant": 50,
+      "max_radius_km": 400,
+      "varias_plantas": false,
+      "max_search_time": 2
     }
   }
 ]

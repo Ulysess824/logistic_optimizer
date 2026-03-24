@@ -32,6 +32,13 @@ DEFAULT_MAX_PLANTS_PER_ROUTE = 1  # Plantas por ruta (1=VRPB clásico, >1=MC-VRP
 DEFAULT_MAX_CUSTOMERS = 4     # Valor de respaldo si no se define N_CLIENTES o un dict
 DEFAULT_THRESHOLD_KM = 100    # Umbral de desvío en km para filtro de retorno
 
+# Emisiones y Pesos (Modelo FCR Xiao et al.)
+DEFAULT_CO2_PER_KM = 1.57        # kg CO2/km a plena carga
+DEFAULT_ALPHA_FCR = 0.5          # Ratio de consumo vacío/cargado
+PAPER_LOAD_KG = 25_000           # Carga de bobinas PP -> CP (kg)
+PALLET_WEIGHT_KG = 145           # Peso promedio por pallet (kg)
+VEHICLE_MAX_LOAD_KG = 25_000     # Capacidad máxima del vehículo (kg)para cálculo ratio FCR
+
 # Create folders if they don't exist
 for folder in [OUTPUT_DIR, RESULTS_DIR, MAPS_DIR, LOGS_DIR]:
     folder.mkdir(parents=True, exist_ok=True)

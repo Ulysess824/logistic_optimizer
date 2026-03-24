@@ -1,0 +1,18 @@
+{
+  "scenario_name": "MULTI-PLANTA TOTAL (11 plantas/ruta)",
+  "total_nodes": 67,
+  "total_routes": 1,
+  "total_time_s": 179.28,
+  "solver_time_s": 60.01,
+  "memory_diff_mb": 18.23,
+  "solution_found": true,
+  "parameters": {
+    "name": "MULTI-PLANTA TOTAL (11 plantas/ruta)",
+    "n_clientes": 30,
+    "max_customers_per_plant": 5,
+    "max_radius_km": 600,
+    "varias_plantas": true,
+    "max_plantas_ruta": 11,
+    "max_search_time": 60
+  }
+}

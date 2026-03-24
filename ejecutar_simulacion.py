@@ -22,6 +22,8 @@ def run_simulation(routes_file=None, plants_file=None):
         routes_file = RESULTS_DIR / "optimized_routes.json"
     if plants_file is None:
         plants_file = DATA_DIR / "locations_smurfit.json"
+    
+    summary_file = RESULTS_DIR / "optimization_summary.json"
 
     # Verificar existencia
     if not Path(routes_file).exists():
@@ -40,6 +42,17 @@ def run_simulation(routes_file=None, plants_file=None):
     with open(plants_file, 'r', encoding='utf-8') as f:
         plants_data = json.load(f)
 
+    # Cargar parámetros del optimizador para sincronización dinámica
+    max_pallets_param = 35
+    if summary_file.exists():
+        try:
+            with open(summary_file, 'r', encoding='utf-8') as f:
+                summary = json.load(f)
+                max_pallets_param = summary.get("parameters", {}).get("max_pallets", 35)
+                logger.info(f"Sincronizados max_pallets = {max_pallets_param} desde el resumen de optimización.")
+        except Exception as e:
+            logger.warning(f"No se pudo leer el resumen de optimización para sincronizar parámetros: {e}")
+
     # 3. Inicializar motor geográfico (para polilíneas reales en la simulación)
     # Por defecto intentamos OSRM para que el GIF sea preciso
     geo_engine = GeoUtils(api_type="osrm")
@@ -54,8 +67,9 @@ def run_simulation(routes_file=None, plants_file=None):
         tiempo_carga_h=(0.5 + 0.3),
         num_muelles=2,
         num_conductores=38,
-        max_pallets=15,
-        geo_utils=geo_engine
+        max_pallets=max_pallets_param,
+        geo_utils=geo_engine,
+        num_muelles = 2
     )
 
     # 6. Ejecutar simulación

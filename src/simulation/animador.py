@@ -1,3 +1,4 @@
+import re
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import numpy as np
@@ -64,7 +65,8 @@ class AnimadorLogistico:
                         seen_plantas.add(key)
                         nodos_planta_lon.append(tramo['lon_destino'])
                         nodos_planta_lat.append(tramo['lat_destino'])
-                        nombres_planta.append(tramo['nombre'])
+                        nombre_limpio = re.sub(r"\s*\(Muelle \d+\)", "", tramo['nombre'])
+                        nombres_planta.append(nombre_limpio)
                 elif tramo['tipo'] == 'customer':
                     nodos_cliente_lon.append(tramo['lon_destino'])
                     nodos_cliente_lat.append(tramo['lat_destino'])
@@ -90,15 +92,15 @@ class AnimadorLogistico:
         props = dict(boxstyle='round,pad=0.5', facecolor='white', alpha=0.85, edgecolor='#ccc')
         self.texto_reloj = self.ax.text(
             0.02, 0.97, '', transform=self.ax.transAxes,
-            fontsize=12, weight='bold', va='top', bbox=props
+            fontsize=11, weight='bold', va='top', bbox=props
         )
         self.texto_stats = self.ax.text(
-            0.02, 0.88, '', transform=self.ax.transAxes,
-            fontsize=10, va='top', bbox=props
+            0.20, 0.97, '', transform=self.ax.transAxes,
+            fontsize=9, va='top', bbox=props
         )
         # Panel de carga / pallets
         self.texto_pallets = self.ax.text(
-            0.02, 0.72, '', transform=self.ax.transAxes,
+            0.55, 0.97, '', transform=self.ax.transAxes,
             fontsize=9, va='top', bbox=props
         )
 
@@ -201,9 +203,9 @@ class AnimadorLogistico:
         )
 
         self.texto_pallets.set_text(
-            f"Pallets en ruta: {pallets_en_ruta}\n"
-            f"Total dia: {self.total_pallets}/{self.capacidad_total} P\n"
-            f"Uso global: {self.pct_uso_global}%"
+            f"Pallets totales: {self.total_pallets}\n"
+            f"Capacidad flota: {self.capacidad_total} P\n"
+            f"Carga promedio global: {self.pct_uso_global}%"
         )
 
         return self.puntos_camiones, self.texto_reloj, self.texto_stats, self.texto_pallets,

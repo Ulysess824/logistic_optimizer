@@ -38,6 +38,15 @@ class LogisticsSolver:
         else:
             self.distance_matrix, self.is_real_road = self.geo.calculate_distance_matrix(self.nodes)
         
+        # Inyectar distancia a planta origen para diagnósticos de "Fuera de Rango"
+        plant_idx_map = {n['id']: n['matrix_idx'] for n in self.nodes if n['type'] == 'carton_plant'}
+        for n in self.nodes:
+            if n['type'] == 'customer' and n.get('parent_cp') in plant_idx_map:
+                p_idx = plant_idx_map[n['parent_cp']]
+                c_idx = n['matrix_idx']
+                dist_m = self.distance_matrix[p_idx][c_idx]
+                n['dist_to_plant'] = dist_m / 1000.0 # Convertir a KM
+
         self._last_solve_args = {}
         self._last_routes = None
 
@@ -338,7 +347,6 @@ class LogisticsSolver:
         solution = routing.SolveWithParameters(search_params)
 
         # ====== NUEVO: GESTIÓN DE DROP LOGGER AUTOMÁTICA ======
-        # Importación interior rápida para evitar ciclos si fuera necesario
         from src.engine.drop_logger import DropLogger
         drop_logger = DropLogger()
         drop_logger.track_nodes(self.nodes)
@@ -349,15 +357,62 @@ class LogisticsSolver:
             routes = self._extract_routes(manager, routing, solution, current_nodes)
             self._last_routes = routes
             
-            # Generar el log y anclarlo como propiedad pública del solver
-            self.drop_log_path = drop_logger.log_dropped_nodes(routes, max_pallets_ruta)
+            # --- CÁLCULO DE ESTADÍSTICAS PARA DIAGNÓSTICO ---
+            fleet_info = {}
+            dim_stats = {}
+            
+            # Mapeo invertido: vehículo -> planta
+            vehicle_to_plant = {}
+            if flota_por_planta:
+                for p_id, v_idxs in plant_to_vehicles.items():
+                    fleet_info[p_id] = {"total": len(v_idxs), "used": 0, "subroutes": []}
+                    for v in v_idxs: vehicle_to_plant[v] = p_id
+            else:
+                fleet_info["Global"] = {"total": num_vehicles, "used": 0, "subroutes": []}
+                for v in range(num_vehicles): vehicle_to_plant[v] = "Global"
+
+            for v_id, route in enumerate(routes):
+                if len(route) <= 2: continue # Ruta vacía
+                
+                plant = vehicle_to_plant.get(v_id, "Global")
+                if plant in fleet_info: 
+                    fleet_info[plant]["used"] += 1
+                
+                # Carga de la ruta
+                try:
+                    load = solution.Value(routing.GetDimensionOrDie('PalletsCapacity').CumulVar(routing.End(v_id)))
+                except:
+                    load = sum(n.get('demanda_pallets', 0) for n in route if n['type']=='customer')
+                
+                # Info de subruta
+                n_stops = len([n for n in route if n['type'] == 'customer'])
+                sub_desc = f"Camion {fleet_info[plant]['used']}: {load}/{max_pallets_ruta} pallets, {n_stops} paradas"
+                fleet_info[plant]["subroutes"].append(sub_desc)
+
+                if plant not in dim_stats:
+                    dim_stats[plant] = {"loads": [], "dists": [], "max_stops_reached": False}
+                
+                dim_stats[plant]["loads"].append(load)
+                if len(route)-2 >= n_clientes:
+                    dim_stats[plant]["max_stops_reached"] = True
+
+            # Consolidar medias
+            for p in dim_stats:
+                loads = dim_stats[p]["loads"]
+                avg_load = sum(loads)/len(loads) if loads else 0
+                dim_stats[p]["avg_load_pct"] = (avg_load / max_pallets_ruta * 100) if max_pallets_ruta else 0
+
+            # Generar el log avanzado
+            self.drop_log_path = drop_logger.log_dropped_nodes(
+                routes, 
+                fleet_data=fleet_info, 
+                dimension_stats=dim_stats
+            )
             
             return routes
 
         status_code = routing.status()
-        status_map = {0: "NOT_SOLVED", 1: "SUCCESS", 2: "FAIL", 3: "FAIL_TIMEOUT", 4: "INVALID"}
-        logger.warning(f"El solver no encontró solución. Estado: {status_map.get(status_code, status_code)}")
-        self.drop_log_path = drop_logger.log_dropped_nodes([], max_pallets_ruta) # Todos descartados
+        self.drop_log_path = drop_logger.log_dropped_nodes([], fleet_data=None) # Todos descartados
         return None
 
     # ------------------------------------------------------------------

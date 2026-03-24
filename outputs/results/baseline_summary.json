@@ -1,0 +1,224 @@
+{
+  "num_routes": 11,
+  "total_km": 11437.93,
+  "total_empty_km": 3922.11,
+  "total_co2_kg": 13505.56,
+  "distance_source": "GPS Real",
+  "parameters": {
+    "n_candidatos": 1,
+    "max_pallets": 35,
+    "threshold_km": 50,
+    "max_radius_km": 200
+  },
+  "routes": [
+    {
+      "route_id": 1,
+      "plants": [
+        "Alcalá"
+      ],
+      "plant_ids": [
+        "CP_ALCALA"
+      ],
+      "num_plants": 1,
+      "num_customers": 1,
+      "customers": [
+        "Villarrubia De Los Ojos"
+      ],
+      "total_pallets": 22,
+      "distance_km": 691.37,
+      "empty_km": 177.45,
+      "co2_emissions_kg": 822.2,
+      "num_stops": 4
+    },
+    {
+      "route_id": 2,
+      "plants": [
+        "Alicante"
+      ],
+      "plant_ids": [
+        "CP_ALICANTE"
+      ],
+      "num_plants": 1,
+      "num_customers": 1,
+      "customers": [
+        "Moratalla"
+      ],
+      "total_pallets": 17,
+      "distance_km": 835.02,
+      "empty_km": 260.85,
+      "co2_emissions_kg": 992.84,
+      "num_stops": 4
+    },
+    {
+      "route_id": 3,
+      "plants": [
+        "Córdoba"
+      ],
+      "plant_ids": [
+        "CP_CORDOBA"
+      ],
+      "num_plants": 1,
+      "num_customers": 1,
+      "customers": [
+        "Jabalquinto"
+      ],
+      "total_pallets": 30,
+      "distance_km": 223.63,
+      "empty_km": 12.96,
+      "co2_emissions_kg": 272.04,
+      "num_stops": 4
+    },
+    {
+      "route_id": 4,
+      "plants": [
+        "Huelva"
+      ],
+      "plant_ids": [
+        "CP_HUELVA"
+      ],
+      "num_plants": 1,
+      "num_customers": 1,
+      "customers": [
+        "Cordoba"
+      ],
+      "total_pallets": 22,
+      "distance_km": 646.17,
+      "empty_km": 131.79,
+      "co2_emissions_kg": 769.28,
+      "num_stops": 4
+    },
+    {
+      "route_id": 5,
+      "plants": [
+        "Burgos"
+      ],
+      "plant_ids": [
+        "CP_BURGOS"
+      ],
+      "num_plants": 1,
+      "num_customers": 1,
+      "customers": [
+        "Castillejo De Robledo"
+      ],
+      "total_pallets": 28,
+      "distance_km": 1149.33,
+      "empty_km": 457.38,
+      "co2_emissions_kg": 1357.81,
+      "num_stops": 4
+    },
+    {
+      "route_id": 6,
+      "plants": [
+        "Navarra"
+      ],
+      "plant_ids": [
+        "CP_NAVARRA"
+      ],
+      "num_plants": 1,
+      "num_customers": 1,
+      "customers": [
+        "Milagro"
+      ],
+      "total_pallets": 19,
+      "distance_km": 1385.92,
+      "empty_km": 623.81,
+      "co2_emissions_kg": 1632.27,
+      "num_stops": 4
+    },
+    {
+      "route_id": 7,
+      "plants": [
+        "Valencia"
+      ],
+      "plant_ids": [
+        "CP_VALENCIA"
+      ],
+      "num_plants": 1,
+      "num_customers": 1,
+      "customers": [
+        "Hellin"
+      ],
+      "total_pallets": 13,
+      "distance_km": 869.95,
+      "empty_km": 245.23,
+      "co2_emissions_kg": 1028.66,
+      "num_stops": 4
+    },
+    {
+      "route_id": 8,
+      "plants": [
+        "Almeria"
+      ],
+      "plant_ids": [
+        "CP_ALMERIA"
+      ],
+      "num_plants": 1,
+      "num_customers": 1,
+      "customers": [
+        "Villanueva De La Reina"
+      ],
+      "total_pallets": 28,
+      "distance_km": 536.96,
+      "empty_km": 12.74,
+      "co2_emissions_kg": 657.02,
+      "num_stops": 4
+    },
+    {
+      "route_id": 9,
+      "plants": [
+        "Canovelles"
+      ],
+      "plant_ids": [
+        "CP_CANOVELLES"
+      ],
+      "num_plants": 1,
+      "num_customers": 1,
+      "customers": [
+        "Caspe"
+      ],
+      "total_pallets": 18,
+      "distance_km": 1694.71,
+      "empty_km": 637.01,
+      "co2_emissions_kg": 1978.94,
+      "num_stops": 4
+    },
+    {
+      "route_id": 10,
+      "plants": [
+        "Celpack"
+      ],
+      "plant_ids": [
+        "CP_CELPACK"
+      ],
+      "num_plants": 1,
+      "num_customers": 1,
+      "customers": [
+        "Castelo Branco"
+      ],
+      "total_pallets": 26,
+      "distance_km": 1591.55,
+      "empty_km": 606.06,
+      "co2_emissions_kg": 1858.65,
+      "num_stops": 4
+    },
+    {
+      "route_id": 11,
+      "plants": [
+        "Vigo"
+      ],
+      "plant_ids": [
+        "CP_VIGO"
+      ],
+      "num_plants": 1,
+      "num_customers": 1,
+      "customers": [
+        "Chaves"
+      ],
+      "total_pallets": 22,
+      "distance_km": 1813.33,
+      "empty_km": 756.82,
+      "co2_emissions_kg": 2135.85,
+      "num_stops": 4
+    }
+  ]
+}

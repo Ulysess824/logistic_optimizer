@@ -9,115 +9,112 @@ def generate_stress_html(results_file, output_html):
     labels = [r['scenario_name'] for r in results]
     times = [r['total_time_s'] for r in results]
     nodes = [r['total_nodes'] for r in results]
-    memory = [r['memory_diff_mb'] for r in results]
-
-    html_content = f"""
-<!DOCTYPE html>
+    
+    # Usamos triple comilla y escapamos las llaves de CSS duplicándolas {{ }}
+    html_content = f"""<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stress Test Full Report - Logistics Optimizer</title>
+    <title>Premium Stress Report - Logistics Optimizer</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
-        .glass {{
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+        body {{ font-family: 'Outfit', sans-serif; background-color: #0f172a; color: #f8fafc; }}
+        .glass-card {{
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }}
+        .glass-card:hover {{
+            transform: translateY(-5px);
+            border-color: rgba(99, 102, 241, 0.4);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+        }}
+        .glow-text {{ text-shadow: 0 0 20px rgba(99, 102, 241, 0.5); }}
+        .custom-scrollbar::-webkit-scrollbar {{ width: 6px; }}
+        .custom-scrollbar::-webkit-scrollbar-track {{ background: transparent; }}
+        .custom-scrollbar::-webkit-scrollbar-thumb {{ background: #334155; border-radius: 10px; }}
     </style>
 </head>
-<body class="bg-gray-50 text-gray-900 font-sans">
-    <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        <div class="mb-12 text-center text-gray-900">
-            <h1 class="text-4xl font-extrabold tracking-tight sm:text-5xl mb-4">
-                🚀 Stress Test Full Report
-            </h1>
-            <p class="text-xl text-gray-600">Evaluación del modelo en situaciones extremas</p>
+<body class="p-4 md:p-12 custom-scrollbar">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row justify-between items-center mb-16 gap-6">
+            <div>
+                <h1 class="text-5xl font-black glow-text tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-cyan-400">
+                    STRESS TEST <span class="font-light text-white italic">v2.0</span>
+                </h1>
+                <p class="text-slate-400 mt-2 font-medium">Análisis de Límites y Alta Disponibilidad del Algoritmo</p>
+            </div>
+            <div class="glass-card px-8 py-4 flex items-center gap-4">
+                <div class="h-3 w-3 rounded-full bg-emerald-500 animate-pulse"></div>
+                <span class="text-sm font-bold tracking-widest uppercase">System Operational</span>
+            </div>
         </div>
 
-        <!-- Dashboard Grid -->
+        <!-- KPI Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-            <!-- Gráfico de Tiempos -->
-            <div class="glass p-6 rounded-2xl shadow-xl">
-                <h3 class="text-lg font-semibold mb-4">Tiempo Total de Ejecución (s)</h3>
-                <canvas id="timeChart"></canvas>
+            <div class="glass-card p-8">
+                <div class="flex justify-between items-end mb-6">
+                    <h3 class="text-lg font-semibold text-slate-300">Latencia del Solver</h3>
+                    <span class="text-xs font-mono text-indigo-400 bg-indigo-400/10 px-2 py-1 rounded">Metrics / SearchTime</span>
+                </div>
+                <canvas id="timeChart" height="150"></canvas>
             </div>
-            <!-- Gráfico de Nodos -->
-            <div class="glass p-6 rounded-2xl shadow-xl">
-                <h3 class="text-lg font-semibold mb-4">Complejidad (Nodos Procesados)</h3>
-                <canvas id="nodeChart"></canvas>
+            <div class="glass-card p-8">
+                <div class="flex justify-between items-end mb-6">
+                    <h3 class="text-lg font-semibold text-slate-300">Escalabilidad (Nodos)</h3>
+                    <span class="text-xs font-mono text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded">Dimensions / Multi-Plant</span>
+                </div>
+                <canvas id="nodeChart" height="150"></canvas>
             </div>
         </div>
 
-        <!-- Tabla de KPIs -->
-        <div class="glass rounded-2xl shadow-xl overflow-hidden mb-12">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-100">
-                    <tr>
-                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Escenario</th>
-                        <th class="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Nodos</th>
-                        <th class="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Rutas</th>
-                        <th class="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Tiempo (s)</th>
-                        <th class="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Memoria (MB)</th>
-                        <th class="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Solución</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-100">
-                    {''.join([f'''
-                    <tr class="hover:bg-gray-50 transition-colors">
-                        <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{r['scenario_name']}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">{r['total_nodes']}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">{r['total_routes']}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center font-bold text-indigo-600">{r['total_time_s']}s</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">{r['memory_diff_mb']} MB</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <span class="px-3 py-1 rounded-full text-xs font-bold {'bg-green-100 text-green-700' if r['solution_found'] else 'bg-red-100 text-red-700'}">
-                                {'ÉXITO' if r['solution_found'] else 'FALLO'}
-                            </span>
-                        </td>
-                    </tr>''' for r in results])}
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Detalles por Escenario -->
-        <div class="space-y-8">
-            <h2 class="text-2xl font-bold border-b border-gray-200 pb-2">Detalle de Pruebas</h2>
+        <!-- Case Cards -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-16">
             {''.join([f'''
-            <div class="glass p-8 rounded-2xl shadow-lg border-l-8 border-indigo-500">
-                <h3 class="text-xl font-bold mb-4">{r['scenario_name']}</h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="space-y-2">
-                        <p class="text-sm text-gray-500">Parámetros:</p>
-                        <ul class="text-xs space-y-1 font-mono bg-gray-50 p-3 rounded-lg border border-gray-100">
-                            { "".join([f"<li>- {k}: {v}</li>" for k, v in r['parameters'].items()]) }
-                        </ul>
+            <div class="glass-card p-6 flex flex-col h-full border-l-4 {'border-emerald-500' if r['solution_found'] else 'border-rose-500'}">
+                <div class="flex justify-between items-start mb-4">
+                    <h4 class="text-lg font-bold text-white max-w-[70%]">{r['scenario_name']}</h4>
+                    <span class="text-[10px] font-black px-2 py-1 rounded {'bg-emerald-500/20 text-emerald-400' if r['solution_found'] else 'bg-rose-500/20 text-rose-400'} uppercase">
+                        { 'Solvable' if r['solution_found'] else 'Overload' }
+                    </span>
+                </div>
+                
+                <div class="space-y-4 mb-6 flex-grow">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-500 italic">Tiempo Total</span>
+                        <span class="font-mono text-indigo-300 font-bold">{r['total_time_s']}s</span>
                     </div>
-                    <div class="col-span-2 space-y-4">
-                        <p class="text-gray-700 leading-relaxed">
-                            Esta prueba evalúa la capacidad del modelo bajo condiciones de 
-                            <strong>{r['scenario_name'].lower()}</strong>. 
-                            Se procesaron {r['total_nodes']} nodos en {r['total_time_s']} segundos.
-                        </p>
-                        <div class="flex space-x-4">
-                            <div class="text-center p-4 bg-indigo-50 rounded-xl flex-1">
-                                <p class="text-xs text-indigo-600 font-bold uppercase mb-1">Carga Solver</p>
-                                <p class="text-2xl font-black text-indigo-800">{r['solver_time_s']}s</p>
-                            </div>
-                            <div class="text-center p-4 bg-emerald-50 rounded-xl flex-1">
-                                <p class="text-xs text-emerald-600 font-bold uppercase mb-1">Rutas</p>
-                                <p class="text-2xl font-black text-emerald-800">{r['total_routes']}</p>
-                            </div>
-                        </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-500 italic">Complejidad</span>
+                        <span class="font-mono text-white">{r['total_nodes']} Nodos</span>
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-slate-700/50 flex justify-between items-center">
+                    <div class="text-2xl font-black text-white">{r['total_routes']}<span class="text-[10px] text-slate-500 ml-1 font-normal uppercase">Rutas</span></div>
+                    <div class="text-right">
+                        <p class="text-[10px] text-slate-500 uppercase">Memory</p>
+                        <p class="text-xs font-mono text-slate-300">+{r['memory_diff_mb']}MB</p>
                     </div>
                 </div>
             </div>''' for r in results])}
         </div>
+
+        <footer class="text-center pb-12 opacity-30 text-xs tracking-widest font-light">
+            SMURFIT WESTROCK &bull; LOGISTICS OPTIMIZATION ENGINE &bull; 2026
+        </footer>
     </div>
 
     <script>
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.font.family = "'Outfit', sans-serif";
+        
         const labels = {json.dumps(labels)};
         
         new Chart(document.getElementById('timeChart'), {{
@@ -125,10 +122,12 @@ def generate_stress_html(results_file, output_html):
             data: {{
                 labels: labels,
                 datasets: [{{
-                    label: 'Tiempo Total (s)',
+                    label: 'Latencia (s)',
                     data: {json.dumps(times)},
-                    backgroundColor: 'rgba(99, 102, 241, 0.8)',
-                    borderRadius: 8
+                    backgroundColor: 'rgba(99, 102, 241, 0.6)',
+                    borderColor: '#818cf8',
+                    borderWidth: 1,
+                    borderRadius: 12
                 }}]
             }},
             options: {{ responsive: true, plugins: {{ legend: {{ display: false }} }} }}
@@ -139,12 +138,14 @@ def generate_stress_html(results_file, output_html):
             data: {{
                 labels: labels,
                 datasets: [{{
-                    label: 'Nodos Totales',
+                    label: 'Nodos',
                     data: {json.dumps(nodes)},
-                    borderColor: 'rgba(16, 185, 129, 1)',
+                    borderColor: '#10b981',
                     backgroundColor: 'rgba(16, 185, 129, 0.1)',
                     fill: true,
-                    tension: 0.4
+                    tension: 0.4,
+                    pointRadius: 6,
+                    pointBackgroundColor: '#10b981'
                 }}]
             }},
             options: {{ responsive: true, plugins: {{ legend: {{ display: false }} }} }}
@@ -152,12 +153,15 @@ def generate_stress_html(results_file, output_html):
     </script>
 </body>
 </html>
-    """
+"""
     with open(output_html, 'w', encoding='utf-8') as f:
         f.write(html_content)
 
 if __name__ == "__main__":
     results_path = Path(__file__).parent / "results" / "all_stress_results.json"
     output_path = Path(__file__).parent / "stress_report.html"
-    generate_stress_html(results_path, output_path)
-    print(f"Reporte generado en: {{output_path}}")
+    if results_path.exists():
+        generate_stress_html(results_path, output_path)
+        print(f"Reporte generado en: {output_path}")
+    else:
+        print(f"No se encontró el archivo de resultados en: {results_path}")

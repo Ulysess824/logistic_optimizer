@@ -38,25 +38,31 @@ Ajusta las constantes en la parte superior:
 - `MANDATORY_CUSTOMERS`: (Opcional) Fuerza visitas a clientes específicos para plantas seleccionadas, ignorando filtros de distancia si es necesario.
 - `TRUCK_SPECS`: Define peso, altura y emisiones para que el cálculo de Google sea apto para vehículos pesados.
 
-### 3. Ejecución de Alto Rendimiento (Recomendado)
-Para evaluar la flota real y obtener métricas de ahorro (ROI), ejecuta:
-```bash
-python main_fast_fleet.py
-```
-*Este comando sincroniza con el Excel de camiones, calcula el ahorro de kilómetros muertos y genera el dashboard interactivo.*
+### 3. Ejecución y Dualidad de Escenarios (Módulos)
+El sistema ahora opera en dos modos independientes para garantizar la integridad de los resultados:
+* **Escenario de Referencia (Baseline)**: `python main_baseline.py`
+  - Actualiza la pestaña **"Condiciones Normales"** del dashboard.
+  - Útil para comparativas de impacto directo.
+* **Escenario de Producción (Optimizado)**: `python main.py`
+  - Actualiza las pestañas de **"Resumen Ejecutivo"**, **"Detalle Operativo"** y **"Mapa"**.
+  - Incluye el cálculo dinámico de **emisiones de CO2** basado en carga (25t papel / pallets).
 
-### 4. Ejecución del Ciclo Completo (Con Animación)
-Si deseas coordinar Optimización + Simulación + Reporte con GIF animado:
-```bash
-python main.py
-```
+### 4. Dashboard Modularizado
+El punto de entrada principal es `outputs/Presentacion_Logistica.html`. 
+Esta interfaz unificada consume piezas HTML independientes generadas por los scripts anteriores, permitiendo actualizaciones parciales sin pérdida de datos en otras secciones.
 
-### 4. Sincroniza el Dashboard o la Simulación
-Si solo deseas actualizar el diseño del HTML o volver a simular la flota con los resultados ya existentes (sin gastar créditos de API de nuevo):
-* **Actualizar Dashboard:** `python refresh_dashboard.py`
-* **Nueva Simulación (GIF):** `python ejecutar_simulacion.py` (Genera la animación `outputs/simulacion_rutas_optimizadas.gif` con los datos actuales de pallets y flota).
+### 5. Sincronización de Componentes
+Si solo deseas actualizar el diseño visual o la simulación sin re-ejecutar el optimizador:
+* **Generar Reporte:** `python src/utils/report_generator.py` (Ensambla los .html).
+* **Nueva Simulación (GIF):** `python ejecutar_simulacion.py` (Genera la animación con los datos de producción).
 
 ---
+
+## 🍃 Sostenibilidad e Impacto Ambiental
+El motor ahora integra una estimación de huella de carbono basada en el modelo **FCR (Fuel Consumption Rate)**:
+- **Carga de Vacío**: Calculada sobre el peso del tráiler.
+- **Carga Dinámica**: 25,000 kg para el tramo de papel y peso variable según número de pallets para el tramo de cartón.
+- **KPIs**: Las emisiones totales y por ruta se visualizan en el **Detalle Operativo**.
 
 ## 🧠 Modelo de Selección Geográfica (Dual-Pass)
 

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f3f4f6; padding: 0; margin: 0; }
+        .card { background-color: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); padding: 20px; }
+        .kpi-value { font-size: 2.5rem; font-weight: bold; color: #1d4ed8; }
+        .kpi-label { font-size: 0.875rem; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; }
+    </style>
+</head>
+<body class="p-6">
+    <!-- KPIs -->
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-6">
+        <div class="card text-center border-t-4 border-blue-500">
+            <p class="kpi-label">Rutas Totales Generadas</p>
+            <p class="kpi-value">38</p>
+        </div>
+        <div class="card text-center border-t-4 border-green-500">
+            <p class="kpi-label">Distancia Total (km)</p>
+            <p class="kpi-value">26,598.81</p>
+        </div>
+        <div class="card text-center border-t-4 border-yellow-500">
+            <p class="kpi-label">Plantas Visitadas</p>
+            <p class="kpi-value">38</p>
+        </div>
+        <div class="card text-center border-t-4 border-purple-500">
+            <p class="kpi-label">Entregas Realizadas</p>
+            <p class="kpi-value">48</p>
+        </div>
+        <div class="card text-center border-t-4 border-red-500">
+            <p class="kpi-label">Ahorro Km Vacíos</p>
+            <p class="kpi-value" style="color: #ef4444;">~35.0%</p>
+        </div>
+    </div>
+
+    <!-- Comparativa -->
+    <div class="grid grid-cols-1 gap-6 mb-6">
+        <div class="card bg-white border border-gray-200 shadow-sm">
+            <h2 class="text-xl font-bold mb-2 text-gray-800">Impacto de la Optimización (Antes vs. Después)</h2>
+            <p class="text-[11px] text-blue-600 mb-4 bg-blue-50 inline-block px-2 py-1 rounded">ℹ Comparativa de kilómetros vacíos al utilizar la estrategia de Backhauling en MC-VRPB frente a trayectos tradicionales (GPS Real).</p>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left text-gray-600">
+                    <thead class="bg-gray-50 text-gray-800 uppercase text-[10px] tracking-wider border-b border-t">
+                        <tr>
+                            <th class="px-3 py-3">Ruta (Planta)</th>
+                            <th class="px-3 py-3 text-center">Distancia Total (km)</th>
+                            <th class="px-3 py-3 text-center">Km Vacíos (Tradicional)</th>
+                            <th class="px-3 py-3 text-center text-blue-800">Km Vacíos (MC-VRPB)</th>
+                            <th class="px-3 py-3 text-center font-bold text-green-600">Mejora (%)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="comparison-tbody" class="divide-y divide-gray-100">
+<tr class="hover:bg-gray-50 border-b text-[12px]"><td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">Alcalá</td><td class="px-3 py-2 text-center font-mono">567.12</td><td class="px-3 py-2 text-center font-mono">280.63</td><td class="px-3 py-2 text-center font-mono font-bold text-blue-700">111.99</td><td class="px-3 py-2 text-center font-bold text-green-600">+60.1%</td></tr>
+<tr class="hover:bg-gray-50 border-b text-[12px]"><td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">Alcalá (Muelle 2)</td><td class="px-3 py-2 text-center font-mono">562.72</td><td class="px-3 py-2 text-center font-mono">280.63</td><td class="px-3 py-2 text-center font-mono font-bold text-blue-700">138.82</td><td class="px-3 py-2 text-center font-bold text-green-600">+50.5%</td></tr>
+<tr class="hover:bg-gray-50 border-b text-[12px]"><td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">Alcalá (Muelle 3)</td><td class="px-3 py-2 text-center font-mono">561.43</td><td class="px-3 py-2 text-center font-mono">280.63</td><td class="px-3 py-2 text-center font-mono font-bold text-blue-700">145.88</td><td class="px-3 py-2 text-center font-bold text-green-600">+48.0%</td></tr>
+<tr class="hover:bg-gray-50 border-b text-[12px]"><td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">Alcalá (Muelle 4)</td><td class="px-3 py-2 text-center font-mono">579.96</td><td class="px-3 py-2 text-center font-mono">280.63</td><td class="px-3 py-2 text-center font-mono font-bold text-blue-700">147.35</td><td class="px-3 py-2 text-center font-bold text-green-600">+47.5%</td></tr>
+<tr class="hover:bg-gray-50 border-b text-[12px]"><td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">Alicante</td><td class="px-3 py-2 text-center font-mono">577.87</td><td class="px-3 py-2 text-center font-mono">288.75</td><td class="px-3 py-2 text-center font-mono font-bold text-blue-700">168.61</td><td class="px-3 py-2 text-center font-bold text-green-600">+41.6%</td></tr>
+<tr class="hover:bg-gray-50 border-b text-[12px]"><td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">Alicante (Muelle 2)</td><td class="px-3 py-2 text-center font-mono">581.86</td><td class="px-3 py-2 text-center font-mono">288.75</td><td class="px-3 py-2 text-center font-mono font-bold text-blue-700">186.83</td><td class="px-3 py-2 text-center font-bold text-green-600">+35.3%</td></tr>
+<tr class="hover:bg-gray-50 border-b text-[12px]"><td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">Alicante (Muelle 3)</td><td class="px-3 py-2 text-center font-mono">598.96</td><td class="px-3 py-2 text-center font-mono">288.75</td><td class="px-3 py-2 text-center font-mono font-bold text-blue-700">192.56</td><td class="px-3 py-2 text-center font-bold text-green-600">+33.3%</td></tr>
+<tr class="hover:bg-gray-50 border-b text-[12px]"><td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">Alicante (Muelle 4)</td><td class="px-3 py-2 text-center font-mono">587.17</td><td class="px-3 py-2 text-center font-mono">288.75</td><td class="px-3 py-2 text-center font-mono font-bold text-blue-700">202.38</td><td class="px-3 py-2 text-center font-bold text-green-600">+29.9%</td></tr>
+<tr class="hover:bg-gray-50 border-b text-[12px]"><td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">Alicante (Muelle 5)</td><td class="px-3 py-2 text-center font-mono">585.64</td><td class="px-3 py-2 text-center font-mono">288.75</td><td class="px-3 py-2 text-center font-mono font-bold text-blue-700">202.52</td><td class="px-3 py-2 text-center font-bold text-green-600">+29.9%</td></tr>
+<tr class="hover:bg-gray-50 border-b text-[12px]"><td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">Córdoba</td><td class="px-3 py-2 text-center font-mono">155.33</td><td class="px-3 py-2 text-center font-mono">76.68</td><td class="px-3 py-2 text-center font-mono font-bold text-blue-700">22.84</td><td class="px-3 py-2 text-center font-bold text-green-600">+70.2%</td></tr>
+<tr class="hover:bg-gray-50 border-b text-[12px]"><td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">Córdoba (Muelle 2)</td><td class="px-3 py-2 text-center font-mono">154.22</td><td class="px-3 py-2 text-center font-mono">76.68</td><td class="px-3 py-2 text-center font-mono font-bold text-blue-700">1.43</td><td class="px-3 py-2 text-center font-bold text-green-600">+98.1%</td></tr>
+<tr class="hover:bg-gray-50 border-b text-[12px]"><td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">Córdoba (Muelle 3)</td><td class="px-3 py-2 text-center font-mono">153.94</td><td class="px-3 py-2 text-center font-mono">76.68</td><td class="px-3 py-2 text-center font-mono font-bold text-blue-700">10.43</td><td class="px-3 py-2 text-center font-bold text-green-600">+86.4%</td></tr>
+<tr class="hover:bg-gray-50 border-b text-[12px]"><td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">Huelva</td><td class="px-3 py-2 text-center font-mono">521.68</td><td class="px-3 py-2 text-center font-mono">250.95</td><td class="px-3 py-2 text-center font-mono font-bold text-blue-700">96.49</td><td class="px-3 py-2 text-center font-bold text-green-600">+61.5%</td></tr>
+<tr class="hover:bg-gray-50 border-b text-[12px]"><td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">Huelva (Muelle 2)</td><td class="px-3 py-2 text-center font-mono">505.29</td><td class="px-3 py-2 text-center font-mono">250.95</td><td class="px-3 py-2 text-center font-mono font-bold text-blue-700">95.08</td><td class="px-3 py-2 text-center font-bold text-green-600">+62.1%</td></tr>
+<tr class="hover:bg-gray-50 border-b text-[12px]"><td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">Huelva (Muelle 3)</td><td class="px-3 py-2 text-center font-mono">508.00</td><td class="px-3 py-2 text-center font-mono">250.95</td><td class="px-3 py-2 text-center font-mono font-bold text-blue-700">97.55</td><td class="px-3 py-2 text-center font-bold text-green-600">+61.1%</td></tr>
+<tr class="hover:bg-gray-50 border-b text-[12px]"><td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">Huelva (Muelle 4)</td><td class="px-3 py-2 text-center font-mono">505.38</td><td class="px-3 py-2 text-center font-mono">250.95</td><td class="px-3 py-2 text-center font-mono font-bold text-blue-700">102.89</td><td class="px-3 py-2 text-center font-bold text-green-600">+59.0%</td></tr>
+<tr class="hover:bg-gray-50 border-b text-[12px]"><td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">Huelva (Muelle 5)</td><td class="px-3 py-2 text-center font-mono">514.97</td><td class="px-3 py-2 text-center font-mono">250.95</td><td class="px-3 py-2 text-center font-mono font-bold text-blue-700">107.11</td><td class="px-3 py-2 text-center font-bold text-green-600">+57.3%</td></tr>
+<tr class="hover:bg-gray-50 border-b text-[12px]"><td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">Burgos</td><td class="px-3 py-2 text-center font-mono">981.41</td><td class="px-3 py-2 text-center font-mono">487.92</td><td class="px-3 py-2 text-center font-mono font-bold text-blue-700">394.50</td><td class="px-3 py-2 text-center font-bold text-green-600">+19.1%</td></tr>
+<tr class="hover:bg-gray-50 border-b text-[12px]"><td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">Burgos (Muelle 2)</td><td class="px-3 py-2 text-center font-mono">978.82</td><td class="px-3 py-2 text-center font-mono">487.92</td><td class="px-3 py-2 text-center font-mono font-bold text-blue-700">398.61</td><td class="px-3 py-2 text-center font-bold text-green-600">+18.3%</td></tr>
+<tr class="hover:bg-gray-50 border-b text-[12px]"><td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">Burgos (Muelle 3)</td><td class="px-3 py-2 text-center font-mono">1,013.88</td><td class="px-3 py-2 text-center font-mono">487.92</td><td class="px-3 py-2 text-center font-mono font-bold text-blue-700">397.13</td><td class="px-3 py-2 text-center font-bold text-green-600">+18.6%</td></tr>
+<tr class="hover:bg-gray-50 border-b text-[12px]"><td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">Burgos (Muelle 4)</td><td class="px-3 py-2 text-center font-mono">981.42</td><td class="px-3 py-2 text-center font-mono">487.92</td><td class="px-3 py-2 text-center font-mono font-bold text-blue-700">398.63</td><td class="px-3 py-2 text-center font-bold text-green-600">+18.3%</td></tr>
+<tr class="hover:bg-gray-50 border-b text-[12px]"><td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">Navarra</td><td class="px-3 py-2 text-center font-mono">1,142.24</td><td class="px-3 py-2 text-center font-mono">564.75</td><td class="px-3 py-2 text-center font-mono font-bold text-blue-700">504.34</td><td class="px-3 py-2 text-center font-bold text-green-600">+10.7%</td></tr>
+<tr class="hover:bg-gray-50 border-b text-[12px]"><td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">Navarra (Muelle 2)</td><td class="px-3 py-2 text-center font-mono">1,146.01</td><td class="px-3 py-2 text-center font-mono">564.75</td><td class="px-3 py-2 text-center font-mono font-bold text-blue-700">505.89</td><td class="px-3 py-2 text-center font-bold text-green-600">+10.4%</td></tr>
+<tr class="hover:bg-gray-50 border-b text-[12px]"><td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">Valencia</td><td class="px-3 py-2 text-center font-mono">680.66</td><td class="px-3 py-2 text-center font-mono">334.08</td><td class="px-3 py-2 text-center font-mono font-bold text-blue-700">192.56</td><td class="px-3 py-2 text-center font-bold text-green-600">+42.4%</td></tr>
+<tr class="hover:bg-gray-50 border-b text-[12px]"><td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">Valencia (Muelle 2)</td><td class="px-3 py-2 text-center font-mono">705.70</td><td class="px-3 py-2 text-center font-mono">334.08</td><td class="px-3 py-2 text-center font-mono font-bold text-blue-700">210.07</td><td class="px-3 py-2 text-center font-bold text-green-600">+37.1%</td></tr>
+<tr class="hover:bg-gray-50 border-b text-[12px]"><td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">Valencia (Muelle 3)</td><td class="px-3 py-2 text-center font-mono">706.14</td><td class="px-3 py-2 text-center font-mono">334.08</td><td class="px-3 py-2 text-center font-mono font-bold text-blue-700">210.25</td><td class="px-3 py-2 text-center font-bold text-green-600">+37.1%</td></tr>
+<tr class="hover:bg-gray-50 border-b text-[12px]"><td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">Almeria</td><td class="px-3 py-2 text-center font-mono">333.82</td><td class="px-3 py-2 text-center font-mono">166.58</td><td class="px-3 py-2 text-center font-mono font-bold text-blue-700">1.43</td><td class="px-3 py-2 text-center font-bold text-green-600">+99.1%</td></tr>
+<tr class="hover:bg-gray-50 border-b text-[12px]"><td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">Almeria (Muelle 2)</td><td class="px-3 py-2 text-center font-mono">340.47</td><td class="px-3 py-2 text-center font-mono">166.58</td><td class="px-3 py-2 text-center font-mono font-bold text-blue-700">7.66</td><td class="px-3 py-2 text-center font-bold text-green-600">+95.4%</td></tr>
+<tr class="hover:bg-gray-50 border-b text-[12px]"><td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">Almeria (Muelle 3)</td><td class="px-3 py-2 text-center font-mono">351.86</td><td class="px-3 py-2 text-center font-mono">166.58</td><td class="px-3 py-2 text-center font-mono font-bold text-blue-700">10.43</td><td class="px-3 py-2 text-center font-bold text-green-600">+93.7%</td></tr>
+<tr class="hover:bg-gray-50 border-b text-[12px]"><td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">Almeria (Muelle 4)</td><td class="px-3 py-2 text-center font-mono">338.09</td><td class="px-3 py-2 text-center font-mono">166.58</td><td class="px-3 py-2 text-center font-mono font-bold text-blue-700">23.62</td><td class="px-3 py-2 text-center font-bold text-green-600">+85.8%</td></tr>
+<tr class="hover:bg-gray-50 border-b text-[12px]"><td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">Almeria (Muelle 5)</td><td class="px-3 py-2 text-center font-mono">360.17</td><td class="px-3 py-2 text-center font-mono">166.58</td><td class="px-3 py-2 text-center font-mono font-bold text-blue-700">12.93</td><td class="px-3 py-2 text-center font-bold text-green-600">+92.2%</td></tr>
+<tr class="hover:bg-gray-50 border-b text-[12px]"><td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">Canovelles</td><td class="px-3 py-2 text-center font-mono">1,316.99</td><td class="px-3 py-2 text-center font-mono">658.08</td><td class="px-3 py-2 text-center font-mono font-bold text-blue-700">486.63</td><td class="px-3 py-2 text-center font-bold text-green-600">+26.1%</td></tr>
+<tr class="hover:bg-gray-50 border-b text-[12px]"><td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">Canovelles (Muelle 2)</td><td class="px-3 py-2 text-center font-mono">1,317.02</td><td class="px-3 py-2 text-center font-mono">658.08</td><td class="px-3 py-2 text-center font-mono font-bold text-blue-700">486.74</td><td class="px-3 py-2 text-center font-bold text-green-600">+26.0%</td></tr>
+<tr class="hover:bg-gray-50 border-b text-[12px]"><td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">Celpack</td><td class="px-3 py-2 text-center font-mono">1,057.13</td><td class="px-3 py-2 text-center font-mono">527.99</td><td class="px-3 py-2 text-center font-mono font-bold text-blue-700">394.83</td><td class="px-3 py-2 text-center font-bold text-green-600">+25.2%</td></tr>
+<tr class="hover:bg-gray-50 border-b text-[12px]"><td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">Celpack (Muelle 2)</td><td class="px-3 py-2 text-center font-mono">1,058.54</td><td class="px-3 py-2 text-center font-mono">527.99</td><td class="px-3 py-2 text-center font-mono font-bold text-blue-700">395.15</td><td class="px-3 py-2 text-center font-bold text-green-600">+25.2%</td></tr>
+<tr class="hover:bg-gray-50 border-b text-[12px]"><td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">Celpack (Muelle 3)</td><td class="px-3 py-2 text-center font-mono">1,060.44</td><td class="px-3 py-2 text-center font-mono">527.99</td><td class="px-3 py-2 text-center font-mono font-bold text-blue-700">397.81</td><td class="px-3 py-2 text-center font-bold text-green-600">+24.7%</td></tr>
+<tr class="hover:bg-gray-50 border-b text-[12px]"><td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">Vigo</td><td class="px-3 py-2 text-center font-mono">1,252.54</td><td class="px-3 py-2 text-center font-mono">617.43</td><td class="px-3 py-2 text-center font-mono font-bold text-blue-700">523.11</td><td class="px-3 py-2 text-center font-bold text-green-600">+15.3%</td></tr>
+<tr class="hover:bg-gray-50 border-b text-[12px]"><td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-blue-500">Vigo (Muelle 2)</td><td class="px-3 py-2 text-center font-mono">1,253.96</td><td class="px-3 py-2 text-center font-mono">617.43</td><td class="px-3 py-2 text-center font-mono font-bold text-blue-700">533.01</td><td class="px-3 py-2 text-center font-bold text-green-600">+13.7%</td></tr>
+</tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reto -->
+    <div class="grid grid-cols-1 gap-6 mt-6">
+        <div class="card">
+            <h2 class="text-xl font-bold mb-4 border-b pb-2 text-gray-800">El Reto de Negocio</h2>
+            <ul class="space-y-3 text-gray-700">
+                <li class="flex"><span class="mr-2 text-green-600">✓</span>Minimizar kilómetros muertos en el retorno al depósito base.</li>
+                <li class="flex"><span class="mr-2 text-green-600">✓</span>Integrar un ciclo operativo complejo: Depósito → Planta → Clientes → Depósito.</li>
+                <li class="flex"><span class="mr-2 text-green-600">✓</span>Garantizar que la carga sea distribuida de forma eficiente y puntual.</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

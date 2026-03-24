@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f3f4f6; padding: 1.5rem; margin: 0; }
+        .card { background-color: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); padding: 20px; }
+    </style>
+</head>
+<body>
+    <!-- Módulo Independiente: Fundamentos Matemáticos y de Negocio -->
+    <div class="grid grid-cols-1 gap-6 mb-6">
+        <div class="card bg-white border-t-4 border-indigo-700 shadow-md">
+            <div class="h-[750px] w-full bg-white rounded overflow-hidden shadow-inner">
+                <iframe src="../maps/explicacion_metodologia.html" class="w-full h-full border-0"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- Visualización 1: Radio y Elipse -->
+    <div class="grid grid-cols-1 gap-6 mb-6 mt-6">
+        <div class="card bg-white border-t-4 border-blue-500 shadow-md">
+            <h2 class="text-xl font-bold text-gray-800 mb-2">Explicación Visual: Radio y Elipse de Desvío</h2>
+            <p class="text-sm text-gray-600 mb-4">Muestra cómo DataManager filtra clientes mediante radio y elipse.</p>
+            <div class="h-[500px] w-full border rounded overflow-hidden shadow-inner bg-gray-50">
+                <iframe src="../maps/visualizacion_logica_datamanager.html" class="w-full h-full border-0"></iframe>
+            </div>
+            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-gray-500">
+                <div class="p-2 bg-blue-50 rounded border-l-4 border-blue-400"><strong>Filtro 1 (Radio):</strong> Garantiza cercanía a la planta.</div>
+                <div class="p-2 bg-green-50 rounded border-l-4 border-green-400"><strong>Filtro 2 (Desvío):</strong> Maximiza eficiencia del retorno.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Visualización 2: Sorting Strategy -->
+    <div class="grid grid-cols-1 gap-6 mb-6 mt-6">
+        <div class="card bg-white border-t-4 border-orange-500 shadow-md">
+            <h2 class="text-xl font-bold text-gray-800 mb-2">Estrategia de Selección: Lejanía vs Desvío</h2>
+            <p class="text-sm text-gray-600 mb-4">Análisis de cómo el parámetro <b>SORTING_STRATEGY</b> determina qué cliente se prioriza.</p>
+            <div class="h-[500px] w-full border rounded overflow-hidden shadow-inner bg-gray-50">
+                <iframe src="../maps/visualizacion_sorting_strategy.html" class="w-full h-full border-0"></iframe>
+            </div>
+            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-gray-500">
+                <div class="p-2 bg-orange-50 rounded border-l-4 border-orange-400"><strong>Detour:</strong> Kilómetros extra mínimos.</div>
+                <div class="p-2 bg-green-50 rounded border-l-4 border-green-400"><strong>Backhauling Eficiente:</strong> Máxima utilidad de retorno.</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "scenario_name": "ULTRA-DENSIDAD (100 clientes/planta)",
+  "total_nodes": 1014,
+  "total_routes": 11,
+  "total_time_s": 428.51,
+  "solver_time_s": 60.12,
+  "memory_diff_mb": 155.84,
+  "solution_found": true,
+  "parameters": {
+    "name": "ULTRA-DENSIDAD (100 clientes/planta)",
+    "n_clientes": 50,
+    "max_customers_per_plant": 100,
+    "max_radius_km": 500,
+    "varias_plantas": false,
+    "max_search_time": 60
+  }
+}

@@ -1,275 +1,228 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stress Test Full Report - Logistics Optimizer</title>
+    <title>Premium Stress Report - Logistics Optimizer</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
-        .glass {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+        body { font-family: 'Outfit', sans-serif; background-color: #0f172a; color: #f8fafc; }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
+        .glass-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(99, 102, 241, 0.4);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+        }
+        .glow-text { text-shadow: 0 0 20px rgba(99, 102, 241, 0.5); }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-900 font-sans">
-    <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        <div class="mb-12 text-center text-gray-900">
-            <h1 class="text-4xl font-extrabold tracking-tight sm:text-5xl mb-4">
-                 Stress Test Full Report
-            </h1>
-            <p class="text-xl text-gray-600">Evaluación del modelo en situaciones extremas</p>
+<body class="p-4 md:p-12 custom-scrollbar">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row justify-between items-center mb-16 gap-6">
+            <div>
+                <h1 class="text-5xl font-black glow-text tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-cyan-400">
+                    STRESS TEST <span class="font-light text-white italic">v2.0</span>
+                </h1>
+                <p class="text-slate-400 mt-2 font-medium">Análisis de Límites y Alta Disponibilidad del Algoritmo</p>
+            </div>
+            <div class="glass-card px-8 py-4 flex items-center gap-4">
+                <div class="h-3 w-3 rounded-full bg-emerald-500 animate-pulse"></div>
+                <span class="text-sm font-bold tracking-widest uppercase">System Operational</span>
+            </div>
         </div>
 
-        <!-- Dashboard Grid -->
+        <!-- KPI Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-            <!-- Gráfico de Tiempos -->
-            <div class="glass p-6 rounded-2xl shadow-xl">
-                <h3 class="text-lg font-semibold mb-4">Tiempo Total de Ejecución (s)</h3>
-                <canvas id="timeChart"></canvas>
+            <div class="glass-card p-8">
+                <div class="flex justify-between items-end mb-6">
+                    <h3 class="text-lg font-semibold text-slate-300">Latencia del Solver</h3>
+                    <span class="text-xs font-mono text-indigo-400 bg-indigo-400/10 px-2 py-1 rounded">Metrics / SearchTime</span>
+                </div>
+                <canvas id="timeChart" height="150"></canvas>
             </div>
-            <!-- Gráfico de Nodos -->
-            <div class="glass p-6 rounded-2xl shadow-xl">
-                <h3 class="text-lg font-semibold mb-4">Complejidad (Nodos Procesados)</h3>
-                <canvas id="nodeChart"></canvas>
+            <div class="glass-card p-8">
+                <div class="flex justify-between items-end mb-6">
+                    <h3 class="text-lg font-semibold text-slate-300">Escalabilidad (Nodos)</h3>
+                    <span class="text-xs font-mono text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded">Dimensions / Multi-Plant</span>
+                </div>
+                <canvas id="nodeChart" height="150"></canvas>
             </div>
         </div>
 
-        <!-- Tabla de KPIs -->
-        <div class="glass rounded-2xl shadow-xl overflow-hidden mb-12">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-100">
-                    <tr>
-                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Escenario</th>
-                        <th class="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Nodos</th>
-                        <th class="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Rutas</th>
-                        <th class="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Tiempo (s)</th>
-                        <th class="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Solución</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-100">
-                    
-                    <tr class="hover:bg-gray-50 transition-colors">
-                        <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">Baseline (Moderado)</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">23</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">11</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center font-bold text-indigo-600">11.07s</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <span class="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">
-                                ÉXITO
-                            </span>
-                        </td>
-                    </tr>
-                    <tr class="hover:bg-gray-50 transition-colors">
-                        <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">Alta Densidad (20 clientes/planta)</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">232</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">11</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center font-bold text-indigo-600">32.74s</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <span class="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">
-                                ÉXITO
-                            </span>
-                        </td>
-                    </tr>
-                    <tr class="hover:bg-gray-50 transition-colors">
-                        <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">Área Masiva (1000km Radio)</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">67</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">11</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center font-bold text-indigo-600">32.61s</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <span class="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">
-                                ÉXITO
-                            </span>
-                        </td>
-                    </tr>
-                    <tr class="hover:bg-gray-50 transition-colors">
-                        <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">Sobrecarga Multi-Planta (3 plantas/ruta)</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">67</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">0</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center font-bold text-indigo-600">42.61s</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <span class="px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700">
-                                FALLO
-                            </span>
-                        </td>
-                    </tr>
-                    <tr class="hover:bg-gray-50 transition-colors">
-                        <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">Tiempo Crítico (Problema complejo en 3s)</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">122</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">0</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center font-bold text-indigo-600">5.47s</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <span class="px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700">
-                                FALLO
-                            </span>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Detalles por Escenario -->
-        <div class="space-y-8">
-            <h2 class="text-2xl font-bold border-b border-gray-200 pb-2">Detalle de Pruebas</h2>
+        <!-- Case Cards -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-16">
             
-            <div class="glass p-8 rounded-2xl shadow-lg border-l-8 border-indigo-500">
-                <h3 class="text-xl font-bold mb-4">Baseline (Moderado)</h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="space-y-2">
-                        <p class="text-sm text-gray-500">Parámetros:</p>
-                        <ul class="text-xs space-y-1 font-mono bg-gray-50 p-3 rounded-lg border border-gray-100">
-                            <li>- name: Baseline (Moderado)</li><li>- n_clientes: 4</li><li>- max_customers_per_plant: 1</li><li>- max_radius_km: 100</li><li>- varias_plantas: False</li><li>- max_search_time: 10</li>
-                        </ul>
+            <div class="glass-card p-6 flex flex-col h-full border-l-4 border-emerald-500">
+                <div class="flex justify-between items-start mb-4">
+                    <h4 class="text-lg font-bold text-white max-w-[70%]">ULTRA-DENSIDAD (100 clientes/planta)</h4>
+                    <span class="text-[10px] font-black px-2 py-1 rounded bg-emerald-500/20 text-emerald-400 uppercase">
+                        Solvable
+                    </span>
+                </div>
+                
+                <div class="space-y-4 mb-6 flex-grow">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-500 italic">Tiempo Total</span>
+                        <span class="font-mono text-indigo-300 font-bold">428.51s</span>
                     </div>
-                    <div class="col-span-2 space-y-4">
-                        <p class="text-gray-700 leading-relaxed">
-                            Esta prueba evalúa la capacidad del modelo bajo condiciones de 
-                            <strong>baseline (moderado)</strong>. 
-                            Se procesaron 23 nodos en 11.07 segundos.
-                        </p>
-                        <div class="flex space-x-4">
-                            <div class="text-center p-4 bg-indigo-50 rounded-xl flex-1">
-                                <p class="text-xs text-indigo-600 font-bold uppercase mb-1">Carga Solver</p>
-                                <p class="text-2xl font-black text-indigo-800">10.01s</p>
-                            </div>
-                            <div class="text-center p-4 bg-emerald-50 rounded-xl flex-1">
-                                <p class="text-xs text-emerald-600 font-bold uppercase mb-1">Rutas</p>
-                                <p class="text-2xl font-black text-emerald-800">11</p>
-                            </div>
-                        </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-500 italic">Complejidad</span>
+                        <span class="font-mono text-white">1014 Nodos</span>
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-slate-700/50 flex justify-between items-center">
+                    <div class="text-2xl font-black text-white">11<span class="text-[10px] text-slate-500 ml-1 font-normal uppercase">Rutas</span></div>
+                    <div class="text-right">
+                        <p class="text-[10px] text-slate-500 uppercase">Memory</p>
+                        <p class="text-xs font-mono text-slate-300">+155.84MB</p>
                     </div>
                 </div>
             </div>
-            <div class="glass p-8 rounded-2xl shadow-lg border-l-8 border-indigo-500">
-                <h3 class="text-xl font-bold mb-4">Alta Densidad (20 clientes/planta)</h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="space-y-2">
-                        <p class="text-sm text-gray-500">Parámetros:</p>
-                        <ul class="text-xs space-y-1 font-mono bg-gray-50 p-3 rounded-lg border border-gray-100">
-                            <li>- name: Alta Densidad (20 clientes/planta)</li><li>- n_clientes: 20</li><li>- max_customers_per_plant: 20</li><li>- max_radius_km: 200</li><li>- varias_plantas: False</li><li>- max_search_time: 30</li>
-                        </ul>
+            <div class="glass-card p-6 flex flex-col h-full border-l-4 border-emerald-500">
+                <div class="flex justify-between items-start mb-4">
+                    <h4 class="text-lg font-bold text-white max-w-[70%]">TRANS-IBERIA (2000km Radio)</h4>
+                    <span class="text-[10px] font-black px-2 py-1 rounded bg-emerald-500/20 text-emerald-400 uppercase">
+                        Solvable
+                    </span>
+                </div>
+                
+                <div class="space-y-4 mb-6 flex-grow">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-500 italic">Tiempo Total</span>
+                        <span class="font-mono text-indigo-300 font-bold">167.22s</span>
                     </div>
-                    <div class="col-span-2 space-y-4">
-                        <p class="text-gray-700 leading-relaxed">
-                            Esta prueba evalúa la capacidad del modelo bajo condiciones de 
-                            <strong>alta densidad (20 clientes/planta)</strong>. 
-                            Se procesaron 232 nodos en 32.74 segundos.
-                        </p>
-                        <div class="flex space-x-4">
-                            <div class="text-center p-4 bg-indigo-50 rounded-xl flex-1">
-                                <p class="text-xs text-indigo-600 font-bold uppercase mb-1">Carga Solver</p>
-                                <p class="text-2xl font-black text-indigo-800">30.01s</p>
-                            </div>
-                            <div class="text-center p-4 bg-emerald-50 rounded-xl flex-1">
-                                <p class="text-xs text-emerald-600 font-bold uppercase mb-1">Rutas</p>
-                                <p class="text-2xl font-black text-emerald-800">11</p>
-                            </div>
-                        </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-500 italic">Complejidad</span>
+                        <span class="font-mono text-white">122 Nodos</span>
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-slate-700/50 flex justify-between items-center">
+                    <div class="text-2xl font-black text-white">4<span class="text-[10px] text-slate-500 ml-1 font-normal uppercase">Rutas</span></div>
+                    <div class="text-right">
+                        <p class="text-[10px] text-slate-500 uppercase">Memory</p>
+                        <p class="text-xs font-mono text-slate-300">+-92.32MB</p>
                     </div>
                 </div>
             </div>
-            <div class="glass p-8 rounded-2xl shadow-lg border-l-8 border-indigo-500">
-                <h3 class="text-xl font-bold mb-4">Área Masiva (1000km Radio)</h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="space-y-2">
-                        <p class="text-sm text-gray-500">Parámetros:</p>
-                        <ul class="text-xs space-y-1 font-mono bg-gray-50 p-3 rounded-lg border border-gray-100">
-                            <li>- name: Área Masiva (1000km Radio)</li><li>- n_clientes: 5</li><li>- max_customers_per_plant: 5</li><li>- max_radius_km: 1000</li><li>- varias_plantas: False</li><li>- max_search_time: 30</li>
-                        </ul>
+            <div class="glass-card p-6 flex flex-col h-full border-l-4 border-emerald-500">
+                <div class="flex justify-between items-start mb-4">
+                    <h4 class="text-lg font-bold text-white max-w-[70%]">FULL PACK (FTL forzado 35 pallets)</h4>
+                    <span class="text-[10px] font-black px-2 py-1 rounded bg-emerald-500/20 text-emerald-400 uppercase">
+                        Solvable
+                    </span>
+                </div>
+                
+                <div class="space-y-4 mb-6 flex-grow">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-500 italic">Tiempo Total</span>
+                        <span class="font-mono text-indigo-300 font-bold">164.31s</span>
                     </div>
-                    <div class="col-span-2 space-y-4">
-                        <p class="text-gray-700 leading-relaxed">
-                            Esta prueba evalúa la capacidad del modelo bajo condiciones de 
-                            <strong>área masiva (1000km radio)</strong>. 
-                            Se procesaron 67 nodos en 32.61 segundos.
-                        </p>
-                        <div class="flex space-x-4">
-                            <div class="text-center p-4 bg-indigo-50 rounded-xl flex-1">
-                                <p class="text-xs text-indigo-600 font-bold uppercase mb-1">Carga Solver</p>
-                                <p class="text-2xl font-black text-indigo-800">30.01s</p>
-                            </div>
-                            <div class="text-center p-4 bg-emerald-50 rounded-xl flex-1">
-                                <p class="text-xs text-emerald-600 font-bold uppercase mb-1">Rutas</p>
-                                <p class="text-2xl font-black text-emerald-800">11</p>
-                            </div>
-                        </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-500 italic">Complejidad</span>
+                        <span class="font-mono text-white">232 Nodos</span>
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-slate-700/50 flex justify-between items-center">
+                    <div class="text-2xl font-black text-white">11<span class="text-[10px] text-slate-500 ml-1 font-normal uppercase">Rutas</span></div>
+                    <div class="text-right">
+                        <p class="text-[10px] text-slate-500 uppercase">Memory</p>
+                        <p class="text-xs font-mono text-slate-300">+31.93MB</p>
                     </div>
                 </div>
             </div>
-            <div class="glass p-8 rounded-2xl shadow-lg border-l-8 border-indigo-500">
-                <h3 class="text-xl font-bold mb-4">Sobrecarga Multi-Planta (3 plantas/ruta)</h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="space-y-2">
-                        <p class="text-sm text-gray-500">Parámetros:</p>
-                        <ul class="text-xs space-y-1 font-mono bg-gray-50 p-3 rounded-lg border border-gray-100">
-                            <li>- name: Sobrecarga Multi-Planta (3 plantas/ruta)</li><li>- n_clientes: 10</li><li>- max_customers_per_plant: 5</li><li>- max_radius_km: 500</li><li>- varias_plantas: True</li><li>- max_plantas_ruta: 3</li><li>- max_search_time: 40</li>
-                        </ul>
+            <div class="glass-card p-6 flex flex-col h-full border-l-4 border-emerald-500">
+                <div class="flex justify-between items-start mb-4">
+                    <h4 class="text-lg font-bold text-white max-w-[70%]">MULTI-PLANTA TOTAL (11 plantas/ruta)</h4>
+                    <span class="text-[10px] font-black px-2 py-1 rounded bg-emerald-500/20 text-emerald-400 uppercase">
+                        Solvable
+                    </span>
+                </div>
+                
+                <div class="space-y-4 mb-6 flex-grow">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-500 italic">Tiempo Total</span>
+                        <span class="font-mono text-indigo-300 font-bold">179.28s</span>
                     </div>
-                    <div class="col-span-2 space-y-4">
-                        <p class="text-gray-700 leading-relaxed">
-                            Esta prueba evalúa la capacidad del modelo bajo condiciones de 
-                            <strong>sobrecarga multi-planta (3 plantas/ruta)</strong>. 
-                            Se procesaron 67 nodos en 42.61 segundos.
-                        </p>
-                        <div class="flex space-x-4">
-                            <div class="text-center p-4 bg-indigo-50 rounded-xl flex-1">
-                                <p class="text-xs text-indigo-600 font-bold uppercase mb-1">Carga Solver</p>
-                                <p class="text-2xl font-black text-indigo-800">40.01s</p>
-                            </div>
-                            <div class="text-center p-4 bg-emerald-50 rounded-xl flex-1">
-                                <p class="text-xs text-emerald-600 font-bold uppercase mb-1">Rutas</p>
-                                <p class="text-2xl font-black text-emerald-800">0</p>
-                            </div>
-                        </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-500 italic">Complejidad</span>
+                        <span class="font-mono text-white">67 Nodos</span>
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-slate-700/50 flex justify-between items-center">
+                    <div class="text-2xl font-black text-white">1<span class="text-[10px] text-slate-500 ml-1 font-normal uppercase">Rutas</span></div>
+                    <div class="text-right">
+                        <p class="text-[10px] text-slate-500 uppercase">Memory</p>
+                        <p class="text-xs font-mono text-slate-300">+18.23MB</p>
                     </div>
                 </div>
             </div>
-            <div class="glass p-8 rounded-2xl shadow-lg border-l-8 border-indigo-500">
-                <h3 class="text-xl font-bold mb-4">Tiempo Crítico (Problema complejo en 3s)</h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="space-y-2">
-                        <p class="text-sm text-gray-500">Parámetros:</p>
-                        <ul class="text-xs space-y-1 font-mono bg-gray-50 p-3 rounded-lg border border-gray-100">
-                            <li>- name: Tiempo Crítico (Problema complejo en 3s)</li><li>- n_clientes: 15</li><li>- max_customers_per_plant: 10</li><li>- max_radius_km: 400</li><li>- varias_plantas: True</li><li>- max_plantas_ruta: 2</li><li>- max_search_time: 3</li>
-                        </ul>
+            <div class="glass-card p-6 flex flex-col h-full border-l-4 border-emerald-500">
+                <div class="flex justify-between items-start mb-4">
+                    <h4 class="text-lg font-bold text-white max-w-[70%]">LIMIT-TIME (Complejidad en 2s)</h4>
+                    <span class="text-[10px] font-black px-2 py-1 rounded bg-emerald-500/20 text-emerald-400 uppercase">
+                        Solvable
+                    </span>
+                </div>
+                
+                <div class="space-y-4 mb-6 flex-grow">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-500 italic">Tiempo Total</span>
+                        <span class="font-mono text-indigo-300 font-bold">219.76s</span>
                     </div>
-                    <div class="col-span-2 space-y-4">
-                        <p class="text-gray-700 leading-relaxed">
-                            Esta prueba evalúa la capacidad del modelo bajo condiciones de 
-                            <strong>tiempo crítico (problema complejo en 3s)</strong>. 
-                            Se procesaron 122 nodos en 5.47 segundos.
-                        </p>
-                        <div class="flex space-x-4">
-                            <div class="text-center p-4 bg-indigo-50 rounded-xl flex-1">
-                                <p class="text-xs text-indigo-600 font-bold uppercase mb-1">Carga Solver</p>
-                                <p class="text-2xl font-black text-indigo-800">3.01s</p>
-                            </div>
-                            <div class="text-center p-4 bg-emerald-50 rounded-xl flex-1">
-                                <p class="text-xs text-emerald-600 font-bold uppercase mb-1">Rutas</p>
-                                <p class="text-2xl font-black text-emerald-800">0</p>
-                            </div>
-                        </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-500 italic">Complejidad</span>
+                        <span class="font-mono text-white">562 Nodos</span>
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-slate-700/50 flex justify-between items-center">
+                    <div class="text-2xl font-black text-white">11<span class="text-[10px] text-slate-500 ml-1 font-normal uppercase">Rutas</span></div>
+                    <div class="text-right">
+                        <p class="text-[10px] text-slate-500 uppercase">Memory</p>
+                        <p class="text-xs font-mono text-slate-300">+-7.48MB</p>
                     </div>
                 </div>
             </div>
         </div>
+
+        <footer class="text-center pb-12 opacity-30 text-xs tracking-widest font-light">
+            SMURFIT WESTROCK &bull; LOGISTICS OPTIMIZATION ENGINE &bull; 2026
+        </footer>
     </div>
 
     <script>
-        const labels = ["Baseline (Moderado)", "Alta Densidad (20 clientes/planta)", "\u00c1rea Masiva (1000km Radio)", "Sobrecarga Multi-Planta (3 plantas/ruta)", "Tiempo Cr\u00edtico (Problema complejo en 3s)"];
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.font.family = "'Outfit', sans-serif";
+        
+        const labels = ["ULTRA-DENSIDAD (100 clientes/planta)", "TRANS-IBERIA (2000km Radio)", "FULL PACK (FTL forzado 35 pallets)", "MULTI-PLANTA TOTAL (11 plantas/ruta)", "LIMIT-TIME (Complejidad en 2s)"];
         
         new Chart(document.getElementById('timeChart'), {
             type: 'bar',
             data: {
                 labels: labels,
                 datasets: [{
-                    label: 'Tiempo Total (s)',
-                    data: [11.07, 32.74, 32.61, 42.61, 5.47],
-                    backgroundColor: 'rgba(99, 102, 241, 0.8)',
-                    borderRadius: 8
+                    label: 'Latencia (s)',
+                    data: [428.51, 167.22, 164.31, 179.28, 219.76],
+                    backgroundColor: 'rgba(99, 102, 241, 0.6)',
+                    borderColor: '#818cf8',
+                    borderWidth: 1,
+                    borderRadius: 12
                 }]
             },
             options: { responsive: true, plugins: { legend: { display: false } } }
@@ -280,12 +233,14 @@
             data: {
                 labels: labels,
                 datasets: [{
-                    label: 'Nodos Totales',
-                    data: [23, 232, 67, 67, 122],
-                    borderColor: 'rgba(16, 185, 129, 1)',
+                    label: 'Nodos',
+                    data: [1014, 122, 232, 67, 562],
+                    borderColor: '#10b981',
                     backgroundColor: 'rgba(16, 185, 129, 0.1)',
                     fill: true,
-                    tension: 0.4
+                    tension: 0.4,
+                    pointRadius: 6,
+                    pointBackgroundColor: '#10b981'
                 }]
             },
             options: { responsive: true, plugins: { legend: { display: false } } }
@@ -293,4 +248,3 @@
     </script>
 </body>
 </html>
-    
