@@ -1,20 +1,24 @@
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
+
 import json
 import logging
 from pathlib import Path
 import folium
 import polyline
 
-from src.engine.solver import LogisticsSolver
-from src.utils.data_manager import DataManager
-from src.utils.geo import GeoUtils
-from src.utils.visualizer import Visualizer
-from src.utils.report_generator import generate_dashboard
-from src.config import (
+from logistic_core.engine.solver import LogisticsSolver
+from logistic_core.utils.data_manager import DataManager
+from logistic_core.utils.geo import GeoUtils
+from logistic_core.utils.visualizer import Visualizer
+from logistic_core.utils.report_generator import generate_dashboard
+from logistic_core.config import (
     RESULTS_DIR, DATA_DIR,
     DEFAULT_CO2_PER_KM, DEFAULT_ALPHA_FCR,
     PAPER_LOAD_KG, PALLET_WEIGHT_KG, VEHICLE_MAX_LOAD_KG
 )
-from src.utils.fcr_estimator import FCREmissionEstimator
+from logistic_core.utils.fcr_estimator import FCREmissionEstimator
 
 logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)
@@ -499,7 +503,7 @@ def main():
                                  max_pallets=MAX_PALLETS, flota_por_planta=flota_final, summary_data=summary)
     print(f"=> Tablero Interactivo (Eficiencia + Mapa): {output_dashboard}")
 
-    # 11. Actualizar Presentacion HTML (Dashboard Global Modular)
+    # 11. Actualizar Presentacion HTML (Dashboard Global Modular) - Solo Vista Baseline
     presentation_path = "outputs/Presentacion_Logistica.html"
     try:
         generate_dashboard(summary_json, output_json, presentation_path, is_baseline=True)

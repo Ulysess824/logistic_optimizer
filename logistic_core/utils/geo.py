@@ -2,8 +2,8 @@ import logging
 import googlemaps
 import numpy as np
 import requests
-from src.config import GOOGLE_MAPS_API_KEY, OSRM_URL
-from src.utils.geo_cache import GeoCache
+from logistic_core.config import GOOGLE_MAPS_API_KEY, OSRM_URL
+from logistic_core.utils.geo_cache import GeoCache
 
 logger = logging.getLogger(__name__)
 

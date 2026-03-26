@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
-from src.engine.solver import LogisticsSolver
-from src.utils.geo import GeoUtils
+from logistic_core.engine.solver import LogisticsSolver
+from logistic_core.utils.geo import GeoUtils
 
 def main():
     """

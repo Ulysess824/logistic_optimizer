@@ -1,14 +1,12 @@
 {
   "num_routes": 38,
-  "total_km": 26598.81,
+  "total_km": 26640.04,
   "total_empty_km": 8516.07,
-  "total_co2_kg": 31765.13,
-  "distance_source": "Haversine (estimacion)",
+  "total_co2_kg": 23371.69,
   "parameters": {
-    "n_candidatos": 30,
-    "max_pallets": 35,
+    "max_pallets": 34,
     "threshold_km": 50,
-    "max_radius_km": 200
+    "n_candidatos": 30
   },
   "routes": [
     {
@@ -16,746 +14,418 @@
       "plants": [
         "Alcalá"
       ],
-      "plant_ids": [
-        "CP_ALCALA"
-      ],
-      "num_plants": 1,
       "num_customers": 2,
-      "customers": [
-        "Manzaneque",
-        "Ciudad Real"
-      ],
-      "total_pallets": 32,
-      "distance_km": 567.12,
+      "total_pallets": 33,
+      "distance_km": 566.26,
       "empty_km": 111.99,
-      "co2_emissions_kg": 686.9,
-      "num_stops": 5
+      "co2_emissions_kg": 501.27
     },
     {
       "route_id": 2,
       "plants": [
         "Alcalá (Muelle 2)"
       ],
-      "plant_ids": [
-        "CP_ALCALA_clone_1"
-      ],
-      "num_plants": 1,
       "num_customers": 2,
-      "customers": [
-        "Ontigola",
-        "Villarrubia De Los Ojos"
-      ],
-      "total_pallets": 35,
-      "distance_km": 562.72,
+      "total_pallets": 34,
+      "distance_km": 569.29,
       "empty_km": 138.82,
-      "co2_emissions_kg": 679.7,
-      "num_stops": 5
+      "co2_emissions_kg": 504.02
     },
     {
       "route_id": 3,
       "plants": [
         "Alcalá (Muelle 3)"
       ],
-      "plant_ids": [
-        "CP_ALCALA_clone_2"
-      ],
-      "num_plants": 1,
       "num_customers": 1,
-      "customers": [
-        "Labores, Las"
-      ],
       "total_pallets": 28,
       "distance_km": 561.43,
       "empty_km": 145.88,
-      "co2_emissions_kg": 678.21,
-      "num_stops": 4
+      "co2_emissions_kg": 497.05
     },
     {
       "route_id": 4,
       "plants": [
         "Alcalá (Muelle 4)"
       ],
-      "plant_ids": [
-        "CP_ALCALA_clone_3"
-      ],
-      "num_plants": 1,
       "num_customers": 2,
-      "customers": [
-        "Villanueva De Alcardete",
-        "Tomelloso"
-      ],
       "total_pallets": 32,
       "distance_km": 579.96,
       "empty_km": 147.35,
-      "co2_emissions_kg": 694.83,
-      "num_stops": 5
+      "co2_emissions_kg": 510.27
     },
     {
       "route_id": 5,
       "plants": [
         "Alicante"
       ],
-      "plant_ids": [
-        "CP_ALICANTE"
-      ],
-      "num_plants": 1,
       "num_customers": 2,
-      "customers": [
-        "Cieza",
-        "Moratalla"
-      ],
       "total_pallets": 27,
       "distance_km": 577.87,
       "empty_km": 168.61,
-      "co2_emissions_kg": 693.22,
-      "num_stops": 5
+      "co2_emissions_kg": 508.93
     },
     {
       "route_id": 6,
       "plants": [
         "Alicante (Muelle 2)"
       ],
-      "plant_ids": [
-        "CP_ALICANTE_clone_1"
-      ],
-      "num_plants": 1,
       "num_customers": 1,
-      "customers": [
-        "Bullas"
-      ],
       "total_pallets": 26,
       "distance_km": 581.86,
       "empty_km": 186.83,
-      "co2_emissions_kg": 696.01,
-      "num_stops": 4
+      "co2_emissions_kg": 511.34
     },
     {
       "route_id": 7,
       "plants": [
         "Alicante (Muelle 3)"
       ],
-      "plant_ids": [
-        "CP_ALICANTE_clone_2"
-      ],
-      "num_plants": 1,
       "num_customers": 2,
-      "customers": [
-        "Cieza",
-        "Hellin"
-      ],
       "total_pallets": 26,
       "distance_km": 598.96,
       "empty_km": 192.56,
-      "co2_emissions_kg": 708.48,
-      "num_stops": 5
+      "co2_emissions_kg": 521.96
     },
     {
       "route_id": 8,
       "plants": [
         "Alicante (Muelle 4)"
       ],
-      "plant_ids": [
-        "CP_ALICANTE_clone_3"
-      ],
-      "num_plants": 1,
       "num_customers": 2,
-      "customers": [
-        "Alguazas",
-        "Mula"
-      ],
       "total_pallets": 29,
       "distance_km": 587.17,
       "empty_km": 202.38,
-      "co2_emissions_kg": 698.68,
-      "num_stops": 5
+      "co2_emissions_kg": 513.98
     },
     {
       "route_id": 9,
       "plants": [
         "Alicante (Muelle 5)"
       ],
-      "plant_ids": [
-        "CP_ALICANTE_clone_4"
-      ],
-      "num_plants": 1,
       "num_customers": 2,
-      "customers": [
-        "Alguazas",
-        "Mula"
-      ],
       "total_pallets": 31,
       "distance_km": 585.64,
       "empty_km": 202.52,
-      "co2_emissions_kg": 698.73,
-      "num_stops": 5
+      "co2_emissions_kg": 513.67
     },
     {
       "route_id": 10,
       "plants": [
         "Córdoba"
       ],
-      "plant_ids": [
-        "CP_CORDOBA"
-      ],
-      "num_plants": 1,
       "num_customers": 1,
-      "customers": [
-        "Andujar"
-      ],
       "total_pallets": 33,
       "distance_km": 155.33,
       "empty_km": 22.84,
-      "co2_emissions_kg": 190.51,
-      "num_stops": 4
+      "co2_emissions_kg": 139.1
     },
     {
       "route_id": 11,
       "plants": [
         "Córdoba (Muelle 2)"
       ],
-      "plant_ids": [
-        "CP_CORDOBA_clone_1"
-      ],
-      "num_plants": 1,
       "num_customers": 1,
-      "customers": [
-        "Mengibar"
-      ],
       "total_pallets": 30,
       "distance_km": 154.22,
       "empty_km": 1.43,
-      "co2_emissions_kg": 191.65,
-      "num_stops": 4
+      "co2_emissions_kg": 139.49
     },
     {
       "route_id": 12,
       "plants": [
         "Córdoba (Muelle 3)"
       ],
-      "plant_ids": [
-        "CP_CORDOBA_clone_2"
-      ],
-      "num_plants": 1,
       "num_customers": 1,
-      "customers": [
-        "Villanueva De La Reina"
-      ],
       "total_pallets": 28,
       "distance_km": 153.94,
       "empty_km": 10.43,
-      "co2_emissions_kg": 189.56,
-      "num_stops": 4
+      "co2_emissions_kg": 138.27
     },
     {
       "route_id": 13,
       "plants": [
         "Huelva"
       ],
-      "plant_ids": [
-        "CP_HUELVA"
-      ],
-      "num_plants": 1,
       "num_customers": 2,
-      "customers": [
-        "Paradas",
-        "Villarrubia"
-      ],
       "total_pallets": 32,
       "distance_km": 521.68,
       "empty_km": 96.49,
-      "co2_emissions_kg": 626.73,
-      "num_stops": 5
+      "co2_emissions_kg": 459.95
     },
     {
       "route_id": 14,
       "plants": [
         "Huelva (Muelle 2)"
       ],
-      "plant_ids": [
-        "CP_HUELVA_clone_1"
-      ],
-      "num_plants": 1,
       "num_customers": 1,
-      "customers": [
-        "Cordoba"
-      ],
       "total_pallets": 22,
       "distance_km": 505.29,
       "empty_km": 95.08,
-      "co2_emissions_kg": 609.6,
-      "num_stops": 4
+      "co2_emissions_kg": 446.91
     },
     {
       "route_id": 15,
       "plants": [
         "Huelva (Muelle 3)"
       ],
-      "plant_ids": [
-        "CP_HUELVA_clone_2"
-      ],
-      "num_plants": 1,
       "num_customers": 2,
-      "customers": [
-        "Cañada Rosal",
-        "Villarrubia"
-      ],
-      "total_pallets": 35,
-      "distance_km": 508.0,
+      "total_pallets": 31,
+      "distance_km": 511.16,
       "empty_km": 97.55,
-      "co2_emissions_kg": 617.1,
-      "num_stops": 5
+      "co2_emissions_kg": 450.97
     },
     {
       "route_id": 16,
       "plants": [
         "Huelva (Muelle 4)"
       ],
-      "plant_ids": [
-        "CP_HUELVA_clone_3"
-      ],
-      "num_plants": 1,
       "num_customers": 2,
-      "customers": [
-        "Carmona",
-        "Santaella"
-      ],
       "total_pallets": 32,
       "distance_km": 505.38,
       "empty_km": 102.89,
-      "co2_emissions_kg": 612.54,
-      "num_stops": 5
+      "co2_emissions_kg": 448.55
     },
     {
       "route_id": 17,
       "plants": [
         "Huelva (Muelle 5)"
       ],
-      "plant_ids": [
-        "CP_HUELVA_clone_4"
-      ],
-      "num_plants": 1,
       "num_customers": 2,
-      "customers": [
-        "Constantina",
-        "Villaviciosa De Cordoba"
-      ],
       "total_pallets": 33,
       "distance_km": 514.97,
       "empty_km": 107.11,
-      "co2_emissions_kg": 620.61,
-      "num_stops": 5
+      "co2_emissions_kg": 455.1
     },
     {
       "route_id": 18,
       "plants": [
         "Burgos"
       ],
-      "plant_ids": [
-        "CP_BURGOS"
-      ],
-      "num_plants": 1,
       "num_customers": 1,
-      "customers": [
-        "Castillejo De Robledo"
-      ],
       "total_pallets": 28,
       "distance_km": 981.41,
       "empty_km": 394.5,
-      "co2_emissions_kg": 1166.04,
-      "num_stops": 4
+      "co2_emissions_kg": 858.11
     },
     {
       "route_id": 19,
       "plants": [
         "Burgos (Muelle 2)"
       ],
-      "plant_ids": [
-        "CP_BURGOS_clone_1"
-      ],
-      "num_plants": 1,
       "num_customers": 1,
-      "customers": [
-        "Castillejo De Robledo"
-      ],
       "total_pallets": 33,
       "distance_km": 978.82,
       "empty_km": 398.61,
-      "co2_emissions_kg": 1165.26,
-      "num_stops": 4
+      "co2_emissions_kg": 857.11
     },
     {
       "route_id": 20,
       "plants": [
         "Burgos (Muelle 3)"
       ],
-      "plant_ids": [
-        "CP_BURGOS_clone_2"
-      ],
-      "num_plants": 1,
       "num_customers": 3,
-      "customers": [
-        "Roa De Duero",
-        "Aranda De Duero",
-        "Castillejo De Robledo"
-      ],
       "total_pallets": 32,
       "distance_km": 1013.88,
       "empty_km": 397.13,
-      "co2_emissions_kg": 1193.35,
-      "num_stops": 6
+      "co2_emissions_kg": 880.28
     },
     {
       "route_id": 21,
       "plants": [
         "Burgos (Muelle 4)"
       ],
-      "plant_ids": [
-        "CP_BURGOS_clone_3"
-      ],
-      "num_plants": 1,
       "num_customers": 1,
-      "customers": [
-        "Castillejo De Robledo"
-      ],
       "total_pallets": 31,
       "distance_km": 981.42,
       "empty_km": 398.63,
-      "co2_emissions_kg": 1166.82,
-      "num_stops": 4
+      "co2_emissions_kg": 858.54
     },
     {
       "route_id": 22,
       "plants": [
         "Navarra"
       ],
-      "plant_ids": [
-        "CP_NAVARRA"
-      ],
-      "num_plants": 1,
       "num_customers": 2,
-      "customers": [
-        "San Adrian (Navarra)",
-        "Milagro"
-      ],
-      "total_pallets": 35,
-      "distance_km": 1142.24,
+      "total_pallets": 34,
+      "distance_km": 1154.65,
       "empty_km": 504.34,
-      "co2_emissions_kg": 1350.38,
-      "num_stops": 5
+      "co2_emissions_kg": 1002.2
     },
     {
       "route_id": 23,
       "plants": [
         "Navarra (Muelle 2)"
       ],
-      "plant_ids": [
-        "CP_NAVARRA_clone_1"
-      ],
-      "num_plants": 1,
       "num_customers": 2,
-      "customers": [
-        "Abarzuza",
-        "Pradejon"
-      ],
       "total_pallets": 30,
       "distance_km": 1146.01,
       "empty_km": 505.89,
-      "co2_emissions_kg": 1351.04,
-      "num_stops": 5
+      "co2_emissions_kg": 996.2
     },
     {
       "route_id": 24,
       "plants": [
         "Valencia"
       ],
-      "plant_ids": [
-        "CP_VALENCIA"
-      ],
-      "num_plants": 1,
       "num_customers": 2,
-      "customers": [
-        "Catadau",
-        "Hellin"
-      ],
       "total_pallets": 31,
       "distance_km": 680.66,
       "empty_km": 192.56,
-      "co2_emissions_kg": 807.75,
-      "num_stops": 5
+      "co2_emissions_kg": 594.61
     },
     {
       "route_id": 25,
       "plants": [
         "Valencia (Muelle 2)"
       ],
-      "plant_ids": [
-        "CP_VALENCIA_clone_1"
-      ],
-      "num_plants": 1,
       "num_customers": 2,
-      "customers": [
-        "Caudete",
-        "Cieza"
-      ],
       "total_pallets": 33,
       "distance_km": 705.7,
       "empty_km": 210.07,
-      "co2_emissions_kg": 833.78,
-      "num_stops": 5
+      "co2_emissions_kg": 614.46
     },
     {
       "route_id": 26,
       "plants": [
         "Valencia (Muelle 3)"
       ],
-      "plant_ids": [
-        "CP_VALENCIA_clone_2"
-      ],
-      "num_plants": 1,
       "num_customers": 2,
-      "customers": [
-        "Jumilla",
-        "Cieza"
-      ],
       "total_pallets": 24,
       "distance_km": 706.14,
       "empty_km": 210.25,
-      "co2_emissions_kg": 832.87,
-      "num_stops": 5
+      "co2_emissions_kg": 614.05
     },
     {
       "route_id": 27,
       "plants": [
         "Almeria"
       ],
-      "plant_ids": [
-        "CP_ALMERIA"
-      ],
-      "num_plants": 1,
       "num_customers": 1,
-      "customers": [
-        "Mengibar"
-      ],
       "total_pallets": 30,
       "distance_km": 333.82,
       "empty_km": 1.43,
-      "co2_emissions_kg": 415.46,
-      "num_stops": 4
+      "co2_emissions_kg": 302.27
     },
     {
       "route_id": 28,
       "plants": [
         "Almeria (Muelle 2)"
       ],
-      "plant_ids": [
-        "CP_ALMERIA_clone_1"
-      ],
-      "num_plants": 1,
       "num_customers": 1,
-      "customers": [
-        "Jabalquinto"
-      ],
       "total_pallets": 30,
       "distance_km": 340.47,
       "empty_km": 7.66,
-      "co2_emissions_kg": 420.74,
-      "num_stops": 4
+      "co2_emissions_kg": 306.64
     },
     {
       "route_id": 29,
       "plants": [
         "Almeria (Muelle 3)"
       ],
-      "plant_ids": [
-        "CP_ALMERIA_clone_2"
-      ],
-      "num_plants": 1,
       "num_customers": 1,
-      "customers": [
-        "Villanueva De La Reina"
-      ],
       "total_pallets": 28,
       "distance_km": 351.86,
       "empty_km": 10.43,
-      "co2_emissions_kg": 429.27,
-      "num_stops": 4
+      "co2_emissions_kg": 313.84
     },
     {
       "route_id": 30,
       "plants": [
         "Almeria (Muelle 4)"
       ],
-      "plant_ids": [
-        "CP_ALMERIA_clone_3"
-      ],
-      "num_plants": 1,
       "num_customers": 1,
-      "customers": [
-        "Jaen"
-      ],
       "total_pallets": 27,
       "distance_km": 338.09,
       "empty_km": 23.62,
-      "co2_emissions_kg": 414.35,
-      "num_stops": 4
+      "co2_emissions_kg": 302.59
     },
     {
       "route_id": 31,
       "plants": [
         "Almeria (Muelle 5)"
       ],
-      "plant_ids": [
-        "CP_ALMERIA_clone_4"
-      ],
-      "num_plants": 1,
       "num_customers": 2,
-      "customers": [
-        "Carchelejo",
-        "Bailen"
-      ],
       "total_pallets": 31,
       "distance_km": 360.17,
       "empty_km": 12.93,
-      "co2_emissions_kg": 434.45,
-      "num_stops": 5
+      "co2_emissions_kg": 318.52
     },
     {
       "route_id": 32,
       "plants": [
         "Canovelles"
       ],
-      "plant_ids": [
-        "CP_CANOVELLES"
-      ],
-      "num_plants": 1,
       "num_customers": 1,
-      "customers": [
-        "Tortosa"
-      ],
       "total_pallets": 27,
       "distance_km": 1316.99,
       "empty_km": 486.63,
-      "co2_emissions_kg": 1571.61,
-      "num_stops": 4
+      "co2_emissions_kg": 1155.31
     },
     {
       "route_id": 33,
       "plants": [
         "Canovelles (Muelle 2)"
       ],
-      "plant_ids": [
-        "CP_CANOVELLES_clone_1"
-      ],
-      "num_plants": 1,
       "num_customers": 1,
-      "customers": [
-        "Tortosa"
-      ],
       "total_pallets": 33,
       "distance_km": 1317.02,
       "empty_km": 486.74,
-      "co2_emissions_kg": 1576.33,
-      "num_stops": 4
+      "co2_emissions_kg": 1157.92
     },
     {
       "route_id": 34,
       "plants": [
         "Celpack"
       ],
-      "plant_ids": [
-        "CP_CELPACK"
-      ],
-      "num_plants": 1,
       "num_customers": 2,
-      "customers": [
-        "Vale De Cambra",
-        "Alcaide"
-      ],
       "total_pallets": 26,
       "distance_km": 1057.13,
       "empty_km": 394.83,
-      "co2_emissions_kg": 1254.48,
-      "num_stops": 5
+      "co2_emissions_kg": 923.47
     },
     {
       "route_id": 35,
       "plants": [
         "Celpack (Muelle 2)"
       ],
-      "plant_ids": [
-        "CP_CELPACK_clone_1"
-      ],
-      "num_plants": 1,
       "num_customers": 1,
-      "customers": [
-        "Castelo Branco"
-      ],
       "total_pallets": 26,
       "distance_km": 1058.54,
       "empty_km": 395.15,
-      "co2_emissions_kg": 1261.45,
-      "num_stops": 4
+      "co2_emissions_kg": 927.63
     },
     {
       "route_id": 36,
       "plants": [
         "Celpack (Muelle 3)"
       ],
-      "plant_ids": [
-        "CP_CELPACK_clone_2"
-      ],
-      "num_plants": 1,
       "num_customers": 2,
-      "customers": [
-        "Tondela",
-        "São Vicente Da Beira"
-      ],
       "total_pallets": 28,
       "distance_km": 1060.44,
       "empty_km": 397.81,
-      "co2_emissions_kg": 1260.02,
-      "num_stops": 5
+      "co2_emissions_kg": 927.25
     },
     {
       "route_id": 37,
       "plants": [
         "Vigo"
       ],
-      "plant_ids": [
-        "CP_VIGO"
-      ],
-      "num_plants": 1,
       "num_customers": 2,
-      "customers": [
-        "Beça",
-        "Chaves"
-      ],
-      "total_pallets": 32,
-      "distance_km": 1252.54,
+      "total_pallets": 33,
+      "distance_km": 1252.7,
       "empty_km": 523.11,
-      "co2_emissions_kg": 1483.19,
-      "num_stops": 5
+      "co2_emissions_kg": 1092.84
     },
     {
       "route_id": 38,
       "plants": [
         "Vigo (Muelle 2)"
       ],
-      "plant_ids": [
-        "CP_VIGO_clone_1"
-      ],
-      "num_plants": 1,
       "num_customers": 3,
-      "customers": [
-        "Monterrei",
-        "Mourazos",
-        "Mourazos"
-      ],
-      "total_pallets": 32,
-      "distance_km": 1253.96,
+      "total_pallets": 34,
+      "distance_km": 1273.75,
       "empty_km": 533.01,
-      "co2_emissions_kg": 1483.46,
-      "num_stops": 6
+      "co2_emissions_kg": 1107.04
     }
   ]
 }

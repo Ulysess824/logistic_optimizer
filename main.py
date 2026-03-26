@@ -1,20 +1,25 @@
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
+
 import json
 import logging
 from pathlib import Path
 import folium
 import polyline
 
-from src.engine.solver import LogisticsSolver
-from src.utils.data_manager import DataManager
-from src.utils.geo import GeoUtils
-from src.utils.visualizer import Visualizer
-from src.utils.report_generator import generate_dashboard
-from src.config import (
+from logistic_core.engine.solver import LogisticsSolver
+from logistic_core.utils.data_manager import DataManager
+from logistic_core.utils.geo import GeoUtils
+from logistic_core.utils.visualizer import Visualizer
+from logistic_core.utils.report_generator import generate_dashboard
+from logistic_core.config import (
     RESULTS_DIR, DATA_DIR,
-    DEFAULT_CO2_PER_KM, DEFAULT_ALPHA_FCR,
+    GLEC_CO2_PER_LITER, GLEC_INTENSITY_GTKM, GLEC_EMPTY_FLOOR_KGKM,
     PAPER_LOAD_KG, PALLET_WEIGHT_KG, VEHICLE_MAX_LOAD_KG
 )
-from src.utils.fcr_estimator import FCREmissionEstimator
+from logistic_core.utils.fcr_estimator import FCREmissionEstimator
+from logistic_core.utils.capacity_estimator import TruckCapacityEstimator, Pallet
 
 logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)
@@ -195,13 +200,27 @@ def generate_logistics_dashboard(routes, solver, output_path="logistics_dashboar
 PLANTS_FILE = DATA_DIR / "locations_smurfit.json"
 CLIENTS_FILE = DATA_DIR / "demanda_simulada.json"
 
-# 2. Restricciones fisicas y de negocio
-MAX_PALLETS = 35                # Capacidad maxima por camion (Bin-packing)
-THRESHOLD_KM_DETOUR = 50       # Desvio maximo permitido para backhauling
+# 2. Restricciones físicas y de negocio (Dinámicas)
+estimator = TruckCapacityEstimator(
+    container_length_m=float(os.getenv("TRAILER_LENGTH", 13.6)),
+    container_width_m=float(os.getenv("TRAILER_WIDTH", 2.4)),
+    container_height_m=float(os.getenv("TRAILER_HEIGHT", 2.7))
+)
+pallet_spec = Pallet(
+    length_m=1.2, 
+    width_m=0.8, 
+    height_m=1.5
+)
+
+# Cálculo dinámico de capacidad real
+cap_info = estimator.capacity(pallet_spec, stackable=False)
+MAX_PALLETS = cap_info["total_pallets"]
+
+THRESHOLD_KM_DETOUR = 50       # Desvío máximo permitido para backhauling
 MAX_RADIUS_KM = 200      
-      # Radio maximo de busqueda alrededor de la planta
-N_CANDIDATOS_PLANTA = 30       # Candidatos por planta (fuerza uso de multiples camiones)
-MAX_SEARCH_TIME = 30            # Tiempo maximo de busqueda del solver (s)
+# Radio máximo de búsqueda alrededor de la planta
+N_CANDIDATOS_PLANTA = 30       # Candidatos por planta (fuerza uso de múltiples camiones)
+MAX_SEARCH_TIME = 30            # Tiempo máximo de búsqueda del solver (s)
 SORTING_STRATEGY = "far_plant_close_depot"
 
 # Motor Geografico: "haversine", "osrm", "google_maps" o "routes_api"
@@ -240,7 +259,69 @@ PLANT_CUSTOMER_LIMITS = None  # O dict con {"CP_ALCALA": 6, ...}
 # =====================================================================
 
 
-def _build_summary(routes, solver):
+def run_optimization(
+    max_pallets=35,
+    threshold_km=50,
+    n_candidatos=30,
+    max_search_time=30,
+    api_type="osrm",
+    flota_por_planta=None,
+    sorting_strategy="far_plant_close_depot",
+    mandatory_customers=None,
+    silent=False
+):
+    """
+    Ejecución modular del optimizador para experimentación paralela o serial.
+    """
+    if not silent:
+        print(f"\n>>> Ejecutando Optimización: Pallets={max_pallets}, Desvío={threshold_km}km, Candidatos={n_candidatos}")
+
+    with open(PLANTS_FILE, 'r', encoding='utf-8') as f:
+        plants_data = json.load(f)
+
+    geo_engine = GeoUtils(api_type=api_type)
+    geo_engine.set_truck_specs(**TRUCK_SPECS)
+
+    dm = DataManager(
+        paper_plant=plants_data['paper_plant'],
+        carton_plants=plants_data['carton_plants'],
+        clients_file=CLIENTS_FILE,
+        geo_utils=geo_engine
+    )
+
+    enriched_data = dm.get_optimized_locations(
+        max_customers_per_plant=None,
+        default_limit=n_candidatos,
+        threshold_km=threshold_km,
+        max_radius_km=MAX_RADIUS_KM,
+        mandatory_customers=mandatory_customers or MANDATORY_CUSTOMERS,
+        sorting_strategy=sorting_strategy,
+        max_pallets=max_pallets
+    )
+
+    # Preparar flota
+    flota_final = {}
+    for p in enriched_data['carton_plants']:
+        p_id = p['id']
+        flota_final[p_id] = (flota_por_planta or FLOTA_POR_PLANTA).get(p_id, 1)
+
+    solver = LogisticsSolver(enriched_data, geo_engine=geo_engine)
+    routes = solver.solve(
+        n_clientes=n_candidatos,
+        varias_plantas=False,
+        max_pallets_ruta=max_pallets,
+        max_search_time=max_search_time,
+        flota_por_planta=flota_final
+    )
+
+    if not routes:
+        return None, None
+
+    summary = _build_summary(routes, solver, max_pallets=max_pallets, threshold_km=threshold_km, n_candidatos=n_candidatos)
+    
+    return routes, summary, solver
+
+def _build_summary(routes, solver, max_pallets=35, threshold_km=50, n_candidatos=30):
     """Genera un JSON de resumen con KPIs por ruta."""
     route_summaries = []
     total_km = 0
@@ -248,8 +329,9 @@ def _build_summary(routes, solver):
     total_co2_kg = 0
     
     co2_estimator = FCREmissionEstimator(
-        fcr_loaded=DEFAULT_CO2_PER_KM,
-        alpha=DEFAULT_ALPHA_FCR
+        co2_per_liter=GLEC_CO2_PER_LITER,
+        intensity_gtkm=GLEC_INTENSITY_GTKM,
+        empty_floor_kgkm=GLEC_EMPTY_FLOOR_KGKM
     )
 
     for i, route in enumerate(routes):
@@ -258,7 +340,6 @@ def _build_summary(routes, solver):
             continue
 
         total_pallets = sum(c.get('demanda_pallets', 0) for c in customer_nodes)
-        
         dist_km = 0
         empty_km = 0
         route_co2_kg = 0
@@ -269,24 +350,18 @@ def _build_summary(routes, solver):
             d = solver.distance_matrix[n1['matrix_idx']][n2['matrix_idx']] / 1000
             dist_km += d
             
-            # Determinar carga actual ANTES de viajar a n2
             if n1['type'] == 'depot':
-                # Tramo Mengibar -> Planta de Cartón (LLeno de papel para backhaul)
                 current_load_kg = PAPER_LOAD_KG
             elif n1['type'] == 'carton_plant':
-                # Tramo Planta -> Primer Cliente (LLeno de pallets de esta ruta)
                 current_load_kg = total_pallets * PALLET_WEIGHT_KG
             elif n1['type'] == 'customer':
-                # Tras dejar pallets en el cliente, la carga se reduce
                 pallets_left = n1.get('demanda_pallets', 0)
                 current_load_kg = max(0, current_load_kg - (pallets_left * PALLET_WEIGHT_KG))
                 
-            # Logica de retorno vacío
             if j == len(route) - 2 and n2['type'] == 'depot':
                 empty_km += d
                 current_load_kg = 0
 
-            # Calcular CO2 para este segmento en función de la carga actual
             leg_co2 = co2_estimator.co2_partial_load(
                 distance_km=d,
                 current_load=current_load_kg,
@@ -299,15 +374,11 @@ def _build_summary(routes, solver):
         route_summaries.append({
             "route_id": len(route_summaries) + 1,
             "plants": [p['name'] for p in plant_nodes],
-            "plant_ids": [p['id'] for p in plant_nodes],
-            "num_plants": len(plant_nodes),
             "num_customers": len(customer_nodes),
-            "customers": [c['name'] for c in customer_nodes],
             "total_pallets": total_pallets,
             "distance_km": round(dist_km, 2),
             "empty_km": round(empty_km, 2),
-            "co2_emissions_kg": round(route_co2_kg, 2),
-            "num_stops": len(route)
+            "co2_emissions_kg": round(route_co2_kg, 2)
         })
         total_km += dist_km
         total_empty_km += empty_km
@@ -318,201 +389,75 @@ def _build_summary(routes, solver):
         "total_km": round(total_km, 2),
         "total_empty_km": round(total_empty_km, 2),
         "total_co2_kg": round(total_co2_kg, 2),
-        "distance_source": "GPS Real" if solver.is_real_road else "Haversine (estimacion)",
         "parameters": {
-            "n_candidatos": N_CANDIDATOS_PLANTA,
-            "max_pallets": MAX_PALLETS,
-            "threshold_km": THRESHOLD_KM_DETOUR,
-            "max_radius_km": MAX_RADIUS_KM,
+            "max_pallets": max_pallets,
+            "threshold_km": threshold_km,
+            "n_candidatos": n_candidatos
         },
         "routes": route_summaries
     }
 
-
 def main():
     print("=====================================================================")
-    print(" LOGISTICS OPTIMIZER - EVALUACION Y DASHBOARD INTEGRADO")
+    print(" LOGISTICS OPTIMIZER - EJECUCION ESTANDAR")
     print("=====================================================================\n")
 
-    if not PLANTS_FILE.exists() or not CLIENTS_FILE.exists():
-        print(f"Error: Archivos de datos insuficientes ({PLANTS_FILE} o {CLIENTS_FILE}).")
-        return
+    print(f"Capacidad Detectada: {MAX_PALLETS} pallets ({cap_info['summary']})")
+    print(f"Configuracion: {'Apilable' if cap_info['stackable'] else 'No Apilable'}\n")
 
-    with open(PLANTS_FILE, 'r', encoding='utf-8') as f:
-        plants_data = json.load(f)
-
-    # 1. Configurar Motor Geografico
-    print(f"[1] Conectando con la API de enrutamiento ({API_TYPE}) para calculos reales de carretera...")
-    geo_engine = GeoUtils(api_type=API_TYPE)
-    geo_engine.set_truck_specs(**TRUCK_SPECS)
-
-    # 2. Auto-Ajuste de Capacidad por clientes obligatorios
-    min_needed_capacity = 0
-    if MANDATORY_CUSTOMERS:
-        for p, custs in MANDATORY_CUSTOMERS.items():
-            num_mand = 1 if isinstance(custs, str) else len(custs)
-            min_needed_capacity = max(min_needed_capacity, num_mand)
-
-    current_n_clientes = N_CANDIDATOS_PLANTA
-    if min_needed_capacity > current_n_clientes:
-        logger.warning("Capacidad insuficiente detectada -- Ajustando N_CANDIDATOS de %d a %d",
-                       current_n_clientes, min_needed_capacity)
-        current_n_clientes = min_needed_capacity
-
-    # 3. Preparacion de Nodos usando DataManager (filtro base + particion de envios)
-    print(f"[2] Filtrando los {current_n_clientes} candidatos mas logicos POR PLANTA mediante DataManager...")
-    dm = DataManager(
-        paper_plant=plants_data['paper_plant'],
-        carton_plants=plants_data['carton_plants'],
-        clients_file=CLIENTS_FILE,
-        geo_utils=geo_engine
-    )
-
-    enriched_data = dm.get_optimized_locations(
-        max_customers_per_plant=PLANT_CUSTOMER_LIMITS,
-        default_limit=current_n_clientes,
+    routes, summary, solver = run_optimization(
+        max_pallets=MAX_PALLETS,
         threshold_km=THRESHOLD_KM_DETOUR,
-        max_radius_km=MAX_RADIUS_KM,
-        mandatory_customers=MANDATORY_CUSTOMERS,
-        sorting_strategy=SORTING_STRATEGY,
-        max_pallets=MAX_PALLETS
-    )
-
-    total_candidatos = sum(len(p.get('customers', [])) for p in enriched_data['carton_plants'])
-    print(f"[3] Nodos encontrados: 1 Deposito, {len(enriched_data['carton_plants'])} Plantas y {total_candidatos} Clientes evaluables.")
-
-    # 4. Preparar la flota final (inyectando defaults)
-    flota_final = {}
-    for p in enriched_data['carton_plants']:
-        p_id = p['id']
-        flota_final[p_id] = FLOTA_POR_PLANTA.get(p_id, 1)
-
-    print(f"[4] Distribucion de la flota activa: {flota_final}")
-
-    # 5. Resolucion VRP con Limite de Pallets
-    print(f"[5] El algoritmo VRP arranca. Objetivo: Minimizar distancia limitando a {MAX_PALLETS} Pallets y respetando la Flota.\n")
-
-    solver = LogisticsSolver(enriched_data, geo_engine=geo_engine)
-    routes = solver.solve(
-        n_clientes=current_n_clientes,
-        varias_plantas=False,
-        max_pallets_ruta=MAX_PALLETS,
-        max_search_time=MAX_SEARCH_TIME,
-        flota_por_planta=flota_final
+        n_candidatos=N_CANDIDATOS_PLANTA,
+        api_type=API_TYPE
     )
 
     if not routes:
-        print("El optimizador no devolvio soluciones.")
+        print("Error en la optimización.")
         return
 
-    print("=" * 70)
-    print(" EXTRACCION DE LOG Y REPORTES")
-    print("=" * 70)
-
-    # Log de clientes descartados
-    if hasattr(solver, 'drop_log_path'):
-        print(f"=> Se ha exportado el reporte de descartes a: {solver.drop_log_path}")
-
-    # 6. Guardar rutas detalladas
+    # 6. Guardar resultados (Compatibilidad con dashboard anterior)
     output_json = RESULTS_DIR / "optimized_routes.json"
     with open(output_json, 'w', encoding='utf-8') as f:
         json.dump(routes, f, indent=2, ensure_ascii=False)
-    print(f"=> Rutas detalladas guardadas en: {output_json}")
-
-    # 7. Generar y guardar resumen de KPIs
-    summary = _build_summary(routes, solver)
+    
     summary_json = RESULTS_DIR / "optimization_summary.json"
     with open(summary_json, 'w', encoding='utf-8') as f:
         json.dump(summary, f, indent=2, ensure_ascii=False)
-    print(f"=> Resumen KPIs guardado en: {summary_json}")
-
-    # 8. Visualizacion avanzada
-    try:
-        visualizer = Visualizer(routes, solver.distance_matrix, geo_utils=solver.geo)
-        map_path = visualizer.create_map("Logistics_Dashboard.html")
-        graph_path = visualizer.create_plotly_graph("Logistics_Graph.html")
-
-        with open(CLIENTS_FILE, 'r', encoding='utf-8') as f:
-            raw_clients = json.load(f)
-        all_clients_list = []
-        for z, dests in raw_clients.items():
-            for d in dests:
-                if "latitude" in d and "longitude" in d:
-                    all_clients_list.append({"name": d.get("municipio_destino", z), "lat": d["latitude"], "lng": d["longitude"]})
-
-        complexity_graph_path = visualizer.create_global_complexity_graph(
-            plants_data['paper_plant'], plants_data['carton_plants'], all_clients_list, "Logistics_Global_Complexity.html"
-        )
-        print(f"=> Mapa interactivo: {map_path}")
-        print(f"=> Grafo optimizado: {graph_path}")
-        print(f"=> Grafo complejidad: {complexity_graph_path}")
-    except Exception as e:
-        logger.warning("No se pudieron generar las visualizaciones avanzadas: %s", e)
 
     # 9. Mapa Folium con rutas OSRM reales
-    m_lat = plants_data['paper_plant']['lat']
-    m_lng = plants_data['paper_plant']['lng']
+    with open(PLANTS_FILE, 'r', encoding='utf-8') as f:
+        plants_data = json.load(f)
+    
+    m_lat, m_lng = plants_data['paper_plant']['lat'], plants_data['paper_plant']['lng']
     mapa = folium.Map(location=[m_lat, m_lng], zoom_start=6, tiles="CartoDB positron")
-
     colores_ruta = ['blue', 'green', 'red', 'purple', 'orange', 'darkred', 'cadetblue']
 
     for i, route in enumerate(routes):
         color_actual = colores_ruta[i % len(colores_ruta)]
-
         for n in route:
-            if n['type'] == 'depot':
-                folium.Marker([n['lat'], n['lng']], popup="MENGIBAR (Depot Papel)", icon=folium.Icon(color='black', icon='home')).add_to(mapa)
-            elif n['type'] == 'carton_plant':
-                folium.Marker([n['lat'], n['lng']], popup=f"PLANTA: {n['name']}", icon=folium.Icon(color='gray', icon='industry', prefix='fa')).add_to(mapa)
-            else:
-                popup_text = f"{n['name']} | Pedido: {n.get('demanda_pallets', 0)} pallets"
-                folium.Marker([n['lat'], n['lng']], popup=popup_text, icon=folium.Icon(color=color_actual)).add_to(mapa)
+            icon = 'home' if n['type'] == 'depot' else ('industry' if n['type'] == 'carton_plant' else 'info-sign')
+            folium.Marker([n['lat'], n['lng']], popup=n['name'], icon=folium.Icon(color=color_actual, icon=icon)).add_to(mapa)
 
         for j in range(len(route) - 1):
-            start_n = route[j]
-            end_n = route[j+1]
-            try:
-                encoded_poly = geo_engine.get_route_polyline((start_n['lat'], start_n['lng']), (end_n['lat'], end_n['lng']))
-                if encoded_poly and encoded_poly != "BILLING_ERROR":
-                    decoded_points = polyline.decode(encoded_poly)
-                    folium.PolyLine(decoded_points, color=color_actual, weight=5, opacity=0.8).add_to(mapa)
-                else:
-                    folium.PolyLine([[start_n['lat'], start_n['lng']], [end_n['lat'], end_n['lng']]], color=color_actual, weight=5, opacity=0.8, dash_array='5, 10').add_to(mapa)
-            except Exception:
-                folium.PolyLine([[start_n['lat'], start_n['lng']], [end_n['lat'], end_n['lng']]], color=color_actual, weight=5, opacity=0.8, dash_array='5, 10').add_to(mapa)
+            s, e = route[j], route[j+1]
+            poly = solver.geo.get_route_polyline((s['lat'], s['lng']), (e['lat'], e['lng']))
+            if poly and poly != "BILLING_ERROR":
+                folium.PolyLine(polyline.decode(poly), color=color_actual, weight=4).add_to(mapa)
+            else:
+                folium.PolyLine([[s['lat'], s['lng']], [e['lat'], e['lng']]], color=color_actual, weight=2, dash_array='5,5').add_to(mapa)
 
-    output_map_html = "mapa_flota_dedicada_folium.html"
-    mapa.save(output_map_html)
-    print(f"=> Mapa de Rutas geolocalizadas: {output_map_html}")
-
-    # 10. Dashboard de Eficiencia por Planta
-    output_dashboard = "logistics_dashboard_pallets.html"
-    generate_logistics_dashboard(routes, solver, output_path=output_dashboard, map_iframe_src=output_map_html, max_pallets=MAX_PALLETS, flota_por_planta=flota_final)
-    print(f"=> Tablero Interactivo (Eficiencia + Mapa): {output_dashboard}")
-
-    # 11. Actualizar Presentacion HTML (Dashboard Global Modular)
+    mapa.save("mapa_flota_dedicada_folium.html")
+    
+    # 10. Actualizar Dashboard Modular (tab_resumen.html)
     presentation_path = "outputs/Presentacion_Logistica.html"
     try:
-        generate_dashboard(summary_json, output_json, presentation_path)
+        generate_dashboard(summary_json, output_json, presentation_path, is_baseline=False)
         print(f"=> Presentacion (Modular) actualizada: {presentation_path}")
     except Exception as e:
         logger.warning("No se pudo actualizar la Presentacion Modular: %s", e)
 
-    # 12. Resumen en consola
-    print("\n" + "=" * 70)
-    print(" RESUMEN DE OPERACION")
-    print("=" * 70)
-    for r in summary['routes']:
-        plants_str = ", ".join(r['plants']) if len(r['plants']) > 1 else r['plants'][0]
-        print(f"  Ruta {r['route_id']}: {plants_str} -> {r['num_customers']} clientes ({r.get('total_pallets', 0)} pallets) -> {r['distance_km']:.2f} km ({r['empty_km']:.2f} km en vacio) | CO2: {r.get('co2_emissions_kg', 0):.2f} kg")
-    print(f"  TOTAL: {summary['total_km']:.2f} km ({summary['total_empty_km']:.2f} km en vacio) en {summary['num_routes']} rutas | CO2 TOTAL: {summary.get('total_co2_kg', 0):.2f} kg")
-
-    print(solver.summary())
-
-    print("\n" + "=" * 70)
-    print(" Proceso finalizado. Puedes abrir el html en cualquier navegador.")
-    print("=" * 70 + "\n")
-
+    print(f"\nTOTAL: {summary['total_km']:.2f} km | CO2: {summary['total_co2_kg']:.2f} kg | Rutas: {summary['num_routes']}")
 
 if __name__ == "__main__":
     main()

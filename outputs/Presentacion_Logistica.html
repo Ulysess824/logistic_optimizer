@@ -37,10 +37,10 @@
             <button class="tab-btn active" onclick="openTab('resumen')">Resumen Ejecutivo</button>
             <button class="tab-btn" onclick="openTab('baseline')">Condiciones Normales</button>
             <button class="tab-btn" onclick="openTab('metodologia')">Metodología</button>
-            <button class="tab-btn" onclick="openTab('resultados')">Detalle Operativo</button>
             <button class="tab-btn" onclick="openTab('mapa')">Mapa Interactivo</button>
             <button class="tab-btn" onclick="openTab('grafo')">Grafos de Red</button>
             <button class="tab-btn" onclick="openTab('simulacion')">Simulación</button>
+            <button class="tab-btn" onclick="openTab('bibliografia')">Bibliografía</button>
         </div>
 
         <!-- Tab Contents (Iframes con Altura Explícita) -->
@@ -56,13 +56,10 @@
             <iframe src="HTML_Bodies/tab_metodologia.html" style="width: 100%; height: 850px;"></iframe>
         </div>
 
-        <div id="resultados" class="tab-content shadow-lg rounded-b-lg bg-white" style="height: 850px;">
-            <iframe src="HTML_Bodies/tab_resultados.html" style="width: 100%; height: 850px;"></iframe>
-        </div>
-
         <div id="mapa" class="tab-content shadow-lg rounded-b-lg bg-white" style="height: 850px;">
             <iframe src="HTML_Bodies/tab_mapa.html" style="width: 100%; height: 850px;"></iframe>
         </div>
+
 
         <div id="grafo" class="tab-content shadow-lg rounded-b-lg bg-white" style="height: 850px;">
             <iframe src="HTML_Bodies/tab_grafo.html" style="width: 100%; height: 850px;"></iframe>
@@ -70,6 +67,10 @@
 
         <div id="simulacion" class="tab-content shadow-lg rounded-b-lg bg-white" style="height: 850px;">
             <iframe src="HTML_Bodies/tab_simulacion.html" style="width: 100%; height: 850px;"></iframe>
+        </div>
+
+        <div id="bibliografia" class="tab-content shadow-lg rounded-b-lg bg-white" style="height: 850px;">
+            <iframe src="HTML_Bodies/tab_bibliografia.html" style="width: 100%; height: 850px;"></iframe>
         </div>
     </div>
 
@@ -100,7 +101,7 @@
 
         // Keyboard navigation
         document.addEventListener('keydown', function(event) {
-            const tabOrder = ['resumen', 'baseline', 'metodologia', 'resultados', 'mapa', 'grafo', 'simulacion'];
+            const tabOrder = ['resumen', 'baseline', 'metodologia', 'mapa', 'grafo', 'simulacion', 'bibliografia'];
             const activeElem = document.querySelector('.tab-content.active');
             if (!activeElem) return;
             

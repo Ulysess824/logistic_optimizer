@@ -3,10 +3,10 @@ import logging
 from pathlib import Path
 
 # Importar modulos del proyecto
-from src.simulation.camion import TruckSimulated
-from src.simulation.animador import AnimadorLogistico
-from src.utils.geo import GeoUtils
-from src.config import DATA_DIR, RESULTS_DIR, OUTPUT_DIR
+from logistic_core.simulation.camion import TruckSimulated
+from logistic_core.simulation.animador import AnimadorLogistico
+from logistic_core.utils.geo import GeoUtils
+from logistic_core.config import DATA_DIR, RESULTS_DIR, OUTPUT_DIR
 
 # Configuración de logs básica para la simulación
 logging.basicConfig(level=logging.INFO, format='%(asctime)s | %(levelname)s | %(message)s')

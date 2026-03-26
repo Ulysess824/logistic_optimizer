@@ -5,8 +5,8 @@ import os
 from pathlib import Path
 import numpy as np
 
-from src.engine.solver import LogisticsSolver
-from src.utils.data_manager import DataManager
+from logistic_core.engine.solver import LogisticsSolver
+from logistic_core.utils.data_manager import DataManager
 from stress_test_full.report_generator import generate_stress_html
 
 def get_memory_usage():

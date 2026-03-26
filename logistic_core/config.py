@@ -32,12 +32,23 @@ DEFAULT_MAX_PLANTS_PER_ROUTE = 1  # Plantas por ruta (1=VRPB clásico, >1=MC-VRP
 DEFAULT_MAX_CUSTOMERS = 4     # Valor de respaldo si no se define N_CLIENTES o un dict
 DEFAULT_THRESHOLD_KM = 100    # Umbral de desvío en km para filtro de retorno
 
-# Emisiones y Pesos (Modelo FCR Xiao et al.)
-DEFAULT_CO2_PER_KM = 1.57        # kg CO2/km a plena carga
-DEFAULT_ALPHA_FCR = 0.5          # Ratio de consumo vacío/cargado
+# Emisiones y Pesos (Modelo GLEC v3.0 / VECTO Euro VI)
+# Referencia: [DOI: 10.1016/j.trd.2019.08.002] (Grigoratos et al. 2019)
+GLEC_CO2_PER_LITER = 2.68        # kg CO2/L (Estándar GLEC v3 Diesel)
+GLEC_INTENSITY_GTKM = 17.32      # g CO2/tkm incremental (40t truck)
+GLEC_EMPTY_FLOOR_KGKM = 0.652    # kg CO2/km suelo vacío (Euro VI)
 PAPER_LOAD_KG = 25_000           # Carga de bobinas PP -> CP (kg)
 PALLET_WEIGHT_KG = 145           # Peso promedio por pallet (kg)
 VEHICLE_MAX_LOAD_KG = 25_000     # Capacidad máxima del vehículo (kg)para cálculo ratio FCR
+
+# --- Dimensiones Físicas (Capacidad 3D) ---
+TRAILER_LENGTH_M = 13.6
+TRAILER_WIDTH_M = 2.4
+TRAILER_HEIGHT_M = 2.7
+PALLET_LENGTH_M = 1.2
+PALLET_WIDTH_M = 0.8
+PALLET_HEIGHT_M = 1.5
+LOAD_STACKABLE = False           # Por defecto la carga no es apilable
 
 # Create folders if they don't exist
 for folder in [OUTPUT_DIR, RESULTS_DIR, MAPS_DIR, LOGS_DIR]:

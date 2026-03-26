@@ -1,0 +1,396 @@
+
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <script src="https://cdn.tailwindcss.com"></script>
+        <title>Laboratorio de Optimización Logística - 20 Pruebas</title>
+        <style>
+            .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+            .sidebar-item.active { background-color: #2563eb; color: white; }
+            ::-webkit-scrollbar { width: 6px; }
+            ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        </style>
+    </head>
+    <body class="bg-slate-900 text-slate-800 font-sans h-screen flex overflow-hidden">
+        
+        <!-- Sidebar -->
+        <div class="w-64 bg-slate-800 text-slate-300 flex flex-col shadow-xl">
+            <div class="p-6 border-b border-slate-700">
+                <h1 class="text-xl font-bold text-white tracking-tight">LOGI-LAB <span class="text-blue-400">VRP</span></h1>
+                <p class="text-[10px] uppercase tracking-widest text-slate-500 mt-1">20 Escenarios de Prueba</p>
+            </div>
+            <div class="flex-1 overflow-y-auto p-4 space-y-2" id="sidebar-list">
+                <!-- Se poblará por JS -->
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-y-auto bg-slate-50">
+            
+            <!-- Header / Leaderboard -->
+            <div class="p-8">
+                <div class="flex justify-between items-end mb-6">
+                    <div>
+                        <h2 class="text-3xl font-black text-slate-900">Métricas Comparativas</h2>
+                        <p class="text-slate-500">Ranking de eficiencia basado en distancia total recorrida.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-8">
+                    <table class="w-full text-left">
+                        <thead class="bg-slate-50 text-slate-400 text-[10px] uppercase tracking-wider font-bold">
+                            <tr>
+                                <th class="px-4 py-4">Test ID</th>
+                                <th class="px-4 py-4">Capacidad</th>
+                                <th class="px-4 py-4">Desvío</th>
+                                <th class="px-4 py-4">Candidatos</th>
+                                <th class="px-4 py-4">Distancia Total</th>
+                                <th class="px-4 py-4">CO2 Estimado</th>
+                                <th class="px-4 py-4 text-center">Flota</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 text-sm">
+                            
+        <tr onclick="showTest(9)" style="cursor:pointer;" class="hover:bg-blue-50 transition-colors">
+            <td class="px-4 py-2 font-bold text-blue-600">#9</td>
+            <td class="px-4 py-2">45 P</td>
+            <td class="px-4 py-2">50 km</td>
+            <td class="px-4 py-2">45</td>
+            <td class="px-4 py-2 font-mono">721.52 km</td>
+            <td class="px-4 py-2 font-mono text-purple-600">871.07 kg</td>
+            <td class="px-4 py-2 text-center"><span class="bg-gray-100 px-2 py-1 rounded text-xs">2 rutas</span></td>
+        </tr>
+        
+        <tr onclick="showTest(14)" style="cursor:pointer;" class="hover:bg-blue-50 transition-colors">
+            <td class="px-4 py-2 font-bold text-blue-600">#14</td>
+            <td class="px-4 py-2">35 P</td>
+            <td class="px-4 py-2">100 km</td>
+            <td class="px-4 py-2">50</td>
+            <td class="px-4 py-2 font-mono">721.52 km</td>
+            <td class="px-4 py-2 font-mono text-purple-600">871.07 kg</td>
+            <td class="px-4 py-2 text-center"><span class="bg-gray-100 px-2 py-1 rounded text-xs">2 rutas</span></td>
+        </tr>
+        
+        <tr onclick="showTest(19)" style="cursor:pointer;" class="hover:bg-blue-50 transition-colors">
+            <td class="px-4 py-2 font-bold text-blue-600">#19</td>
+            <td class="px-4 py-2">35 P</td>
+            <td class="px-4 py-2">45 km</td>
+            <td class="px-4 py-2">40</td>
+            <td class="px-4 py-2 font-mono">721.52 km</td>
+            <td class="px-4 py-2 font-mono text-purple-600">871.07 kg</td>
+            <td class="px-4 py-2 text-center"><span class="bg-gray-100 px-2 py-1 rounded text-xs">2 rutas</span></td>
+        </tr>
+        
+        <tr onclick="showTest(2)" style="cursor:pointer;" class="hover:bg-blue-50 transition-colors">
+            <td class="px-4 py-2 font-bold text-blue-600">#2</td>
+            <td class="px-4 py-2">35 P</td>
+            <td class="px-4 py-2">20 km</td>
+            <td class="px-4 py-2">30</td>
+            <td class="px-4 py-2 font-mono">2,422.35 km</td>
+            <td class="px-4 py-2 font-mono text-purple-600">2,912.86 kg</td>
+            <td class="px-4 py-2 text-center"><span class="bg-gray-100 px-2 py-1 rounded text-xs">5 rutas</span></td>
+        </tr>
+        
+        <tr onclick="showTest(3)" style="cursor:pointer;" class="hover:bg-blue-50 transition-colors">
+            <td class="px-4 py-2 font-bold text-blue-600">#3</td>
+            <td class="px-4 py-2">35 P</td>
+            <td class="px-4 py-2">80 km</td>
+            <td class="px-4 py-2">30</td>
+            <td class="px-4 py-2 font-mono">2,422.35 km</td>
+            <td class="px-4 py-2 font-mono text-purple-600">2,912.86 kg</td>
+            <td class="px-4 py-2 text-center"><span class="bg-gray-100 px-2 py-1 rounded text-xs">5 rutas</span></td>
+        </tr>
+        
+        <tr onclick="showTest(4)" style="cursor:pointer;" class="hover:bg-blue-50 transition-colors">
+            <td class="px-4 py-2 font-bold text-blue-600">#4</td>
+            <td class="px-4 py-2">28 P</td>
+            <td class="px-4 py-2">50 km</td>
+            <td class="px-4 py-2">30</td>
+            <td class="px-4 py-2 font-mono">2,422.35 km</td>
+            <td class="px-4 py-2 font-mono text-purple-600">2,911.59 kg</td>
+            <td class="px-4 py-2 text-center"><span class="bg-gray-100 px-2 py-1 rounded text-xs">5 rutas</span></td>
+        </tr>
+        
+        <tr onclick="showTest(5)" style="cursor:pointer;" class="hover:bg-blue-50 transition-colors">
+            <td class="px-4 py-2 font-bold text-blue-600">#5</td>
+            <td class="px-4 py-2">32 P</td>
+            <td class="px-4 py-2">50 km</td>
+            <td class="px-4 py-2">30</td>
+            <td class="px-4 py-2 font-mono">2,422.35 km</td>
+            <td class="px-4 py-2 font-mono text-purple-600">2,912.6 kg</td>
+            <td class="px-4 py-2 text-center"><span class="bg-gray-100 px-2 py-1 rounded text-xs">5 rutas</span></td>
+        </tr>
+        
+        <tr onclick="showTest(6)" style="cursor:pointer;" class="hover:bg-blue-50 transition-colors">
+            <td class="px-4 py-2 font-bold text-blue-600">#6</td>
+            <td class="px-4 py-2">38 P</td>
+            <td class="px-4 py-2">50 km</td>
+            <td class="px-4 py-2">30</td>
+            <td class="px-4 py-2 font-mono">2,422.35 km</td>
+            <td class="px-4 py-2 font-mono text-purple-600">2,912.86 kg</td>
+            <td class="px-4 py-2 text-center"><span class="bg-gray-100 px-2 py-1 rounded text-xs">5 rutas</span></td>
+        </tr>
+        
+        <tr onclick="showTest(11)" style="cursor:pointer;" class="hover:bg-blue-50 transition-colors">
+            <td class="px-4 py-2 font-bold text-blue-600">#11</td>
+            <td class="px-4 py-2">30 P</td>
+            <td class="px-4 py-2">60 km</td>
+            <td class="px-4 py-2">25</td>
+            <td class="px-4 py-2 font-mono">2,422.35 km</td>
+            <td class="px-4 py-2 font-mono text-purple-600">2,912.1 kg</td>
+            <td class="px-4 py-2 text-center"><span class="bg-gray-100 px-2 py-1 rounded text-xs">5 rutas</span></td>
+        </tr>
+        
+        <tr onclick="showTest(12)" style="cursor:pointer;" class="hover:bg-blue-50 transition-colors">
+            <td class="px-4 py-2 font-bold text-blue-600">#12</td>
+            <td class="px-4 py-2">40 P</td>
+            <td class="px-4 py-2">40 km</td>
+            <td class="px-4 py-2">35</td>
+            <td class="px-4 py-2 font-mono">2,422.35 km</td>
+            <td class="px-4 py-2 font-mono text-purple-600">2,912.86 kg</td>
+            <td class="px-4 py-2 text-center"><span class="bg-gray-100 px-2 py-1 rounded text-xs">5 rutas</span></td>
+        </tr>
+        
+        <tr onclick="showTest(15)" style="cursor:pointer;" class="hover:bg-blue-50 transition-colors">
+            <td class="px-4 py-2 font-bold text-blue-600">#15</td>
+            <td class="px-4 py-2">33 P</td>
+            <td class="px-4 py-2">40 km</td>
+            <td class="px-4 py-2">30</td>
+            <td class="px-4 py-2 font-mono">2,422.35 km</td>
+            <td class="px-4 py-2 font-mono text-purple-600">2,912.86 kg</td>
+            <td class="px-4 py-2 text-center"><span class="bg-gray-100 px-2 py-1 rounded text-xs">5 rutas</span></td>
+        </tr>
+        
+        <tr onclick="showTest(16)" style="cursor:pointer;" class="hover:bg-blue-50 transition-colors">
+            <td class="px-4 py-2 font-bold text-blue-600">#16</td>
+            <td class="px-4 py-2">33 P</td>
+            <td class="px-4 py-2">60 km</td>
+            <td class="px-4 py-2">30</td>
+            <td class="px-4 py-2 font-mono">2,422.35 km</td>
+            <td class="px-4 py-2 font-mono text-purple-600">2,912.86 kg</td>
+            <td class="px-4 py-2 text-center"><span class="bg-gray-100 px-2 py-1 rounded text-xs">5 rutas</span></td>
+        </tr>
+        
+        <tr onclick="showTest(17)" style="cursor:pointer;" class="hover:bg-blue-50 transition-colors">
+            <td class="px-4 py-2 font-bold text-blue-600">#17</td>
+            <td class="px-4 py-2">25 P</td>
+            <td class="px-4 py-2">50 km</td>
+            <td class="px-4 py-2">30</td>
+            <td class="px-4 py-2 font-mono">2,422.35 km</td>
+            <td class="px-4 py-2 font-mono text-purple-600">2,908.98 kg</td>
+            <td class="px-4 py-2 text-center"><span class="bg-gray-100 px-2 py-1 rounded text-xs">5 rutas</span></td>
+        </tr>
+        
+        <tr onclick="showTest(1)" style="cursor:pointer;" class="hover:bg-blue-50 transition-colors">
+            <td class="px-4 py-2 font-bold text-blue-600">#1</td>
+            <td class="px-4 py-2">35 P</td>
+            <td class="px-4 py-2">50 km</td>
+            <td class="px-4 py-2">30</td>
+            <td class="px-4 py-2 font-mono">2,517.0 km</td>
+            <td class="px-4 py-2 font-mono text-purple-600">3,004.64 kg</td>
+            <td class="px-4 py-2 text-center"><span class="bg-gray-100 px-2 py-1 rounded text-xs">5 rutas</span></td>
+        </tr>
+        
+        <tr onclick="showTest(18)" style="cursor:pointer;" class="hover:bg-blue-50 transition-colors">
+            <td class="px-4 py-2 font-bold text-blue-600">#18</td>
+            <td class="px-4 py-2">45 P</td>
+            <td class="px-4 py-2">50 km</td>
+            <td class="px-4 py-2">30</td>
+            <td class="px-4 py-2 font-mono">2,552.67 km</td>
+            <td class="px-4 py-2 font-mono text-purple-600">3,051.35 kg</td>
+            <td class="px-4 py-2 text-center"><span class="bg-gray-100 px-2 py-1 rounded text-xs">5 rutas</span></td>
+        </tr>
+        
+        <tr onclick="showTest(8)" style="cursor:pointer;" class="hover:bg-blue-50 transition-colors">
+            <td class="px-4 py-2 font-bold text-blue-600">#8</td>
+            <td class="px-4 py-2">35 P</td>
+            <td class="px-4 py-2">50 km</td>
+            <td class="px-4 py-2">20</td>
+            <td class="px-4 py-2 font-mono">23,305.48 km</td>
+            <td class="px-4 py-2 font-mono text-purple-600">27,775.75 kg</td>
+            <td class="px-4 py-2 text-center"><span class="bg-gray-100 px-2 py-1 rounded text-xs">33 rutas</span></td>
+        </tr>
+        
+        <tr onclick="showTest(10)" style="cursor:pointer;" class="hover:bg-blue-50 transition-colors">
+            <td class="px-4 py-2 font-bold text-blue-600">#10</td>
+            <td class="px-4 py-2">30 P</td>
+            <td class="px-4 py-2">30 km</td>
+            <td class="px-4 py-2">20</td>
+            <td class="px-4 py-2 font-mono">26,430.09 km</td>
+            <td class="px-4 py-2 font-mono text-purple-600">31,495.87 kg</td>
+            <td class="px-4 py-2 text-center"><span class="bg-gray-100 px-2 py-1 rounded text-xs">38 rutas</span></td>
+        </tr>
+        
+        <tr onclick="showTest(13)" style="cursor:pointer;" class="hover:bg-blue-50 transition-colors">
+            <td class="px-4 py-2 font-bold text-blue-600">#13</td>
+            <td class="px-4 py-2">35 P</td>
+            <td class="px-4 py-2">15 km</td>
+            <td class="px-4 py-2">15</td>
+            <td class="px-4 py-2 font-mono">26,455.12 km</td>
+            <td class="px-4 py-2 font-mono text-purple-600">31,606.06 kg</td>
+            <td class="px-4 py-2 text-center"><span class="bg-gray-100 px-2 py-1 rounded text-xs">38 rutas</span></td>
+        </tr>
+        
+        <tr onclick="showTest(20)" style="cursor:pointer;" class="hover:bg-blue-50 transition-colors">
+            <td class="px-4 py-2 font-bold text-blue-600">#20</td>
+            <td class="px-4 py-2">35 P</td>
+            <td class="px-4 py-2">55 km</td>
+            <td class="px-4 py-2">15</td>
+            <td class="px-4 py-2 font-mono">26,797.26 km</td>
+            <td class="px-4 py-2 font-mono text-purple-600">31,988.23 kg</td>
+            <td class="px-4 py-2 text-center"><span class="bg-gray-100 px-2 py-1 rounded text-xs">38 rutas</span></td>
+        </tr>
+        
+        <tr onclick="showTest(7)" style="cursor:pointer;" class="hover:bg-blue-50 transition-colors">
+            <td class="px-4 py-2 font-bold text-blue-600">#7</td>
+            <td class="px-4 py-2">35 P</td>
+            <td class="px-4 py-2">50 km</td>
+            <td class="px-4 py-2">10</td>
+            <td class="px-4 py-2 font-mono">26,903.01 km</td>
+            <td class="px-4 py-2 font-mono text-purple-600">32,081.24 kg</td>
+            <td class="px-4 py-2 text-center"><span class="bg-gray-100 px-2 py-1 rounded text-xs">38 rutas</span></td>
+        </tr>
+        
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Experiment Viewer -->
+                <div id="viewer" class="grid grid-cols-1 lg:grid-cols-3 gap-8 pb-12">
+                    
+                    <!-- KPIs Section -->
+                    <div class="lg:col-span-1 space-y-6">
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 shadow-blue-100/50">
+                            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4" id="test-title">Detalle del Test</h3>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="bg-slate-50 p-4 rounded-xl">
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase">Distancia</p>
+                                    <p class="text-xl font-black text-blue-600" id="stat-dist">-</p>
+                                </div>
+                                <div class="bg-slate-50 p-4 rounded-xl">
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase">CO2 (kg)</p>
+                                    <p class="text-xl font-black text-purple-600" id="stat-co2">-</p>
+                                </div>
+                                <div class="bg-slate-50 p-4 rounded-xl">
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase">Rutas</p>
+                                    <p class="text-xl font-black text-slate-800" id="stat-routes">-</p>
+                                </div>
+                                <div class="bg-slate-50 p-4 rounded-xl">
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase">Promedio Km</p>
+                                    <p class="text-xl font-black text-slate-800" id="stat-avg">-</p>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-6 pt-6 border-t border-slate-100">
+                                <p class="text-[11px] font-bold text-slate-800 mb-2">Parámetros de Entrada:</p>
+                                <ul class="text-xs space-y-1 text-slate-500" id="param-list">
+                                    <!-- JS -->
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Map Section -->
+                    <div class="lg:col-span-2">
+                        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-2 h-[500px] overflow-hidden relative">
+                            <iframe id="map-iframe" src="" class="w-full h-full rounded-xl bg-slate-100 border-0"></iframe>
+                            <div class="absolute top-4 right-4 bg-white/80 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold shadow-sm border border-slate-200">MAPA INTERACTIVO</div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Technical Section: GLS -->
+                <div class="mt-12 bg-slate-900 rounded-3xl p-8 border border-slate-800 shadow-2xl">
+                    <div class="flex items-center gap-4 mb-6 border-b border-slate-800 pb-4">
+                        <div class="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                        </div>
+                        <div>
+                            <h3 class="text-white font-bold text-lg">Análisis Técnico: Algoritmo GLS (Guided Local Search)</h3>
+                            <p class="text-slate-500 text-[10px] uppercase tracking-widest uppercase">Basado en: Voudouris & Tsang (1999)</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="space-y-4">
+                            <h4 class="text-blue-400 text-xs font-bold uppercase tracking-wider">1. Función de Objetivo Aumentada (h)</h4>
+                            <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800 text-center shadow-inner">
+                                <code class="text-xl text-white font-mono italic">h(s) = g(s) + &lambda; &middot; &sum; (p<sub>i</sub> &middot; I<sub>i</sub>(s))</code>
+                            </div>
+                            <ul class="text-[11px] space-y-2 text-slate-400 list-disc list-inside">
+                                <li><span class="text-slate-200">g(s):</span> Coste base (Distancia real en km).</li>
+                                <li><span class="text-slate-200">&lambda;:</span> Hiper-parámetro de regularización de penalización.</li>
+                                <li><span class="text-slate-200">p<sub>i</sub>:</span> Penalización acumulada por el arco (i).</li>
+                                <li><span class="text-slate-200">I<sub>i</sub>(s):</span> Binario (1 si el arco está presente en la solución).</li>
+                            </ul>
+                        </div>
+
+                        <div class="space-y-4">
+                            <h4 class="text-amber-400 text-xs font-bold uppercase tracking-wider">2. Criterio de Perturbación (Utilidad)</h4>
+                            <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800 text-center shadow-inner">
+                                <code class="text-xl text-white font-mono italic">Util(s, i) = c<sub>i</sub>(s) / (1 + p<sub>i</sub>)</code>
+                            </div>
+                            <p class="text-[11px] text-slate-400 leading-relaxed">
+                                Tras alcanzar un óptimo local, el algoritmo penaliza los arcos con mayor <span class="text-slate-200 italic font-medium">coste de transporte (c<sub>i</sub>)</span> 
+                                que tienen bajas penalizaciones previas. Esto genera un gradiente sintético que "expulsa" al 
+                                solver de cuencas de atracción sub-óptimas, facilitando la búsqueda de mejores consolidaciones de flota.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <script>
+            const data = {"1": {"id": 1, "params": {"pallets": 35, "threshold": 50, "candidates": 30}, "stats": {"num_routes": 5, "total_km": 2517.0, "total_empty_km": 566.88, "total_co2_kg": 3004.64, "parameters": {"max_pallets": 35, "threshold_km": 50, "n_candidatos": 30}, "routes": [{"route_id": 1, "plants": ["Alcal\u00e1"], "num_customers": 2, "total_pallets": 33, "distance_km": 660.84, "empty_km": 111.99, "co2_emissions_kg": 772.33}, {"route_id": 2, "plants": ["Alcal\u00e1 (Muelle 2)"], "num_customers": 1, "total_pallets": 22, "distance_km": 561.28, "empty_km": 138.82, "co2_emissions_kg": 675.1}, {"route_id": 3, "plants": ["Alcal\u00e1 (Muelle 3)"], "num_customers": 1, "total_pallets": 21, "distance_km": 578.12, "empty_km": 147.35, "co2_emissions_kg": 688.47}, {"route_id": 4, "plants": ["Alcal\u00e1 (Muelle 4)"], "num_customers": 1, "total_pallets": 28, "distance_km": 561.43, "empty_km": 145.88, "co2_emissions_kg": 678.21}, {"route_id": 5, "plants": ["C\u00f3rdoba"], "num_customers": 1, "total_pallets": 33, "distance_km": 155.33, "empty_km": 22.84, "co2_emissions_kg": 190.51}]}, "map_url": "outputs/experiments/map_test_1.html"}, "2": {"id": 2, "params": {"pallets": 35, "threshold": 20, "candidates": 30}, "stats": {"num_routes": 5, "total_km": 2422.35, "total_empty_km": 566.88, "total_co2_kg": 2912.86, "parameters": {"max_pallets": 35, "threshold_km": 20, "n_candidatos": 30}, "routes": [{"route_id": 1, "plants": ["Alcal\u00e1"], "num_customers": 1, "total_pallets": 20, "distance_km": 566.19, "empty_km": 111.99, "co2_emissions_kg": 680.56}, {"route_id": 2, "plants": ["Alcal\u00e1 (Muelle 2)"], "num_customers": 1, "total_pallets": 22, "distance_km": 561.28, "empty_km": 138.82, "co2_emissions_kg": 675.1}, {"route_id": 3, "plants": ["Alcal\u00e1 (Muelle 3)"], "num_customers": 1, "total_pallets": 21, "distance_km": 578.12, "empty_km": 147.35, "co2_emissions_kg": 688.47}, {"route_id": 4, "plants": ["Alcal\u00e1 (Muelle 4)"], "num_customers": 1, "total_pallets": 28, "distance_km": 561.43, "empty_km": 145.88, "co2_emissions_kg": 678.21}, {"route_id": 5, "plants": ["C\u00f3rdoba"], "num_customers": 1, "total_pallets": 33, "distance_km": 155.33, "empty_km": 22.84, "co2_emissions_kg": 190.51}]}, "map_url": "outputs/experiments/map_test_2.html"}, "3": {"id": 3, "params": {"pallets": 35, "threshold": 80, "candidates": 30}, "stats": {"num_routes": 5, "total_km": 2422.35, "total_empty_km": 566.88, "total_co2_kg": 2912.86, "parameters": {"max_pallets": 35, "threshold_km": 80, "n_candidatos": 30}, "routes": [{"route_id": 1, "plants": ["Alcal\u00e1"], "num_customers": 1, "total_pallets": 20, "distance_km": 566.19, "empty_km": 111.99, "co2_emissions_kg": 680.56}, {"route_id": 2, "plants": ["Alcal\u00e1 (Muelle 2)"], "num_customers": 1, "total_pallets": 22, "distance_km": 561.28, "empty_km": 138.82, "co2_emissions_kg": 675.1}, {"route_id": 3, "plants": ["Alcal\u00e1 (Muelle 3)"], "num_customers": 1, "total_pallets": 21, "distance_km": 578.12, "empty_km": 147.35, "co2_emissions_kg": 688.47}, {"route_id": 4, "plants": ["Alcal\u00e1 (Muelle 4)"], "num_customers": 1, "total_pallets": 28, "distance_km": 561.43, "empty_km": 145.88, "co2_emissions_kg": 678.21}, {"route_id": 5, "plants": ["C\u00f3rdoba"], "num_customers": 1, "total_pallets": 33, "distance_km": 155.33, "empty_km": 22.84, "co2_emissions_kg": 190.51}]}, "map_url": "outputs/experiments/map_test_3.html"}, "4": {"id": 4, "params": {"pallets": 28, "threshold": 50, "candidates": 30}, "stats": {"num_routes": 5, "total_km": 2422.35, "total_empty_km": 566.88, "total_co2_kg": 2911.59, "parameters": {"max_pallets": 28, "threshold_km": 50, "n_candidatos": 30}, "routes": [{"route_id": 1, "plants": ["Alcal\u00e1"], "num_customers": 1, "total_pallets": 20, "distance_km": 566.19, "empty_km": 111.99, "co2_emissions_kg": 680.56}, {"route_id": 2, "plants": ["Alcal\u00e1 (Muelle 2)"], "num_customers": 1, "total_pallets": 22, "distance_km": 561.28, "empty_km": 138.82, "co2_emissions_kg": 675.1}, {"route_id": 3, "plants": ["Alcal\u00e1 (Muelle 3)"], "num_customers": 1, "total_pallets": 21, "distance_km": 578.12, "empty_km": 147.35, "co2_emissions_kg": 688.47}, {"route_id": 4, "plants": ["Alcal\u00e1 (Muelle 4)"], "num_customers": 1, "total_pallets": 28, "distance_km": 561.43, "empty_km": 145.88, "co2_emissions_kg": 678.21}, {"route_id": 5, "plants": ["C\u00f3rdoba"], "num_customers": 1, "total_pallets": 28, "distance_km": 155.33, "empty_km": 22.84, "co2_emissions_kg": 189.24}]}, "map_url": "outputs/experiments/map_test_4.html"}, "5": {"id": 5, "params": {"pallets": 32, "threshold": 50, "candidates": 30}, "stats": {"num_routes": 5, "total_km": 2422.35, "total_empty_km": 566.88, "total_co2_kg": 2912.6, "parameters": {"max_pallets": 32, "threshold_km": 50, "n_candidatos": 30}, "routes": [{"route_id": 1, "plants": ["Alcal\u00e1"], "num_customers": 1, "total_pallets": 20, "distance_km": 566.19, "empty_km": 111.99, "co2_emissions_kg": 680.56}, {"route_id": 2, "plants": ["Alcal\u00e1 (Muelle 2)"], "num_customers": 1, "total_pallets": 22, "distance_km": 561.28, "empty_km": 138.82, "co2_emissions_kg": 675.1}, {"route_id": 3, "plants": ["Alcal\u00e1 (Muelle 3)"], "num_customers": 1, "total_pallets": 21, "distance_km": 578.12, "empty_km": 147.35, "co2_emissions_kg": 688.47}, {"route_id": 4, "plants": ["Alcal\u00e1 (Muelle 4)"], "num_customers": 1, "total_pallets": 28, "distance_km": 561.43, "empty_km": 145.88, "co2_emissions_kg": 678.21}, {"route_id": 5, "plants": ["C\u00f3rdoba"], "num_customers": 1, "total_pallets": 32, "distance_km": 155.33, "empty_km": 22.84, "co2_emissions_kg": 190.25}]}, "map_url": "outputs/experiments/map_test_5.html"}, "6": {"id": 6, "params": {"pallets": 38, "threshold": 50, "candidates": 30}, "stats": {"num_routes": 5, "total_km": 2422.35, "total_empty_km": 566.88, "total_co2_kg": 2912.86, "parameters": {"max_pallets": 38, "threshold_km": 50, "n_candidatos": 30}, "routes": [{"route_id": 1, "plants": ["Alcal\u00e1"], "num_customers": 1, "total_pallets": 20, "distance_km": 566.19, "empty_km": 111.99, "co2_emissions_kg": 680.56}, {"route_id": 2, "plants": ["Alcal\u00e1 (Muelle 2)"], "num_customers": 1, "total_pallets": 22, "distance_km": 561.28, "empty_km": 138.82, "co2_emissions_kg": 675.1}, {"route_id": 3, "plants": ["Alcal\u00e1 (Muelle 3)"], "num_customers": 1, "total_pallets": 21, "distance_km": 578.12, "empty_km": 147.35, "co2_emissions_kg": 688.47}, {"route_id": 4, "plants": ["Alcal\u00e1 (Muelle 4)"], "num_customers": 1, "total_pallets": 28, "distance_km": 561.43, "empty_km": 145.88, "co2_emissions_kg": 678.21}, {"route_id": 5, "plants": ["C\u00f3rdoba"], "num_customers": 1, "total_pallets": 33, "distance_km": 155.33, "empty_km": 22.84, "co2_emissions_kg": 190.51}]}, "map_url": "outputs/experiments/map_test_6.html"}, "7": {"id": 7, "params": {"pallets": 35, "threshold": 50, "candidates": 10}, "stats": {"num_routes": 38, "total_km": 26903.01, "total_empty_km": 8523.14, "total_co2_kg": 32081.24, "parameters": {"max_pallets": 35, "threshold_km": 50, "n_candidatos": 10}, "routes": [{"route_id": 1, "plants": ["Alcal\u00e1"], "num_customers": 1, "total_pallets": 20, "distance_km": 566.19, "empty_km": 111.99, "co2_emissions_kg": 680.56}, {"route_id": 2, "plants": ["Alcal\u00e1 (Muelle 2)"], "num_customers": 2, "total_pallets": 33, "distance_km": 580.76, "empty_km": 138.82, "co2_emissions_kg": 698.46}, {"route_id": 3, "plants": ["Alcal\u00e1 (Muelle 3)"], "num_customers": 1, "total_pallets": 28, "distance_km": 561.43, "empty_km": 145.88, "co2_emissions_kg": 678.21}, {"route_id": 4, "plants": ["Alcal\u00e1 (Muelle 4)"], "num_customers": 2, "total_pallets": 34, "distance_km": 615.45, "empty_km": 147.35, "co2_emissions_kg": 730.2}, {"route_id": 5, "plants": ["Alicante"], "num_customers": 2, "total_pallets": 30, "distance_km": 598.63, "empty_km": 168.61, "co2_emissions_kg": 713.55}, {"route_id": 6, "plants": ["Alicante (Muelle 2)"], "num_customers": 1, "total_pallets": 26, "distance_km": 581.86, "empty_km": 186.83, "co2_emissions_kg": 696.01}, {"route_id": 7, "plants": ["Alicante (Muelle 3)"], "num_customers": 2, "total_pallets": 35, "distance_km": 626.28, "empty_km": 209.73, "co2_emissions_kg": 738.33}, {"route_id": 8, "plants": ["Alicante (Muelle 4)"], "num_customers": 1, "total_pallets": 31, "distance_km": 606.6, "empty_km": 188.19, "co2_emissions_kg": 721.15}, {"route_id": 9, "plants": ["Alicante (Muelle 5)"], "num_customers": 1, "total_pallets": 22, "distance_km": 607.34, "empty_km": 191.57, "co2_emissions_kg": 716.15}, {"route_id": 10, "plants": ["C\u00f3rdoba"], "num_customers": 1, "total_pallets": 33, "distance_km": 155.33, "empty_km": 22.84, "co2_emissions_kg": 190.51}, {"route_id": 11, "plants": ["C\u00f3rdoba (Muelle 2)"], "num_customers": 1, "total_pallets": 30, "distance_km": 154.22, "empty_km": 1.43, "co2_emissions_kg": 191.65}, {"route_id": 12, "plants": ["C\u00f3rdoba (Muelle 3)"], "num_customers": 1, "total_pallets": 28, "distance_km": 153.94, "empty_km": 10.43, "co2_emissions_kg": 189.56}, {"route_id": 13, "plants": ["Huelva"], "num_customers": 2, "total_pallets": 35, "distance_km": 533.53, "empty_km": 96.49, "co2_emissions_kg": 643.16}, {"route_id": 14, "plants": ["Huelva (Muelle 2)"], "num_customers": 2, "total_pallets": 34, "distance_km": 509.91, "empty_km": 95.08, "co2_emissions_kg": 622.13}, {"route_id": 15, "plants": ["Huelva (Muelle 3)"], "num_customers": 1, "total_pallets": 29, "distance_km": 515.4, "empty_km": 107.64, "co2_emissions_kg": 622.29}, {"route_id": 16, "plants": ["Huelva (Muelle 4)"], "num_customers": 1, "total_pallets": 22, "distance_km": 505.38, "empty_km": 102.89, "co2_emissions_kg": 608.9}, {"route_id": 17, "plants": ["Huelva (Muelle 5)"], "num_customers": 1, "total_pallets": 32, "distance_km": 516.87, "empty_km": 107.28, "co2_emissions_kg": 625.85}, {"route_id": 18, "plants": ["Burgos"], "num_customers": 1, "total_pallets": 28, "distance_km": 981.41, "empty_km": 394.5, "co2_emissions_kg": 1166.04}, {"route_id": 19, "plants": ["Burgos (Muelle 2)"], "num_customers": 1, "total_pallets": 33, "distance_km": 978.82, "empty_km": 398.61, "co2_emissions_kg": 1165.26}, {"route_id": 20, "plants": ["Burgos (Muelle 3)"], "num_customers": 2, "total_pallets": 35, "distance_km": 986.29, "empty_km": 403.01, "co2_emissions_kg": 1171.86}, {"route_id": 21, "plants": ["Burgos (Muelle 4)"], "num_customers": 2, "total_pallets": 32, "distance_km": 1114.52, "empty_km": 397.13, "co2_emissions_kg": 1279.34}, {"route_id": 22, "plants": ["Navarra"], "num_customers": 2, "total_pallets": 35, "distance_km": 1142.24, "empty_km": 504.34, "co2_emissions_kg": 1350.38}, {"route_id": 23, "plants": ["Navarra (Muelle 2)"], "num_customers": 2, "total_pallets": 35, "distance_km": 1146.38, "empty_km": 505.89, "co2_emissions_kg": 1354.12}, {"route_id": 24, "plants": ["Valencia"], "num_customers": 2, "total_pallets": 24, "distance_km": 693.68, "empty_km": 192.56, "co2_emissions_kg": 823.41}, {"route_id": 25, "plants": ["Valencia (Muelle 2)"], "num_customers": 2, "total_pallets": 33, "distance_km": 705.7, "empty_km": 210.07, "co2_emissions_kg": 833.78}, {"route_id": 26, "plants": ["Valencia (Muelle 3)"], "num_customers": 2, "total_pallets": 28, "distance_km": 711.84, "empty_km": 210.25, "co2_emissions_kg": 839.84}, {"route_id": 27, "plants": ["Almeria"], "num_customers": 1, "total_pallets": 30, "distance_km": 333.82, "empty_km": 1.43, "co2_emissions_kg": 415.46}, {"route_id": 28, "plants": ["Almeria (Muelle 2)"], "num_customers": 1, "total_pallets": 30, "distance_km": 340.47, "empty_km": 7.66, "co2_emissions_kg": 420.74}, {"route_id": 29, "plants": ["Almeria (Muelle 3)"], "num_customers": 1, "total_pallets": 28, "distance_km": 351.86, "empty_km": 10.43, "co2_emissions_kg": 429.27}, {"route_id": 30, "plants": ["Almeria (Muelle 4)"], "num_customers": 3, "total_pallets": 34, "distance_km": 361.03, "empty_km": 12.93, "co2_emissions_kg": 441.01}, {"route_id": 31, "plants": ["Almeria (Muelle 5)"], "num_customers": 1, "total_pallets": 31, "distance_km": 346.05, "empty_km": 24.95, "co2_emissions_kg": 424.22}, {"route_id": 32, "plants": ["Canovelles"], "num_customers": 1, "total_pallets": 27, "distance_km": 1316.99, "empty_km": 486.63, "co2_emissions_kg": 1571.61}, {"route_id": 33, "plants": ["Canovelles (Muelle 2)"], "num_customers": 1, "total_pallets": 33, "distance_km": 1317.02, "empty_km": 486.74, "co2_emissions_kg": 1576.33}, {"route_id": 34, "plants": ["Celpack"], "num_customers": 2, "total_pallets": 33, "distance_km": 1058.34, "empty_km": 394.83, "co2_emissions_kg": 1262.18}, {"route_id": 35, "plants": ["Celpack (Muelle 2)"], "num_customers": 1, "total_pallets": 26, "distance_km": 1058.54, "empty_km": 395.15, "co2_emissions_kg": 1261.45}, {"route_id": 36, "plants": ["Celpack (Muelle 3)"], "num_customers": 2, "total_pallets": 28, "distance_km": 1060.44, "empty_km": 397.81, "co2_emissions_kg": 1260.02}, {"route_id": 37, "plants": ["Vigo"], "num_customers": 2, "total_pallets": 32, "distance_km": 1257.05, "empty_km": 523.11, "co2_emissions_kg": 1487.78}, {"route_id": 38, "plants": ["Vigo (Muelle 2)"], "num_customers": 1, "total_pallets": 29, "distance_km": 1251.41, "empty_km": 532.07, "co2_emissions_kg": 1480.49}]}, "map_url": "outputs/experiments/map_test_7.html"}, "8": {"id": 8, "params": {"pallets": 35, "threshold": 50, "candidates": 20}, "stats": {"num_routes": 33, "total_km": 23305.48, "total_empty_km": 7289.85, "total_co2_kg": 27775.75, "parameters": {"max_pallets": 35, "threshold_km": 50, "n_candidatos": 20}, "routes": [{"route_id": 1, "plants": ["Alcal\u00e1"], "num_customers": 1, "total_pallets": 20, "distance_km": 566.19, "empty_km": 111.99, "co2_emissions_kg": 680.56}, {"route_id": 2, "plants": ["Alcal\u00e1 (Muelle 2)"], "num_customers": 1, "total_pallets": 22, "distance_km": 561.28, "empty_km": 138.82, "co2_emissions_kg": 675.1}, {"route_id": 3, "plants": ["Alcal\u00e1 (Muelle 3)"], "num_customers": 1, "total_pallets": 28, "distance_km": 561.43, "empty_km": 145.88, "co2_emissions_kg": 678.21}, {"route_id": 4, "plants": ["Alcal\u00e1 (Muelle 4)"], "num_customers": 1, "total_pallets": 21, "distance_km": 578.12, "empty_km": 147.35, "co2_emissions_kg": 688.47}, {"route_id": 5, "plants": ["Alicante"], "num_customers": 1, "total_pallets": 17, "distance_km": 577.71, "empty_km": 168.61, "co2_emissions_kg": 689.49}, {"route_id": 6, "plants": ["Alicante (Muelle 2)"], "num_customers": 1, "total_pallets": 26, "distance_km": 581.86, "empty_km": 186.83, "co2_emissions_kg": 696.01}, {"route_id": 7, "plants": ["Alicante (Muelle 3)"], "num_customers": 1, "total_pallets": 13, "distance_km": 583.08, "empty_km": 192.56, "co2_emissions_kg": 690.41}, {"route_id": 8, "plants": ["Alicante (Muelle 4)"], "num_customers": 1, "total_pallets": 13, "distance_km": 583.47, "empty_km": 202.38, "co2_emissions_kg": 690.16}, {"route_id": 9, "plants": ["C\u00f3rdoba"], "num_customers": 1, "total_pallets": 33, "distance_km": 155.33, "empty_km": 22.84, "co2_emissions_kg": 190.51}, {"route_id": 10, "plants": ["Huelva"], "num_customers": 1, "total_pallets": 18, "distance_km": 502.68, "empty_km": 96.49, "co2_emissions_kg": 604.32}, {"route_id": 11, "plants": ["Huelva (Muelle 2)"], "num_customers": 1, "total_pallets": 22, "distance_km": 505.29, "empty_km": 95.08, "co2_emissions_kg": 609.6}, {"route_id": 12, "plants": ["Huelva (Muelle 3)"], "num_customers": 1, "total_pallets": 12, "distance_km": 503.0, "empty_km": 97.55, "co2_emissions_kg": 600.29}, {"route_id": 13, "plants": ["Huelva (Muelle 4)"], "num_customers": 1, "total_pallets": 22, "distance_km": 505.38, "empty_km": 102.89, "co2_emissions_kg": 608.9}, {"route_id": 14, "plants": ["Huelva (Muelle 5)"], "num_customers": 1, "total_pallets": 17, "distance_km": 514.35, "empty_km": 107.11, "co2_emissions_kg": 612.85}, {"route_id": 15, "plants": ["Burgos"], "num_customers": 1, "total_pallets": 28, "distance_km": 981.41, "empty_km": 394.5, "co2_emissions_kg": 1166.04}, {"route_id": 16, "plants": ["Burgos (Muelle 2)"], "num_customers": 1, "total_pallets": 33, "distance_km": 978.82, "empty_km": 398.61, "co2_emissions_kg": 1165.26}, {"route_id": 17, "plants": ["Burgos (Muelle 3)"], "num_customers": 1, "total_pallets": 10, "distance_km": 983.21, "empty_km": 397.13, "co2_emissions_kg": 1159.31}, {"route_id": 18, "plants": ["Burgos (Muelle 4)"], "num_customers": 1, "total_pallets": 31, "distance_km": 981.42, "empty_km": 398.63, "co2_emissions_kg": 1166.82}, {"route_id": 19, "plants": ["Valencia"], "num_customers": 1, "total_pallets": 13, "distance_km": 678.56, "empty_km": 192.56, "co2_emissions_kg": 803.92}, {"route_id": 20, "plants": ["Valencia (Muelle 2)"], "num_customers": 1, "total_pallets": 10, "distance_km": 705.26, "empty_km": 210.07, "co2_emissions_kg": 823.22}, {"route_id": 21, "plants": ["Valencia (Muelle 3)"], "num_customers": 1, "total_pallets": 13, "distance_km": 705.22, "empty_km": 210.25, "co2_emissions_kg": 825.38}, {"route_id": 22, "plants": ["Almeria"], "num_customers": 1, "total_pallets": 30, "distance_km": 333.82, "empty_km": 1.43, "co2_emissions_kg": 415.46}, {"route_id": 23, "plants": ["Almeria (Muelle 2)"], "num_customers": 1, "total_pallets": 30, "distance_km": 340.47, "empty_km": 7.66, "co2_emissions_kg": 420.74}, {"route_id": 24, "plants": ["Almeria (Muelle 3)"], "num_customers": 1, "total_pallets": 28, "distance_km": 351.86, "empty_km": 10.43, "co2_emissions_kg": 429.27}, {"route_id": 25, "plants": ["Almeria (Muelle 4)"], "num_customers": 1, "total_pallets": 27, "distance_km": 338.09, "empty_km": 23.62, "co2_emissions_kg": 414.35}, {"route_id": 26, "plants": ["Almeria (Muelle 5)"], "num_customers": 1, "total_pallets": 12, "distance_km": 355.29, "empty_km": 12.93, "co2_emissions_kg": 419.27}, {"route_id": 27, "plants": ["Canovelles"], "num_customers": 1, "total_pallets": 27, "distance_km": 1316.99, "empty_km": 486.63, "co2_emissions_kg": 1571.61}, {"route_id": 28, "plants": ["Canovelles (Muelle 2)"], "num_customers": 1, "total_pallets": 33, "distance_km": 1317.02, "empty_km": 486.74, "co2_emissions_kg": 1576.33}, {"route_id": 29, "plants": ["Celpack"], "num_customers": 1, "total_pallets": 15, "distance_km": 1057.11, "empty_km": 394.83, "co2_emissions_kg": 1253.47}, {"route_id": 30, "plants": ["Celpack (Muelle 2)"], "num_customers": 1, "total_pallets": 26, "distance_km": 1058.54, "empty_km": 395.15, "co2_emissions_kg": 1261.45}, {"route_id": 31, "plants": ["Celpack (Muelle 3)"], "num_customers": 1, "total_pallets": 15, "distance_km": 1060.44, "empty_km": 397.81, "co2_emissions_kg": 1256.11}, {"route_id": 32, "plants": ["Vigo"], "num_customers": 1, "total_pallets": 22, "distance_km": 1245.14, "empty_km": 523.11, "co2_emissions_kg": 1472.59}, {"route_id": 33, "plants": ["Vigo (Muelle 2)"], "num_customers": 1, "total_pallets": 10, "distance_km": 1237.64, "empty_km": 531.39, "co2_emissions_kg": 1460.27}]}, "map_url": "outputs/experiments/map_test_8.html"}, "9": {"id": 9, "params": {"pallets": 45, "threshold": 50, "candidates": 45}, "stats": {"num_routes": 2, "total_km": 721.52, "total_empty_km": 134.83, "total_co2_kg": 871.07, "parameters": {"max_pallets": 45, "threshold_km": 50, "n_candidatos": 45}, "routes": [{"route_id": 1, "plants": ["Alcal\u00e1"], "num_customers": 1, "total_pallets": 20, "distance_km": 566.19, "empty_km": 111.99, "co2_emissions_kg": 680.56}, {"route_id": 2, "plants": ["C\u00f3rdoba"], "num_customers": 1, "total_pallets": 33, "distance_km": 155.33, "empty_km": 22.84, "co2_emissions_kg": 190.51}]}, "map_url": "outputs/experiments/map_test_9.html"}, "10": {"id": 10, "params": {"pallets": 30, "threshold": 30, "candidates": 20}, "stats": {"num_routes": 38, "total_km": 26430.09, "total_empty_km": 8575.38, "total_co2_kg": 31495.87, "parameters": {"max_pallets": 30, "threshold_km": 30, "n_candidatos": 20}, "routes": [{"route_id": 1, "plants": ["Alcal\u00e1"], "num_customers": 1, "total_pallets": 20, "distance_km": 566.19, "empty_km": 111.99, "co2_emissions_kg": 680.56}, {"route_id": 2, "plants": ["Alcal\u00e1 (Muelle 2)"], "num_customers": 1, "total_pallets": 22, "distance_km": 561.28, "empty_km": 138.82, "co2_emissions_kg": 675.1}, {"route_id": 3, "plants": ["Alcal\u00e1 (Muelle 3)"], "num_customers": 1, "total_pallets": 28, "distance_km": 561.43, "empty_km": 145.88, "co2_emissions_kg": 678.21}, {"route_id": 4, "plants": ["Alcal\u00e1 (Muelle 4)"], "num_customers": 1, "total_pallets": 21, "distance_km": 578.12, "empty_km": 147.35, "co2_emissions_kg": 688.47}, {"route_id": 5, "plants": ["Alicante"], "num_customers": 1, "total_pallets": 17, "distance_km": 577.71, "empty_km": 168.61, "co2_emissions_kg": 689.49}, {"route_id": 6, "plants": ["Alicante (Muelle 2)"], "num_customers": 1, "total_pallets": 26, "distance_km": 581.86, "empty_km": 186.83, "co2_emissions_kg": 696.01}, {"route_id": 7, "plants": ["Alicante (Muelle 3)"], "num_customers": 1, "total_pallets": 13, "distance_km": 583.08, "empty_km": 192.56, "co2_emissions_kg": 690.41}, {"route_id": 8, "plants": ["Alicante (Muelle 4)"], "num_customers": 1, "total_pallets": 13, "distance_km": 583.47, "empty_km": 202.38, "co2_emissions_kg": 690.16}, {"route_id": 9, "plants": ["Alicante (Muelle 5)"], "num_customers": 1, "total_pallets": 21, "distance_km": 583.5, "empty_km": 202.52, "co2_emissions_kg": 693.53}, {"route_id": 10, "plants": ["C\u00f3rdoba"], "num_customers": 1, "total_pallets": 30, "distance_km": 155.33, "empty_km": 22.84, "co2_emissions_kg": 189.75}, {"route_id": 11, "plants": ["C\u00f3rdoba (Muelle 2)"], "num_customers": 1, "total_pallets": 30, "distance_km": 154.22, "empty_km": 1.43, "co2_emissions_kg": 191.65}, {"route_id": 12, "plants": ["C\u00f3rdoba (Muelle 3)"], "num_customers": 1, "total_pallets": 28, "distance_km": 153.94, "empty_km": 10.43, "co2_emissions_kg": 189.56}, {"route_id": 13, "plants": ["Huelva"], "num_customers": 1, "total_pallets": 18, "distance_km": 502.68, "empty_km": 96.49, "co2_emissions_kg": 604.32}, {"route_id": 14, "plants": ["Huelva (Muelle 2)"], "num_customers": 1, "total_pallets": 22, "distance_km": 505.29, "empty_km": 95.08, "co2_emissions_kg": 609.6}, {"route_id": 15, "plants": ["Huelva (Muelle 3)"], "num_customers": 1, "total_pallets": 12, "distance_km": 503.0, "empty_km": 97.55, "co2_emissions_kg": 600.29}, {"route_id": 16, "plants": ["Huelva (Muelle 4)"], "num_customers": 1, "total_pallets": 22, "distance_km": 505.38, "empty_km": 102.89, "co2_emissions_kg": 608.9}, {"route_id": 17, "plants": ["Huelva (Muelle 5)"], "num_customers": 1, "total_pallets": 17, "distance_km": 514.35, "empty_km": 107.11, "co2_emissions_kg": 612.85}, {"route_id": 18, "plants": ["Burgos"], "num_customers": 1, "total_pallets": 28, "distance_km": 981.41, "empty_km": 394.5, "co2_emissions_kg": 1166.04}, {"route_id": 19, "plants": ["Burgos (Muelle 2)"], "num_customers": 1, "total_pallets": 30, "distance_km": 978.82, "empty_km": 398.61, "co2_emissions_kg": 1164.0}, {"route_id": 20, "plants": ["Burgos (Muelle 3)"], "num_customers": 1, "total_pallets": 10, "distance_km": 983.21, "empty_km": 397.13, "co2_emissions_kg": 1159.31}, {"route_id": 21, "plants": ["Burgos (Muelle 4)"], "num_customers": 1, "total_pallets": 30, "distance_km": 981.42, "empty_km": 398.63, "co2_emissions_kg": 1166.39}, {"route_id": 22, "plants": ["Navarra"], "num_customers": 1, "total_pallets": 19, "distance_km": 1130.63, "empty_km": 504.34, "co2_emissions_kg": 1336.19}, {"route_id": 23, "plants": ["Navarra (Muelle 2)"], "num_customers": 1, "total_pallets": 19, "distance_km": 1131.85, "empty_km": 505.89, "co2_emissions_kg": 1337.13}, {"route_id": 24, "plants": ["Valencia"], "num_customers": 1, "total_pallets": 13, "distance_km": 678.56, "empty_km": 192.56, "co2_emissions_kg": 803.92}, {"route_id": 25, "plants": ["Valencia (Muelle 2)"], "num_customers": 1, "total_pallets": 11, "distance_km": 691.34, "empty_km": 223.08, "co2_emissions_kg": 811.68}, {"route_id": 26, "plants": ["Valencia (Muelle 3)"], "num_customers": 1, "total_pallets": 23, "distance_km": 689.62, "empty_km": 258.16, "co2_emissions_kg": 813.8}, {"route_id": 27, "plants": ["Almeria"], "num_customers": 1, "total_pallets": 30, "distance_km": 333.82, "empty_km": 1.43, "co2_emissions_kg": 415.46}, {"route_id": 28, "plants": ["Almeria (Muelle 2)"], "num_customers": 1, "total_pallets": 30, "distance_km": 340.47, "empty_km": 7.66, "co2_emissions_kg": 420.74}, {"route_id": 29, "plants": ["Almeria (Muelle 3)"], "num_customers": 1, "total_pallets": 28, "distance_km": 351.86, "empty_km": 10.43, "co2_emissions_kg": 429.27}, {"route_id": 30, "plants": ["Almeria (Muelle 4)"], "num_customers": 1, "total_pallets": 27, "distance_km": 338.09, "empty_km": 23.62, "co2_emissions_kg": 414.35}, {"route_id": 31, "plants": ["Almeria (Muelle 5)"], "num_customers": 1, "total_pallets": 12, "distance_km": 355.29, "empty_km": 12.93, "co2_emissions_kg": 419.27}, {"route_id": 32, "plants": ["Canovelles"], "num_customers": 1, "total_pallets": 27, "distance_km": 1316.99, "empty_km": 486.63, "co2_emissions_kg": 1571.61}, {"route_id": 33, "plants": ["Canovelles (Muelle 2)"], "num_customers": 1, "total_pallets": 30, "distance_km": 1317.02, "empty_km": 486.74, "co2_emissions_kg": 1573.97}, {"route_id": 34, "plants": ["Celpack"], "num_customers": 1, "total_pallets": 15, "distance_km": 1057.11, "empty_km": 394.83, "co2_emissions_kg": 1253.47}, {"route_id": 35, "plants": ["Celpack (Muelle 2)"], "num_customers": 1, "total_pallets": 26, "distance_km": 1058.54, "empty_km": 395.15, "co2_emissions_kg": 1261.45}, {"route_id": 36, "plants": ["Celpack (Muelle 3)"], "num_customers": 1, "total_pallets": 15, "distance_km": 1060.44, "empty_km": 397.81, "co2_emissions_kg": 1256.11}, {"route_id": 37, "plants": ["Vigo"], "num_customers": 1, "total_pallets": 22, "distance_km": 1245.14, "empty_km": 523.11, "co2_emissions_kg": 1472.59}, {"route_id": 38, "plants": ["Vigo (Muelle 2)"], "num_customers": 1, "total_pallets": 10, "distance_km": 1237.64, "empty_km": 531.39, "co2_emissions_kg": 1460.27}]}, "map_url": "outputs/experiments/map_test_10.html"}, "11": {"id": 11, "params": {"pallets": 30, "threshold": 60, "candidates": 25}, "stats": {"num_routes": 5, "total_km": 2422.35, "total_empty_km": 566.88, "total_co2_kg": 2912.1, "parameters": {"max_pallets": 30, "threshold_km": 60, "n_candidatos": 25}, "routes": [{"route_id": 1, "plants": ["Alcal\u00e1"], "num_customers": 1, "total_pallets": 20, "distance_km": 566.19, "empty_km": 111.99, "co2_emissions_kg": 680.56}, {"route_id": 2, "plants": ["Alcal\u00e1 (Muelle 2)"], "num_customers": 1, "total_pallets": 22, "distance_km": 561.28, "empty_km": 138.82, "co2_emissions_kg": 675.1}, {"route_id": 3, "plants": ["Alcal\u00e1 (Muelle 3)"], "num_customers": 1, "total_pallets": 21, "distance_km": 578.12, "empty_km": 147.35, "co2_emissions_kg": 688.47}, {"route_id": 4, "plants": ["Alcal\u00e1 (Muelle 4)"], "num_customers": 1, "total_pallets": 28, "distance_km": 561.43, "empty_km": 145.88, "co2_emissions_kg": 678.21}, {"route_id": 5, "plants": ["C\u00f3rdoba"], "num_customers": 1, "total_pallets": 30, "distance_km": 155.33, "empty_km": 22.84, "co2_emissions_kg": 189.75}]}, "map_url": "outputs/experiments/map_test_11.html"}, "12": {"id": 12, "params": {"pallets": 40, "threshold": 40, "candidates": 35}, "stats": {"num_routes": 5, "total_km": 2422.35, "total_empty_km": 566.88, "total_co2_kg": 2912.86, "parameters": {"max_pallets": 40, "threshold_km": 40, "n_candidatos": 35}, "routes": [{"route_id": 1, "plants": ["Alcal\u00e1"], "num_customers": 1, "total_pallets": 20, "distance_km": 566.19, "empty_km": 111.99, "co2_emissions_kg": 680.56}, {"route_id": 2, "plants": ["Alcal\u00e1 (Muelle 2)"], "num_customers": 1, "total_pallets": 22, "distance_km": 561.28, "empty_km": 138.82, "co2_emissions_kg": 675.1}, {"route_id": 3, "plants": ["Alcal\u00e1 (Muelle 3)"], "num_customers": 1, "total_pallets": 21, "distance_km": 578.12, "empty_km": 147.35, "co2_emissions_kg": 688.47}, {"route_id": 4, "plants": ["Alcal\u00e1 (Muelle 4)"], "num_customers": 1, "total_pallets": 28, "distance_km": 561.43, "empty_km": 145.88, "co2_emissions_kg": 678.21}, {"route_id": 5, "plants": ["C\u00f3rdoba"], "num_customers": 1, "total_pallets": 33, "distance_km": 155.33, "empty_km": 22.84, "co2_emissions_kg": 190.51}]}, "map_url": "outputs/experiments/map_test_12.html"}, "13": {"id": 13, "params": {"pallets": 35, "threshold": 15, "candidates": 15}, "stats": {"num_routes": 38, "total_km": 26455.12, "total_empty_km": 8729.74, "total_co2_kg": 31606.06, "parameters": {"max_pallets": 35, "threshold_km": 15, "n_candidatos": 15}, "routes": [{"route_id": 1, "plants": ["Alcal\u00e1"], "num_customers": 2, "total_pallets": 32, "distance_km": 567.12, "empty_km": 111.99, "co2_emissions_kg": 686.9}, {"route_id": 2, "plants": ["Alcal\u00e1 (Muelle 2)"], "num_customers": 2, "total_pallets": 35, "distance_km": 562.72, "empty_km": 138.82, "co2_emissions_kg": 679.7}, {"route_id": 3, "plants": ["Alcal\u00e1 (Muelle 3)"], "num_customers": 1, "total_pallets": 28, "distance_km": 561.43, "empty_km": 145.88, "co2_emissions_kg": 678.21}, {"route_id": 4, "plants": ["Alcal\u00e1 (Muelle 4)"], "num_customers": 1, "total_pallets": 33, "distance_km": 563.46, "empty_km": 158.89, "co2_emissions_kg": 681.23}, {"route_id": 5, "plants": ["Alicante"], "num_customers": 2, "total_pallets": 27, "distance_km": 577.87, "empty_km": 168.61, "co2_emissions_kg": 693.22}, {"route_id": 6, "plants": ["Alicante (Muelle 2)"], "num_customers": 1, "total_pallets": 26, "distance_km": 581.86, "empty_km": 186.83, "co2_emissions_kg": 696.01}, {"route_id": 7, "plants": ["Alicante (Muelle 3)"], "num_customers": 2, "total_pallets": 26, "distance_km": 598.96, "empty_km": 192.56, "co2_emissions_kg": 708.48}, {"route_id": 8, "plants": ["Alicante (Muelle 4)"], "num_customers": 2, "total_pallets": 29, "distance_km": 587.17, "empty_km": 202.38, "co2_emissions_kg": 698.68}, {"route_id": 9, "plants": ["Alicante (Muelle 5)"], "num_customers": 2, "total_pallets": 31, "distance_km": 585.64, "empty_km": 202.52, "co2_emissions_kg": 698.73}, {"route_id": 10, "plants": ["C\u00f3rdoba"], "num_customers": 1, "total_pallets": 33, "distance_km": 155.33, "empty_km": 22.84, "co2_emissions_kg": 190.51}, {"route_id": 11, "plants": ["C\u00f3rdoba (Muelle 2)"], "num_customers": 1, "total_pallets": 30, "distance_km": 154.22, "empty_km": 1.43, "co2_emissions_kg": 191.65}, {"route_id": 12, "plants": ["C\u00f3rdoba (Muelle 3)"], "num_customers": 1, "total_pallets": 28, "distance_km": 153.94, "empty_km": 10.43, "co2_emissions_kg": 189.56}, {"route_id": 13, "plants": ["Huelva"], "num_customers": 1, "total_pallets": 18, "distance_km": 502.68, "empty_km": 96.49, "co2_emissions_kg": 604.32}, {"route_id": 14, "plants": ["Huelva (Muelle 2)"], "num_customers": 1, "total_pallets": 22, "distance_km": 505.29, "empty_km": 95.08, "co2_emissions_kg": 609.6}, {"route_id": 15, "plants": ["Huelva (Muelle 3)"], "num_customers": 2, "total_pallets": 35, "distance_km": 508.0, "empty_km": 97.55, "co2_emissions_kg": 617.1}, {"route_id": 16, "plants": ["Huelva (Muelle 4)"], "num_customers": 1, "total_pallets": 22, "distance_km": 505.38, "empty_km": 102.89, "co2_emissions_kg": 608.9}, {"route_id": 17, "plants": ["Huelva (Muelle 5)"], "num_customers": 2, "total_pallets": 33, "distance_km": 514.97, "empty_km": 107.11, "co2_emissions_kg": 620.61}, {"route_id": 18, "plants": ["Burgos"], "num_customers": 1, "total_pallets": 28, "distance_km": 981.41, "empty_km": 394.5, "co2_emissions_kg": 1166.04}, {"route_id": 19, "plants": ["Burgos (Muelle 2)"], "num_customers": 1, "total_pallets": 33, "distance_km": 978.82, "empty_km": 398.61, "co2_emissions_kg": 1165.26}, {"route_id": 20, "plants": ["Burgos (Muelle 3)"], "num_customers": 3, "total_pallets": 32, "distance_km": 1013.88, "empty_km": 397.13, "co2_emissions_kg": 1193.35}, {"route_id": 21, "plants": ["Burgos (Muelle 4)"], "num_customers": 1, "total_pallets": 31, "distance_km": 981.42, "empty_km": 398.63, "co2_emissions_kg": 1166.82}, {"route_id": 22, "plants": ["Navarra"], "num_customers": 2, "total_pallets": 35, "distance_km": 1142.24, "empty_km": 504.34, "co2_emissions_kg": 1350.38}, {"route_id": 23, "plants": ["Navarra (Muelle 2)"], "num_customers": 2, "total_pallets": 35, "distance_km": 1146.38, "empty_km": 505.89, "co2_emissions_kg": 1354.12}, {"route_id": 24, "plants": ["Valencia"], "num_customers": 2, "total_pallets": 31, "distance_km": 680.66, "empty_km": 192.56, "co2_emissions_kg": 807.75}, {"route_id": 25, "plants": ["Valencia (Muelle 2)"], "num_customers": 1, "total_pallets": 23, "distance_km": 676.91, "empty_km": 287.96, "co2_emissions_kg": 799.38}, {"route_id": 26, "plants": ["Valencia (Muelle 3)"], "num_customers": 1, "total_pallets": 31, "distance_km": 669.39, "empty_km": 306.38, "co2_emissions_kg": 791.81}, {"route_id": 27, "plants": ["Almeria"], "num_customers": 1, "total_pallets": 30, "distance_km": 333.82, "empty_km": 1.43, "co2_emissions_kg": 415.46}, {"route_id": 28, "plants": ["Almeria (Muelle 2)"], "num_customers": 1, "total_pallets": 30, "distance_km": 340.47, "empty_km": 7.66, "co2_emissions_kg": 420.74}, {"route_id": 29, "plants": ["Almeria (Muelle 3)"], "num_customers": 1, "total_pallets": 27, "distance_km": 338.09, "empty_km": 23.62, "co2_emissions_kg": 414.35}, {"route_id": 30, "plants": ["Almeria (Muelle 4)"], "num_customers": 1, "total_pallets": 31, "distance_km": 334.76, "empty_km": 28.15, "co2_emissions_kg": 413.31}, {"route_id": 31, "plants": ["Almeria (Muelle 5)"], "num_customers": 1, "total_pallets": 31, "distance_km": 346.05, "empty_km": 24.95, "co2_emissions_kg": 424.22}, {"route_id": 32, "plants": ["Canovelles"], "num_customers": 1, "total_pallets": 27, "distance_km": 1316.99, "empty_km": 486.63, "co2_emissions_kg": 1571.61}, {"route_id": 33, "plants": ["Canovelles (Muelle 2)"], "num_customers": 1, "total_pallets": 33, "distance_km": 1317.02, "empty_km": 486.74, "co2_emissions_kg": 1576.33}, {"route_id": 34, "plants": ["Celpack"], "num_customers": 2, "total_pallets": 26, "distance_km": 1057.13, "empty_km": 394.83, "co2_emissions_kg": 1254.48}, {"route_id": 35, "plants": ["Celpack (Muelle 2)"], "num_customers": 1, "total_pallets": 26, "distance_km": 1058.54, "empty_km": 395.15, "co2_emissions_kg": 1261.45}, {"route_id": 36, "plants": ["Celpack (Muelle 3)"], "num_customers": 2, "total_pallets": 28, "distance_km": 1060.44, "empty_km": 397.81, "co2_emissions_kg": 1260.02}, {"route_id": 37, "plants": ["Vigo"], "num_customers": 2, "total_pallets": 32, "distance_km": 1250.27, "empty_km": 523.11, "co2_emissions_kg": 1478.63}, {"route_id": 38, "plants": ["Vigo (Muelle 2)"], "num_customers": 2, "total_pallets": 29, "distance_km": 1244.43, "empty_km": 531.39, "co2_emissions_kg": 1467.16}]}, "map_url": "outputs/experiments/map_test_13.html"}, "14": {"id": 14, "params": {"pallets": 35, "threshold": 100, "candidates": 50}, "stats": {"num_routes": 2, "total_km": 721.52, "total_empty_km": 134.83, "total_co2_kg": 871.07, "parameters": {"max_pallets": 35, "threshold_km": 100, "n_candidatos": 50}, "routes": [{"route_id": 1, "plants": ["Alcal\u00e1"], "num_customers": 1, "total_pallets": 20, "distance_km": 566.19, "empty_km": 111.99, "co2_emissions_kg": 680.56}, {"route_id": 2, "plants": ["C\u00f3rdoba"], "num_customers": 1, "total_pallets": 33, "distance_km": 155.33, "empty_km": 22.84, "co2_emissions_kg": 190.51}]}, "map_url": "outputs/experiments/map_test_14.html"}, "15": {"id": 15, "params": {"pallets": 33, "threshold": 40, "candidates": 30}, "stats": {"num_routes": 5, "total_km": 2422.35, "total_empty_km": 566.88, "total_co2_kg": 2912.86, "parameters": {"max_pallets": 33, "threshold_km": 40, "n_candidatos": 30}, "routes": [{"route_id": 1, "plants": ["Alcal\u00e1"], "num_customers": 1, "total_pallets": 20, "distance_km": 566.19, "empty_km": 111.99, "co2_emissions_kg": 680.56}, {"route_id": 2, "plants": ["Alcal\u00e1 (Muelle 2)"], "num_customers": 1, "total_pallets": 22, "distance_km": 561.28, "empty_km": 138.82, "co2_emissions_kg": 675.1}, {"route_id": 3, "plants": ["Alcal\u00e1 (Muelle 3)"], "num_customers": 1, "total_pallets": 21, "distance_km": 578.12, "empty_km": 147.35, "co2_emissions_kg": 688.47}, {"route_id": 4, "plants": ["Alcal\u00e1 (Muelle 4)"], "num_customers": 1, "total_pallets": 28, "distance_km": 561.43, "empty_km": 145.88, "co2_emissions_kg": 678.21}, {"route_id": 5, "plants": ["C\u00f3rdoba"], "num_customers": 1, "total_pallets": 33, "distance_km": 155.33, "empty_km": 22.84, "co2_emissions_kg": 190.51}]}, "map_url": "outputs/experiments/map_test_15.html"}, "16": {"id": 16, "params": {"pallets": 33, "threshold": 60, "candidates": 30}, "stats": {"num_routes": 5, "total_km": 2422.35, "total_empty_km": 566.88, "total_co2_kg": 2912.86, "parameters": {"max_pallets": 33, "threshold_km": 60, "n_candidatos": 30}, "routes": [{"route_id": 1, "plants": ["Alcal\u00e1"], "num_customers": 1, "total_pallets": 20, "distance_km": 566.19, "empty_km": 111.99, "co2_emissions_kg": 680.56}, {"route_id": 2, "plants": ["Alcal\u00e1 (Muelle 2)"], "num_customers": 1, "total_pallets": 22, "distance_km": 561.28, "empty_km": 138.82, "co2_emissions_kg": 675.1}, {"route_id": 3, "plants": ["Alcal\u00e1 (Muelle 3)"], "num_customers": 1, "total_pallets": 21, "distance_km": 578.12, "empty_km": 147.35, "co2_emissions_kg": 688.47}, {"route_id": 4, "plants": ["Alcal\u00e1 (Muelle 4)"], "num_customers": 1, "total_pallets": 28, "distance_km": 561.43, "empty_km": 145.88, "co2_emissions_kg": 678.21}, {"route_id": 5, "plants": ["C\u00f3rdoba"], "num_customers": 1, "total_pallets": 33, "distance_km": 155.33, "empty_km": 22.84, "co2_emissions_kg": 190.51}]}, "map_url": "outputs/experiments/map_test_16.html"}, "17": {"id": 17, "params": {"pallets": 25, "threshold": 50, "candidates": 30}, "stats": {"num_routes": 5, "total_km": 2422.35, "total_empty_km": 566.88, "total_co2_kg": 2908.98, "parameters": {"max_pallets": 25, "threshold_km": 50, "n_candidatos": 30}, "routes": [{"route_id": 1, "plants": ["Alcal\u00e1"], "num_customers": 1, "total_pallets": 20, "distance_km": 566.19, "empty_km": 111.99, "co2_emissions_kg": 680.56}, {"route_id": 2, "plants": ["Alcal\u00e1 (Muelle 2)"], "num_customers": 1, "total_pallets": 22, "distance_km": 561.28, "empty_km": 138.82, "co2_emissions_kg": 675.1}, {"route_id": 3, "plants": ["Alcal\u00e1 (Muelle 3)"], "num_customers": 1, "total_pallets": 21, "distance_km": 578.12, "empty_km": 147.35, "co2_emissions_kg": 688.47}, {"route_id": 4, "plants": ["Alcal\u00e1 (Muelle 4)"], "num_customers": 1, "total_pallets": 25, "distance_km": 561.43, "empty_km": 145.88, "co2_emissions_kg": 676.37}, {"route_id": 5, "plants": ["C\u00f3rdoba"], "num_customers": 1, "total_pallets": 25, "distance_km": 155.33, "empty_km": 22.84, "co2_emissions_kg": 188.48}]}, "map_url": "outputs/experiments/map_test_17.html"}, "18": {"id": 18, "params": {"pallets": 45, "threshold": 50, "candidates": 30}, "stats": {"num_routes": 5, "total_km": 2552.67, "total_empty_km": 597.49, "total_co2_kg": 3051.35, "parameters": {"max_pallets": 45, "threshold_km": 50, "n_candidatos": 30}, "routes": [{"route_id": 1, "plants": ["Alcal\u00e1"], "num_customers": 2, "total_pallets": 42, "distance_km": 572.68, "empty_km": 111.99, "co2_emissions_kg": 700.45}, {"route_id": 2, "plants": ["Alcal\u00e1 (Muelle 2)"], "num_customers": 1, "total_pallets": 21, "distance_km": 578.12, "empty_km": 147.35, "co2_emissions_kg": 688.47}, {"route_id": 3, "plants": ["Alcal\u00e1 (Muelle 3)"], "num_customers": 2, "total_pallets": 41, "distance_km": 654.91, "empty_km": 145.88, "co2_emissions_kg": 772.37}, {"route_id": 4, "plants": ["Alcal\u00e1 (Muelle 4)"], "num_customers": 1, "total_pallets": 23, "distance_km": 591.62, "empty_km": 169.43, "co2_emissions_kg": 699.54}, {"route_id": 5, "plants": ["C\u00f3rdoba"], "num_customers": 1, "total_pallets": 33, "distance_km": 155.33, "empty_km": 22.84, "co2_emissions_kg": 190.51}]}, "map_url": "outputs/experiments/map_test_18.html"}, "19": {"id": 19, "params": {"pallets": 35, "threshold": 45, "candidates": 40}, "stats": {"num_routes": 2, "total_km": 721.52, "total_empty_km": 134.83, "total_co2_kg": 871.07, "parameters": {"max_pallets": 35, "threshold_km": 45, "n_candidatos": 40}, "routes": [{"route_id": 1, "plants": ["Alcal\u00e1"], "num_customers": 1, "total_pallets": 20, "distance_km": 566.19, "empty_km": 111.99, "co2_emissions_kg": 680.56}, {"route_id": 2, "plants": ["C\u00f3rdoba"], "num_customers": 1, "total_pallets": 33, "distance_km": 155.33, "empty_km": 22.84, "co2_emissions_kg": 190.51}]}, "map_url": "outputs/experiments/map_test_19.html"}, "20": {"id": 20, "params": {"pallets": 35, "threshold": 55, "candidates": 15}, "stats": {"num_routes": 38, "total_km": 26797.26, "total_empty_km": 8515.98, "total_co2_kg": 31988.23, "parameters": {"max_pallets": 35, "threshold_km": 55, "n_candidatos": 15}, "routes": [{"route_id": 1, "plants": ["Alcal\u00e1"], "num_customers": 2, "total_pallets": 32, "distance_km": 567.12, "empty_km": 111.99, "co2_emissions_kg": 686.9}, {"route_id": 2, "plants": ["Alcal\u00e1 (Muelle 2)"], "num_customers": 2, "total_pallets": 33, "distance_km": 580.76, "empty_km": 138.82, "co2_emissions_kg": 698.46}, {"route_id": 3, "plants": ["Alcal\u00e1 (Muelle 3)"], "num_customers": 1, "total_pallets": 28, "distance_km": 561.43, "empty_km": 145.88, "co2_emissions_kg": 678.21}, {"route_id": 4, "plants": ["Alcal\u00e1 (Muelle 4)"], "num_customers": 2, "total_pallets": 34, "distance_km": 615.45, "empty_km": 147.35, "co2_emissions_kg": 730.2}, {"route_id": 5, "plants": ["Alicante"], "num_customers": 2, "total_pallets": 30, "distance_km": 598.63, "empty_km": 168.61, "co2_emissions_kg": 713.55}, {"route_id": 6, "plants": ["Alicante (Muelle 2)"], "num_customers": 1, "total_pallets": 26, "distance_km": 581.86, "empty_km": 186.83, "co2_emissions_kg": 696.01}, {"route_id": 7, "plants": ["Alicante (Muelle 3)"], "num_customers": 2, "total_pallets": 35, "distance_km": 626.28, "empty_km": 209.73, "co2_emissions_kg": 738.33}, {"route_id": 8, "plants": ["Alicante (Muelle 4)"], "num_customers": 2, "total_pallets": 35, "distance_km": 616.13, "empty_km": 191.57, "co2_emissions_kg": 729.4}, {"route_id": 9, "plants": ["Alicante (Muelle 5)"], "num_customers": 1, "total_pallets": 31, "distance_km": 606.6, "empty_km": 188.19, "co2_emissions_kg": 721.15}, {"route_id": 10, "plants": ["C\u00f3rdoba"], "num_customers": 1, "total_pallets": 33, "distance_km": 155.33, "empty_km": 22.84, "co2_emissions_kg": 190.51}, {"route_id": 11, "plants": ["C\u00f3rdoba (Muelle 2)"], "num_customers": 1, "total_pallets": 30, "distance_km": 154.22, "empty_km": 1.43, "co2_emissions_kg": 191.65}, {"route_id": 12, "plants": ["C\u00f3rdoba (Muelle 3)"], "num_customers": 1, "total_pallets": 28, "distance_km": 153.94, "empty_km": 10.43, "co2_emissions_kg": 189.56}, {"route_id": 13, "plants": ["Huelva"], "num_customers": 2, "total_pallets": 35, "distance_km": 533.53, "empty_km": 96.49, "co2_emissions_kg": 643.16}, {"route_id": 14, "plants": ["Huelva (Muelle 2)"], "num_customers": 1, "total_pallets": 22, "distance_km": 505.29, "empty_km": 95.08, "co2_emissions_kg": 609.6}, {"route_id": 15, "plants": ["Huelva (Muelle 3)"], "num_customers": 2, "total_pallets": 32, "distance_km": 516.74, "empty_km": 97.55, "co2_emissions_kg": 623.7}, {"route_id": 16, "plants": ["Huelva (Muelle 4)"], "num_customers": 1, "total_pallets": 22, "distance_km": 505.38, "empty_km": 102.89, "co2_emissions_kg": 608.9}, {"route_id": 17, "plants": ["Huelva (Muelle 5)"], "num_customers": 2, "total_pallets": 33, "distance_km": 521.6, "empty_km": 114.99, "co2_emissions_kg": 629.27}, {"route_id": 18, "plants": ["Burgos"], "num_customers": 1, "total_pallets": 28, "distance_km": 981.41, "empty_km": 394.5, "co2_emissions_kg": 1166.04}, {"route_id": 19, "plants": ["Burgos (Muelle 2)"], "num_customers": 1, "total_pallets": 33, "distance_km": 978.82, "empty_km": 398.61, "co2_emissions_kg": 1165.26}, {"route_id": 20, "plants": ["Burgos (Muelle 3)"], "num_customers": 3, "total_pallets": 32, "distance_km": 1013.88, "empty_km": 397.13, "co2_emissions_kg": 1193.35}, {"route_id": 21, "plants": ["Burgos (Muelle 4)"], "num_customers": 1, "total_pallets": 31, "distance_km": 981.42, "empty_km": 398.63, "co2_emissions_kg": 1166.82}, {"route_id": 22, "plants": ["Navarra"], "num_customers": 2, "total_pallets": 35, "distance_km": 1142.24, "empty_km": 504.34, "co2_emissions_kg": 1350.38}, {"route_id": 23, "plants": ["Navarra (Muelle 2)"], "num_customers": 2, "total_pallets": 35, "distance_km": 1146.38, "empty_km": 505.89, "co2_emissions_kg": 1354.12}, {"route_id": 24, "plants": ["Valencia"], "num_customers": 2, "total_pallets": 24, "distance_km": 693.68, "empty_km": 192.56, "co2_emissions_kg": 823.41}, {"route_id": 25, "plants": ["Valencia (Muelle 2)"], "num_customers": 2, "total_pallets": 33, "distance_km": 705.7, "empty_km": 210.07, "co2_emissions_kg": 833.78}, {"route_id": 26, "plants": ["Valencia (Muelle 3)"], "num_customers": 2, "total_pallets": 28, "distance_km": 711.84, "empty_km": 210.25, "co2_emissions_kg": 839.84}, {"route_id": 27, "plants": ["Almeria"], "num_customers": 1, "total_pallets": 30, "distance_km": 333.82, "empty_km": 1.43, "co2_emissions_kg": 415.46}, {"route_id": 28, "plants": ["Almeria (Muelle 2)"], "num_customers": 1, "total_pallets": 30, "distance_km": 340.47, "empty_km": 7.66, "co2_emissions_kg": 420.74}, {"route_id": 29, "plants": ["Almeria (Muelle 3)"], "num_customers": 1, "total_pallets": 28, "distance_km": 351.86, "empty_km": 10.43, "co2_emissions_kg": 429.27}, {"route_id": 30, "plants": ["Almeria (Muelle 4)"], "num_customers": 1, "total_pallets": 27, "distance_km": 338.09, "empty_km": 23.62, "co2_emissions_kg": 414.35}, {"route_id": 31, "plants": ["Almeria (Muelle 5)"], "num_customers": 3, "total_pallets": 34, "distance_km": 361.03, "empty_km": 12.93, "co2_emissions_kg": 441.01}, {"route_id": 32, "plants": ["Canovelles"], "num_customers": 1, "total_pallets": 27, "distance_km": 1316.99, "empty_km": 486.63, "co2_emissions_kg": 1571.61}, {"route_id": 33, "plants": ["Canovelles (Muelle 2)"], "num_customers": 1, "total_pallets": 33, "distance_km": 1317.02, "empty_km": 486.74, "co2_emissions_kg": 1576.33}, {"route_id": 34, "plants": ["Celpack"], "num_customers": 2, "total_pallets": 33, "distance_km": 1058.34, "empty_km": 394.83, "co2_emissions_kg": 1262.18}, {"route_id": 35, "plants": ["Celpack (Muelle 2)"], "num_customers": 1, "total_pallets": 26, "distance_km": 1058.54, "empty_km": 395.15, "co2_emissions_kg": 1261.45}, {"route_id": 36, "plants": ["Celpack (Muelle 3)"], "num_customers": 2, "total_pallets": 28, "distance_km": 1060.44, "empty_km": 397.81, "co2_emissions_kg": 1260.02}, {"route_id": 37, "plants": ["Vigo"], "num_customers": 2, "total_pallets": 32, "distance_km": 1252.54, "empty_km": 523.11, "co2_emissions_kg": 1483.19}, {"route_id": 38, "plants": ["Vigo (Muelle 2)"], "num_customers": 2, "total_pallets": 29, "distance_km": 1252.48, "empty_km": 533.01, "co2_emissions_kg": 1481.08}]}, "map_url": "outputs/experiments/map_test_20.html"}};
+            
+            function initSidebar() {
+                const list = document.getElementById('sidebar-list');
+                Object.values(data).forEach(t => {
+                    const btn = document.createElement('button');
+                    btn.className = `sidebar-item w-full text-left p-3 rounded-lg text-sm font-medium transition-all hover:bg-slate-700/50 flex justify-between items-center`;
+                    btn.id = 'side-' + t.id;
+                    btn.onclick = () => showTest(t.id);
+                    btn.innerHTML = "<span>Test Case #" + t.id + "</span><span class='text-[10px] opacity-50 font-mono'>" + t.stats.total_km + " km</span>";
+                    list.appendChild(btn);
+                });
+            }
+
+            function showTest(id) {
+                const t = data[id];
+                if (!t) return;
+
+                // UI Updates
+                document.getElementById('test-title').innerText = "Detalle del Test #" + id;
+                document.getElementById('stat-dist').innerText = t.stats.total_km + ' km';
+                document.getElementById('stat-co2').innerText = t.stats.total_co2_kg + ' kg';
+                document.getElementById('stat-routes').innerText = t.stats.num_routes;
+                document.getElementById('stat-avg').innerText = (t.stats.total_km / t.stats.num_routes).toFixed(1) + ' km';
+
+                document.getElementById('param-list').innerHTML = 
+                    "<li>• Capacidad: <b>" + t.params.pallets + " pallets</b></li>" +
+                    "<li>• Desvío Max: <b>" + t.params.threshold + " km</b></li>" +
+                    "<li>• Candidatos: <b>" + t.params.candidates + " por planta</b></li>";
+
+                document.getElementById('map-iframe').src = t.map_url;
+
+                // Active Sidebar effect
+                document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
+                document.getElementById('side-' + id).classList.add('active');
+                
+                // Scroll to viewer if mobile
+                if (window.innerWidth < 1024) {
+                    document.getElementById('viewer').scrollIntoView({behavior: 'smooth'});
+                }
+            }
+
+            initSidebar();
+            // Mostrar el primero por defecto
+            showTest(Object.keys(data)[0]);
+        </script>
+    </body>
+    </html>
+    

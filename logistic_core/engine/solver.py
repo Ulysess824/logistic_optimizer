@@ -4,8 +4,8 @@ import math
 import numpy as np
 from ortools.constraint_solver import routing_enums_pb2
 from ortools.constraint_solver import pywrapcp
-from src.utils.geo import GeoUtils
-from src.config import (
+from logistic_core.utils.geo import GeoUtils
+from logistic_core.config import (
     MAX_SEARCH_TIME, DIST_LIMIT,
     DEFAULT_N_CLIENTES, DEFAULT_MAX_PLANTS_PER_ROUTE,
 )
@@ -347,7 +347,7 @@ class LogisticsSolver:
         solution = routing.SolveWithParameters(search_params)
 
         # ====== NUEVO: GESTIÓN DE DROP LOGGER AUTOMÁTICA ======
-        from src.engine.drop_logger import DropLogger
+        from logistic_core.engine.drop_logger import DropLogger
         drop_logger = DropLogger()
         drop_logger.track_nodes(self.nodes)
 

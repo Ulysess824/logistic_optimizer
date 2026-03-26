@@ -4,13 +4,15 @@ import numpy as np
 import unicodedata
 import polars as pl
 from pathlib import Path
-from src.utils.geo import GeoUtils
-from src.config import DEFAULT_MAX_CUSTOMERS, DEFAULT_THRESHOLD_KM
+from logistic_core.utils.geo import GeoUtils
+from logistic_core.config import DEFAULT_MAX_CUSTOMERS, DEFAULT_THRESHOLD_KM
 
 logger = logging.getLogger(__name__)
 
 
 class DataManager:
+    _cached_raw_data = None  # Caché de clase para evitar re-lectura de disco
+
     def __init__(self, paper_plant, carton_plants, clients_file, geo_utils=None):
         self.paper_plant = paper_plant
         self.carton_plants = carton_plants
@@ -97,8 +99,11 @@ class DataManager:
 
         logger.info("Procesando clientes de %s (Radio Max: %skm)...", self.clients_file.name, max_radius_km)
 
-        with open(self.clients_file, 'r', encoding='utf-8') as f:
-            raw_data = json.load(f)
+        if DataManager._cached_raw_data is None:
+            with open(self.clients_file, 'r', encoding='utf-8') as f:
+                DataManager._cached_raw_data = json.load(f)
+        
+        raw_data = DataManager._cached_raw_data
 
         flattened_clients = []
         for zip_code, destinations in raw_data.items():

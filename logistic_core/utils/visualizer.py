@@ -4,8 +4,8 @@ from folium import plugins
 import plotly.graph_objects as go
 import polyline
 import networkx as nx
-from src.config import MAPS_DIR, RESULTS_DIR
-from src.utils.geo import GeoUtils
+from logistic_core.config import MAPS_DIR, RESULTS_DIR
+from logistic_core.utils.geo import GeoUtils
 
 logger = logging.getLogger(__name__)
 

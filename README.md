@@ -13,11 +13,9 @@ Actualmente, el proyecto cuenta con un sistema maduro, empaquetado y altamente v
 3. **Smart Data Filtering y Capacidad Física**: El sistema descarta ramificaciones inviables por distancia antes de saturar el motor y aplica **Restricciones Duras de BIN-PACKING (Pallets)**. Un camión descarta inteligentemente clientes si su demanda supera la capacidad paramétrica del tráiler (ej. 35 Pallets).
 4. **Dashboard Interactivo Profesional**: En lugar de simples planillas de texto, el proyecto emite un archivo HTML interactivo (`Presentacion_Logistica.html`) combinando Mapas satelitales (Folium), Grafos relacionales (Plotly), y tablas de KPIs matemáticos. **Incluye una sección de metodología con visualización interactiva de la lógica de filtros y elipse de desvío.**
 5. **Optimización Multi-Planta (Backhauling Avanzado)**: El solver ahora permite que un mismo vehículo visite múltiples plantas en su ruta de regreso, maximizando la consolidación de carga y reduciendo drásticamente la flota necesaria cuando se activa el modo `VARIAS_PLANTAS`.
-6. **Simulación Dinámica de Flotas (SOTA)**: Módulo especializado (`src/simulation/`) que utiliza **SimPy** para modelar la operación real. A diferencia de modelos estáticos, esta simulación:
-    - Considera **tiempos de viaje reales** y **polilíneas de carretera** (vía caché de Google).
-    - Modela cuellos de botella en **muelles de carga** y **disponibilidad de conductores**.
-    - Incluye un parámetro de `desfase_hora` para simular la llegada aleatoria de camiones, evitando sincronizaciones artificiales.
-    - Genera animaciones GIF que muestran el flujo logístico sobre el mapa real.
+6. **Simulación Dinámica de Flotas (SOTA)**: Módulo especializado (`logistic_core/simulation/`) que utiliza **SimPy** para modelar la operación real (tiempos de viaje, muelles, disponibilidad de conductores).
+7. **Motor de Huella de Carbono Científico (GLEC v3.0 / ISO 14083)**: Integración rigurosa del marco global de emisiones. El sistema utiliza factores de emisión calibrados para **Euro VI (0.652 - 1.085 kg/km)** y una metodología basada en actividad auditada.
+8. **Optimización Volumétrica 3D**: Nuevo estimador de capacidad que evalúa la geometría real del tráiler (13.6m) y decide la mejor orientación de carga (longitudinal vs transversal), maximizando el aprovechamiento del suelo hasta **34 pallets EPAL** y validando apilamiento (stacking).
 
 ---
 
@@ -58,11 +56,11 @@ Si solo deseas actualizar el diseño visual o la simulación sin re-ejecutar el 
 
 ---
 
-## 🍃 Sostenibilidad e Impacto Ambiental
-El motor ahora integra una estimación de huella de carbono basada en el modelo **FCR (Fuel Consumption Rate)**:
-- **Carga de Vacío**: Calculada sobre el peso del tráiler.
-- **Carga Dinámica**: 25,000 kg para el tramo de papel y peso variable según número de pallets para el tramo de cartón.
-- **KPIs**: Las emisiones totales y por ruta se visualizan en el **Detalle Operativo**.
+## 🍃 Sostenibilidad e Impacto Ambiental (GLEC v3.0)
+El motor utiliza el modelo **FCR (Fuel Consumption Rate)** alineado con el marco **GLEC v3.0**:
+- **Factores VECTO**: Calibrado para vehículos de 40t (Subgrupo 5-LH).
+- **Consumo Realista**: Distingue entre tramos en vacío (0.652 kg/km) y cargado (1.085 kg/km).
+- **Transparencia**: El Dashboard incluye una **Pestaña de Bibliografía** con los DOIs científicos que respaldan cada cálculo.
 
 ## 🧠 Modelo de Selección Geográfica (Dual-Pass)
 
