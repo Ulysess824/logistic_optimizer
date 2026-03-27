@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', 'Segoe UI', sans-serif; background-color: #f8fafc; color: #1e293b; }
+        .logic-window { background: #ffffff; border: 2px solid #e2e8f0; border-radius: 12px; font-family: 'ui-monospace', 'SFMono-Regular', Menlo, Monaco, Consolas, monospace; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-left: 6px solid #1e3a8a; }
+        .keyword { color: #1e40af; font-weight: 800; }
+        .indent { margin-left: 2rem; border-left: 2px solid #f1f5f9; padding-left: 1rem; }
+        
+        /* Standard Flowchart Symbols */
+        .symbol { position: relative; display: flex; align-items: center; justify-content: center; text-align: center; }
+        .oval { width: 100px; height: 50px; background: #dcfce7; border: 2px solid #16a34a; border-radius: 50px; font-size: 0.75rem; font-weight: 700; color: #166534; }
+        .rect { width: 120px; height: 60px; background: #eff6ff; border: 2px solid #3b82f6; border-radius: 4px; font-size: 0.75rem; font-weight: 600; color: #1e40af; }
+        .diamond { width: 80px; height: 80px; background: #fef9c3; border: 2px solid #ca8a04; transform: rotate(45deg); display: flex; align-items: center; justify-content: center; }
+        .diamond span { transform: rotate(-45deg); font-size: 0.65rem; font-weight: 700; color: #854d0e; }
+        .rhomboid { width: 120px; height: 60px; background: #f3e8ff; border: 2px solid #9333ea; transform: skew(-20deg); border-radius: 4px; }
+        .rhomboid span { transform: skew(20deg); font-size: 0.75rem; font-weight: 600; color: #6b21a8; }
+        
+        .arrow { width: 40px; height: 2px; background: #94a3b8; position: relative; }
+        .arrow::after { content: ''; position: absolute; right: 0; top: -4px; border-left: 6px solid #94a3b8; border-top: 5px solid transparent; border-bottom: 5px solid transparent; }
+    </style>
+</head>
+<body class="p-8">
+    <h1 class="text-3xl font-bold text-[#1e3a8a] mb-2 text-center">Protocolo de Operación: MC-VRPB</h1>
+    <p class="text-slate-500 mb-12 text-center text-sm italic">Arquitectura algorítmica bajo estándares internacionales (Localizado).</p>
+
+    <!-- 1. Standard Flowchart Section (Spanish) -->
+    <div class="flex flex-wrap items-center justify-center gap-2 mb-16 p-6 bg-white rounded-2xl border border-slate-100 shadow-sm">
+        <div class="symbol oval">INICIO</div>
+        <div class="arrow"></div>
+        <div class="symbol rhomboid"><span>ENTRADA Datos<br>(JSON/Excel)</span></div>
+        <div class="arrow"></div>
+        <div class="symbol rect">Análisis Espacial<br>(Radio 200km)</div>
+        <div class="arrow"></div>
+        <div class="symbol diamond"><span>¿Desvío<br>< 50km?</span></div>
+        <div class="arrow"></div>
+        <div class="symbol rect">Ejecutar Solver<br>(OR-Tools)</div>
+        <div class="arrow"></div>
+        <div class="symbol rhomboid"><span>SALIDA<br>Dashboard</span></div>
+        <div class="arrow"></div>
+        <div class="symbol oval">FIN</div>
+    </div>
+
+    <!-- 2. Standard Pseudocode Section (Spanish) -->
+    <div class="max-w-4xl mx-auto">
+        <div class="flex items-center mb-4 space-x-3">
+            <div class="h-6 w-1 bg-blue-600 rounded"></div>
+            <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest">Procedimiento Algorítmico</h3>
+        </div>
+        <div class="logic-window">
+            <div><span class="keyword">INICIO</span> Optimizador Logístico</div>
+            <div class="indent">
+                <span class="keyword">ASIGNAR</span> Tarifa_TCO a 1.0317 €/km<br>
+                <span class="keyword">ENTRADA</span> Nodos Logísticos y Demanda Diaria<br><br>
+                <span class="keyword">PARA CADA</span> Planta EN la Red:<br>
+                <div class="indent">
+                    <span class="keyword">OBTENER</span> Clientes Candidatos en radio de 200km<br><br>
+                    <span class="keyword">SI</span> el Desvío de la Ruta es menor a 50km <span class="keyword">ENTONCES</span><br>
+                    <div class="indent">
+                        <span class="keyword">AGREGAR</span> Cliente a la lista de candidatos válidos<br>
+                    </div>
+                    <span class="keyword">SINO</span><br>
+                    <div class="indent">
+                        <span class="keyword">DESCARTAR</span> Cliente<br>
+                    </div>
+                    <span class="keyword">FIN SI</span>
+                </div>
+                <br>
+                <span class="keyword">ORDENAR</span> Candidatos para Máxima Eficiencia de Retorno<br>
+                <span class="keyword">EJECUTAR</span> Solver Metahurístico (Motor MC-VRPB)<br><br>
+                <span class="keyword">SI</span> el Solver encuentra rutas factibles <span class="keyword">ENTONCES</span><br>
+                <div class="indent">
+                    <span class="keyword">CALCULAR</span> Ahorro Sistémico (Base de 2 Camiones)<br>
+                    <span class="keyword">MOSTRAR</span> Mapas Interactivos y Estadísticas Financieras<br>
+                </div>
+                <span class="keyword">SINO</span><br>
+                <div class="indent">
+                    <span class="keyword">ALERTAR</span> "La optimización falló por restricciones"<br>
+                </div>
+                <span class="keyword">FIN SI</span>
+            </div>
+            <br>
+            <div><span class="keyword">FIN</span></div>
+        </div>
+    </div>
+
+    <div class="mt-8 text-center text-[10px] text-slate-400 font-bold uppercase tracking-tighter">
+        Cumplimiento de Estándar Codecademy v1.0 (Localizado)
+    </div>
+
+</body>
+</html>

@@ -72,3 +72,19 @@ if not GOOGLE_MAPS_API_KEY:
     logging.getLogger("config").warning(
         "GOOGLE_MAPS_API_KEY no está configurada. Se usará estimación Haversine."
     )
+
+# --- Costes de Explotación (TCO) ---
+# Referencia: [docs/Bibliografia.md] (Basado en TCO/Observatorio MITMA)
+TCO_FIXED_COSTS_ANNUAL = {
+    "amortizacion": 15000,
+    "seguro": 3000,
+    "personal_fijo": 35000,
+    "impuestos_tasas": 1200
+}
+TCO_VARIABLE_COSTS_KM = {
+    "combustible": 0.45,
+    "mantenimiento": 0.08,
+    "neumaticos": 0.03,
+    "adblue": 0.02
+}
+TCO_ANNUAL_KM_PER_TRUCK = 120000

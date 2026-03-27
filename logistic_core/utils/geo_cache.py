@@ -44,7 +44,7 @@ class GeoCache:
                 (key,)
             )
             row = cursor.fetchone()
-            if row:
+            if row and row[0] is not None:
                 logger.debug("Cache HIT for route %s -> %s", origin, destination)
                 return {
                     "distance_meters": row[0],

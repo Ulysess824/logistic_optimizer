@@ -432,3 +432,34 @@ class GeoUtils:
             except Exception:
                 continue
         return None
+
+    def get_route_distance(self, start_coords, end_coords):
+        """
+        Obtiene la distancia real por carretera (metros) entre dos puntos.
+        Utiliza el motor configurado (Google o OSRM) y consulta caché.
+        """
+        # Validar coordenadas
+        if any(c is None for c in start_coords) or any(c is None for c in end_coords):
+            logger.warning("Coordenadas inválidas en get_route_distance: %s -> %s", start_coords, end_coords)
+            return 0.0
+
+        # Intentar caché
+        cached = self.cache.get_route(start_coords, end_coords, truck_specs=self.truck_specs)
+        if cached:
+            return float(cached['distance_meters'])
+            
+        # Fallback a matriz pequeña de 2x2 para reutilizar lógica
+        nodes = [
+            {'lat': start_coords[0], 'lng': start_coords[1]},
+            {'lat': end_coords[0], 'lng': end_coords[1]}
+        ]
+        try:
+            matrix, is_real = self.calculate_distance_matrix(nodes)
+            if is_real and matrix[0][1] is not None:
+                return float(matrix[0][1])
+        except Exception as e:
+            logger.warning("Error en calculate_distance_matrix: %s. Usando Haversine.", e)
+        
+        # Último recurso: Haversine
+        h_dist = self.haversine_distance(nodes[0], nodes[1])
+        return float(h_dist) if h_dist is not None else 0.0

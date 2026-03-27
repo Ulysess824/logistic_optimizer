@@ -13,13 +13,15 @@ from logistic_core.utils.data_manager import DataManager
 from logistic_core.utils.geo import GeoUtils
 from logistic_core.utils.visualizer import Visualizer
 from logistic_core.utils.report_generator import generate_dashboard
-from logistic_core.config import (
-    RESULTS_DIR, DATA_DIR,
-    GLEC_CO2_PER_LITER, GLEC_INTENSITY_GTKM, GLEC_EMPTY_FLOOR_KGKM,
-    PAPER_LOAD_KG, PALLET_WEIGHT_KG, VEHICLE_MAX_LOAD_KG
-)
 from logistic_core.utils.fcr_estimator import FCREmissionEstimator
 from logistic_core.utils.capacity_estimator import TruckCapacityEstimator, Pallet
+from logistic_core.utils.cost_estimator import CostEstimator, FleetSizer
+from logistic_core.config import (
+    RESULTS_DIR, DATA_DIR, MAPS_DIR,
+    GLEC_CO2_PER_LITER, GLEC_INTENSITY_GTKM, GLEC_EMPTY_FLOOR_KGKM,
+    PAPER_LOAD_KG, PALLET_WEIGHT_KG, VEHICLE_MAX_LOAD_KG,
+    TCO_FIXED_COSTS_ANNUAL, TCO_VARIABLE_COSTS_KM, TCO_ANNUAL_KM_PER_TRUCK
+)
 
 logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)
@@ -324,10 +326,17 @@ def run_optimization(
 def _build_summary(routes, solver, max_pallets=35, threshold_km=50, n_candidatos=30):
     """Genera un JSON de resumen con KPIs por ruta."""
     route_summaries = []
+    total_co2_kg = 0
+    total_cost_eur = 0
     total_km = 0
     total_empty_km = 0
-    total_co2_kg = 0
     
+    cost_estimator = CostEstimator(
+        fixed_costs_annual=TCO_FIXED_COSTS_ANNUAL,
+        variable_costs_km=TCO_VARIABLE_COSTS_KM,
+        annual_km_per_truck=TCO_ANNUAL_KM_PER_TRUCK
+    )
+
     co2_estimator = FCREmissionEstimator(
         co2_per_liter=GLEC_CO2_PER_LITER,
         intensity_gtkm=GLEC_INTENSITY_GTKM,
@@ -378,17 +387,20 @@ def _build_summary(routes, solver, max_pallets=35, threshold_km=50, n_candidatos
             "total_pallets": total_pallets,
             "distance_km": round(dist_km, 2),
             "empty_km": round(empty_km, 2),
-            "co2_emissions_kg": round(route_co2_kg, 2)
+            "co2_emissions_kg": round(route_co2_kg, 2),
+            "estimated_cost_eur": cost_estimator.estimate_cost(dist_km)
         })
         total_km += dist_km
         total_empty_km += empty_km
         total_co2_kg += route_co2_kg
+        total_cost_eur += cost_estimator.estimate_cost(dist_km)
 
     return {
         "num_routes": len(route_summaries),
         "total_km": round(total_km, 2),
         "total_empty_km": round(total_empty_km, 2),
         "total_co2_kg": round(total_co2_kg, 2),
+        "total_cost_eur": round(total_cost_eur, 2),
         "parameters": {
             "max_pallets": max_pallets,
             "threshold_km": threshold_km,
@@ -447,7 +459,9 @@ def main():
             else:
                 folium.PolyLine([[s['lat'], s['lng']], [e['lat'], e['lng']]], color=color_actual, weight=2, dash_array='5,5').add_to(mapa)
 
-    mapa.save("mapa_flota_dedicada_folium.html")
+    map_output = MAPS_DIR / "Logistics_Dashboard.html"
+    mapa.save(str(map_output))
+    print(f"=> Mapa interactivo actualizado: {map_output}")
     
     # 10. Actualizar Dashboard Modular (tab_resumen.html)
     presentation_path = "outputs/Presentacion_Logistica.html"
@@ -457,7 +471,7 @@ def main():
     except Exception as e:
         logger.warning("No se pudo actualizar la Presentacion Modular: %s", e)
 
-    print(f"\nTOTAL: {summary['total_km']:.2f} km | CO2: {summary['total_co2_kg']:.2f} kg | Rutas: {summary['num_routes']}")
+    print(f"\nTOTAL: {summary['total_km']:.2f} km | CO2: {summary['total_co2_kg']:.2f} kg | Rutas: {summary['num_routes']} | Coste Est.: {summary['total_cost_eur']:.2f} €")
 
 if __name__ == "__main__":
     main()

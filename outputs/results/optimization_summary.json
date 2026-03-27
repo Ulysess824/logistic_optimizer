@@ -3,6 +3,7 @@
   "total_km": 26640.04,
   "total_empty_km": 8516.07,
   "total_co2_kg": 23371.69,
+  "total_cost_eur": 27483.64,
   "parameters": {
     "max_pallets": 34,
     "threshold_km": 50,
@@ -18,7 +19,8 @@
       "total_pallets": 33,
       "distance_km": 566.26,
       "empty_km": 111.99,
-      "co2_emissions_kg": 501.27
+      "co2_emissions_kg": 501.27,
+      "estimated_cost_eur": 584.19
     },
     {
       "route_id": 2,
@@ -29,7 +31,8 @@
       "total_pallets": 34,
       "distance_km": 569.29,
       "empty_km": 138.82,
-      "co2_emissions_kg": 504.02
+      "co2_emissions_kg": 504.02,
+      "estimated_cost_eur": 587.32
     },
     {
       "route_id": 3,
@@ -40,7 +43,8 @@
       "total_pallets": 28,
       "distance_km": 561.43,
       "empty_km": 145.88,
-      "co2_emissions_kg": 497.05
+      "co2_emissions_kg": 497.05,
+      "estimated_cost_eur": 579.21
     },
     {
       "route_id": 4,
@@ -51,7 +55,8 @@
       "total_pallets": 32,
       "distance_km": 579.96,
       "empty_km": 147.35,
-      "co2_emissions_kg": 510.27
+      "co2_emissions_kg": 510.27,
+      "estimated_cost_eur": 598.32
     },
     {
       "route_id": 5,
@@ -62,7 +67,8 @@
       "total_pallets": 27,
       "distance_km": 577.87,
       "empty_km": 168.61,
-      "co2_emissions_kg": 508.93
+      "co2_emissions_kg": 508.93,
+      "estimated_cost_eur": 596.17
     },
     {
       "route_id": 6,
@@ -73,7 +79,8 @@
       "total_pallets": 26,
       "distance_km": 581.86,
       "empty_km": 186.83,
-      "co2_emissions_kg": 511.34
+      "co2_emissions_kg": 511.34,
+      "estimated_cost_eur": 600.29
     },
     {
       "route_id": 7,
@@ -84,7 +91,8 @@
       "total_pallets": 26,
       "distance_km": 598.96,
       "empty_km": 192.56,
-      "co2_emissions_kg": 521.96
+      "co2_emissions_kg": 521.96,
+      "estimated_cost_eur": 617.92
     },
     {
       "route_id": 8,
@@ -95,7 +103,8 @@
       "total_pallets": 29,
       "distance_km": 587.17,
       "empty_km": 202.38,
-      "co2_emissions_kg": 513.98
+      "co2_emissions_kg": 513.98,
+      "estimated_cost_eur": 605.77
     },
     {
       "route_id": 9,
@@ -106,7 +115,8 @@
       "total_pallets": 31,
       "distance_km": 585.64,
       "empty_km": 202.52,
-      "co2_emissions_kg": 513.67
+      "co2_emissions_kg": 513.67,
+      "estimated_cost_eur": 604.18
     },
     {
       "route_id": 10,
@@ -117,7 +127,8 @@
       "total_pallets": 33,
       "distance_km": 155.33,
       "empty_km": 22.84,
-      "co2_emissions_kg": 139.1
+      "co2_emissions_kg": 139.1,
+      "estimated_cost_eur": 160.25
     },
     {
       "route_id": 11,
@@ -128,7 +139,8 @@
       "total_pallets": 30,
       "distance_km": 154.22,
       "empty_km": 1.43,
-      "co2_emissions_kg": 139.49
+      "co2_emissions_kg": 139.49,
+      "estimated_cost_eur": 159.1
     },
     {
       "route_id": 12,
@@ -139,7 +151,8 @@
       "total_pallets": 28,
       "distance_km": 153.94,
       "empty_km": 10.43,
-      "co2_emissions_kg": 138.27
+      "co2_emissions_kg": 138.27,
+      "estimated_cost_eur": 158.82
     },
     {
       "route_id": 13,
@@ -150,7 +163,8 @@
       "total_pallets": 32,
       "distance_km": 521.68,
       "empty_km": 96.49,
-      "co2_emissions_kg": 459.95
+      "co2_emissions_kg": 459.95,
+      "estimated_cost_eur": 538.2
     },
     {
       "route_id": 14,
@@ -161,7 +175,8 @@
       "total_pallets": 22,
       "distance_km": 505.29,
       "empty_km": 95.08,
-      "co2_emissions_kg": 446.91
+      "co2_emissions_kg": 446.91,
+      "estimated_cost_eur": 521.29
     },
     {
       "route_id": 15,
@@ -172,7 +187,8 @@
       "total_pallets": 31,
       "distance_km": 511.16,
       "empty_km": 97.55,
-      "co2_emissions_kg": 450.97
+      "co2_emissions_kg": 450.97,
+      "estimated_cost_eur": 527.34
     },
     {
       "route_id": 16,
@@ -183,7 +199,8 @@
       "total_pallets": 32,
       "distance_km": 505.38,
       "empty_km": 102.89,
-      "co2_emissions_kg": 448.55
+      "co2_emissions_kg": 448.55,
+      "estimated_cost_eur": 521.39
     },
     {
       "route_id": 17,
@@ -194,7 +211,8 @@
       "total_pallets": 33,
       "distance_km": 514.97,
       "empty_km": 107.11,
-      "co2_emissions_kg": 455.1
+      "co2_emissions_kg": 455.1,
+      "estimated_cost_eur": 531.27
     },
     {
       "route_id": 18,
@@ -205,7 +223,8 @@
       "total_pallets": 28,
       "distance_km": 981.41,
       "empty_km": 394.5,
-      "co2_emissions_kg": 858.11
+      "co2_emissions_kg": 858.11,
+      "estimated_cost_eur": 1012.48
     },
     {
       "route_id": 19,
@@ -216,7 +235,8 @@
       "total_pallets": 33,
       "distance_km": 978.82,
       "empty_km": 398.61,
-      "co2_emissions_kg": 857.11
+      "co2_emissions_kg": 857.11,
+      "estimated_cost_eur": 1009.82
     },
     {
       "route_id": 20,
@@ -227,7 +247,8 @@
       "total_pallets": 32,
       "distance_km": 1013.88,
       "empty_km": 397.13,
-      "co2_emissions_kg": 880.28
+      "co2_emissions_kg": 880.28,
+      "estimated_cost_eur": 1045.98
     },
     {
       "route_id": 21,
@@ -238,7 +259,8 @@
       "total_pallets": 31,
       "distance_km": 981.42,
       "empty_km": 398.63,
-      "co2_emissions_kg": 858.54
+      "co2_emissions_kg": 858.54,
+      "estimated_cost_eur": 1012.5
     },
     {
       "route_id": 22,
@@ -249,7 +271,8 @@
       "total_pallets": 34,
       "distance_km": 1154.65,
       "empty_km": 504.34,
-      "co2_emissions_kg": 1002.2
+      "co2_emissions_kg": 1002.2,
+      "estimated_cost_eur": 1191.21
     },
     {
       "route_id": 23,
@@ -260,7 +283,8 @@
       "total_pallets": 30,
       "distance_km": 1146.01,
       "empty_km": 505.89,
-      "co2_emissions_kg": 996.2
+      "co2_emissions_kg": 996.2,
+      "estimated_cost_eur": 1182.3
     },
     {
       "route_id": 24,
@@ -271,7 +295,8 @@
       "total_pallets": 31,
       "distance_km": 680.66,
       "empty_km": 192.56,
-      "co2_emissions_kg": 594.61
+      "co2_emissions_kg": 594.61,
+      "estimated_cost_eur": 702.21
     },
     {
       "route_id": 25,
@@ -282,7 +307,8 @@
       "total_pallets": 33,
       "distance_km": 705.7,
       "empty_km": 210.07,
-      "co2_emissions_kg": 614.46
+      "co2_emissions_kg": 614.46,
+      "estimated_cost_eur": 728.05
     },
     {
       "route_id": 26,
@@ -293,7 +319,8 @@
       "total_pallets": 24,
       "distance_km": 706.14,
       "empty_km": 210.25,
-      "co2_emissions_kg": 614.05
+      "co2_emissions_kg": 614.05,
+      "estimated_cost_eur": 728.5
     },
     {
       "route_id": 27,
@@ -304,7 +331,8 @@
       "total_pallets": 30,
       "distance_km": 333.82,
       "empty_km": 1.43,
-      "co2_emissions_kg": 302.27
+      "co2_emissions_kg": 302.27,
+      "estimated_cost_eur": 344.39
     },
     {
       "route_id": 28,
@@ -315,7 +343,8 @@
       "total_pallets": 30,
       "distance_km": 340.47,
       "empty_km": 7.66,
-      "co2_emissions_kg": 306.64
+      "co2_emissions_kg": 306.64,
+      "estimated_cost_eur": 351.25
     },
     {
       "route_id": 29,
@@ -326,7 +355,8 @@
       "total_pallets": 28,
       "distance_km": 351.86,
       "empty_km": 10.43,
-      "co2_emissions_kg": 313.84
+      "co2_emissions_kg": 313.84,
+      "estimated_cost_eur": 363.0
     },
     {
       "route_id": 30,
@@ -337,7 +367,8 @@
       "total_pallets": 27,
       "distance_km": 338.09,
       "empty_km": 23.62,
-      "co2_emissions_kg": 302.59
+      "co2_emissions_kg": 302.59,
+      "estimated_cost_eur": 348.8
     },
     {
       "route_id": 31,
@@ -348,7 +379,8 @@
       "total_pallets": 31,
       "distance_km": 360.17,
       "empty_km": 12.93,
-      "co2_emissions_kg": 318.52
+      "co2_emissions_kg": 318.52,
+      "estimated_cost_eur": 371.57
     },
     {
       "route_id": 32,
@@ -359,7 +391,8 @@
       "total_pallets": 27,
       "distance_km": 1316.99,
       "empty_km": 486.63,
-      "co2_emissions_kg": 1155.31
+      "co2_emissions_kg": 1155.31,
+      "estimated_cost_eur": 1358.69
     },
     {
       "route_id": 33,
@@ -370,7 +403,8 @@
       "total_pallets": 33,
       "distance_km": 1317.02,
       "empty_km": 486.74,
-      "co2_emissions_kg": 1157.92
+      "co2_emissions_kg": 1157.92,
+      "estimated_cost_eur": 1358.73
     },
     {
       "route_id": 34,
@@ -381,7 +415,8 @@
       "total_pallets": 26,
       "distance_km": 1057.13,
       "empty_km": 394.83,
-      "co2_emissions_kg": 923.47
+      "co2_emissions_kg": 923.47,
+      "estimated_cost_eur": 1090.6
     },
     {
       "route_id": 35,
@@ -392,7 +427,8 @@
       "total_pallets": 26,
       "distance_km": 1058.54,
       "empty_km": 395.15,
-      "co2_emissions_kg": 927.63
+      "co2_emissions_kg": 927.63,
+      "estimated_cost_eur": 1092.06
     },
     {
       "route_id": 36,
@@ -403,7 +439,8 @@
       "total_pallets": 28,
       "distance_km": 1060.44,
       "empty_km": 397.81,
-      "co2_emissions_kg": 927.25
+      "co2_emissions_kg": 927.25,
+      "estimated_cost_eur": 1094.02
     },
     {
       "route_id": 37,
@@ -414,7 +451,8 @@
       "total_pallets": 33,
       "distance_km": 1252.7,
       "empty_km": 523.11,
-      "co2_emissions_kg": 1092.84
+      "co2_emissions_kg": 1092.84,
+      "estimated_cost_eur": 1292.36
     },
     {
       "route_id": 38,
@@ -425,7 +463,8 @@
       "total_pallets": 34,
       "distance_km": 1273.75,
       "empty_km": 533.01,
-      "co2_emissions_kg": 1107.04
+      "co2_emissions_kg": 1107.04,
+      "estimated_cost_eur": 1314.09
     }
   ]
 }
