@@ -1,6 +1,6 @@
 import logging
 from typing import Dict, Any
-
+from logistic_core.config import INTERNAL_OPERATIONAL_TCO_RATE, EXTERNAL_PROVIDER_RATE_PER_KM
 from logistic_core.utils.fcr_estimator import FCREmissionEstimator
 
 class ExternalCostAnalyst:
@@ -9,16 +9,16 @@ class ExternalCostAnalyst:
     Compara el tramo de entrega (Linehaul) bajo mimas condiciones de distancia.
     """
     
-    def __init__(self, internal_rate: float = 1.14, external_rate: float = 1.35):
+    def __init__(self, internal_rate: float = None, external_rate: float = None):
         """
         Args:
-            internal_rate (float): Coste interno por km (€). Default: 1.14.
-            external_rate (float): Tarifa externa por km (€). Default: 1.35.
+            internal_rate (float): Coste interno por km (€). Default de config.
+            external_rate (float): Tarifa externa por km (€). Default de config.
         """
-        self.internal_rate = internal_rate
-        self.external_rate = external_rate
+        self.internal_rate = internal_rate or INTERNAL_OPERATIONAL_TCO_RATE
+        self.external_rate = external_rate or EXTERNAL_PROVIDER_RATE_PER_KM
         self.co2_est = FCREmissionEstimator() # GLEC v3 Motor
-        logging.info(f"ExternalCostAnalyst inicializado. Interno: {internal_rate} €/km, Externo: {external_rate} €/km")
+        logging.info(f"ExternalCostAnalyst inicializado. Interno: {self.internal_rate} €/km, Externo: {self.external_rate} €/km")
 
     def analyze_leg(self, linehaul_distance: float, load_tons: float = 25.0) -> Dict[str, Any]:
         """

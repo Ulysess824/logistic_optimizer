@@ -7,7 +7,7 @@ from pathlib import Path
 logger = logging.getLogger(__name__)
 
 class GeoCache:
-    def __init__(self, db_path="data/geo_cache.db"):
+    def __init__(self, db_path="data/geo_cache_v3.db"):
         self.db_path = Path(db_path)
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         self._init_db()

@@ -16,11 +16,13 @@ from logistic_core.utils.report_generator import generate_dashboard
 from logistic_core.utils.fcr_estimator import FCREmissionEstimator
 from logistic_core.utils.capacity_estimator import TruckCapacityEstimator, Pallet
 from logistic_core.utils.cost_estimator import CostEstimator, FleetSizer
+from logistic_core.utils.fleet_estimator import FleetCapexEstimator
 from logistic_core.config import (
     RESULTS_DIR, DATA_DIR, MAPS_DIR,
     GLEC_CO2_PER_LITER, GLEC_INTENSITY_GTKM, GLEC_EMPTY_FLOOR_KGKM,
     PAPER_LOAD_KG, PALLET_WEIGHT_KG, VEHICLE_MAX_LOAD_KG,
-    TCO_FIXED_COSTS_ANNUAL, TCO_VARIABLE_COSTS_KM, TCO_ANNUAL_KM_PER_TRUCK
+    TCO_FIXED_COSTS_ANNUAL, TCO_VARIABLE_COSTS_KM, TCO_ANNUAL_KM_PER_TRUCK,
+    CAPEX_TRUCK_UNIT_COST, DEFAULT_CYCLE_TIME_DAYS, DAILY_TRUCK_OUTBOUND, DEFAULT_FLEET_BUFFER
 )
 
 logging.basicConfig(level=logging.WARNING)
@@ -437,30 +439,9 @@ def main():
     with open(summary_json, 'w', encoding='utf-8') as f:
         json.dump(summary, f, indent=2, ensure_ascii=False)
 
-    # 9. Mapa Folium con rutas OSRM reales
-    with open(PLANTS_FILE, 'r', encoding='utf-8') as f:
-        plants_data = json.load(f)
-    
-    m_lat, m_lng = plants_data['paper_plant']['lat'], plants_data['paper_plant']['lng']
-    mapa = folium.Map(location=[m_lat, m_lng], zoom_start=6, tiles="CartoDB positron")
-    colores_ruta = ['blue', 'green', 'red', 'purple', 'orange', 'darkred', 'cadetblue']
-
-    for i, route in enumerate(routes):
-        color_actual = colores_ruta[i % len(colores_ruta)]
-        for n in route:
-            icon = 'home' if n['type'] == 'depot' else ('industry' if n['type'] == 'carton_plant' else 'info-sign')
-            folium.Marker([n['lat'], n['lng']], popup=n['name'], icon=folium.Icon(color=color_actual, icon=icon)).add_to(mapa)
-
-        for j in range(len(route) - 1):
-            s, e = route[j], route[j+1]
-            poly = solver.geo.get_route_polyline((s['lat'], s['lng']), (e['lat'], e['lng']))
-            if poly and poly != "BILLING_ERROR":
-                folium.PolyLine(polyline.decode(poly), color=color_actual, weight=4).add_to(mapa)
-            else:
-                folium.PolyLine([[s['lat'], s['lng']], [e['lat'], e['lng']]], color=color_actual, weight=2, dash_array='5,5').add_to(mapa)
-
-    map_output = MAPS_DIR / "Logistics_Dashboard.html"
-    mapa.save(str(map_output))
+    # 9. Mapa Folium con rutas OSRM reales (Usando Visualizer centralizado)
+    viz = Visualizer(routes, solver.distance_matrix, geo_utils=solver.geo)
+    map_output = viz.create_map("Logistics_Dashboard.html")
     print(f"=> Mapa interactivo actualizado: {map_output}")
     
     # 10. Actualizar Dashboard Modular (tab_resumen.html)
@@ -472,6 +453,23 @@ def main():
         logger.warning("No se pudo actualizar la Presentacion Modular: %s", e)
 
     print(f"\nTOTAL: {summary['total_km']:.2f} km | CO2: {summary['total_co2_kg']:.2f} kg | Rutas: {summary['num_routes']} | Coste Est.: {summary['total_cost_eur']:.2f} €")
+    
+    # 11. Imprimir Estimación de CAPEX y Flota (Ley de Little)
+    print("\n=====================================================================")
+    print(" INVERSION NECESARIA: FLOTA HEAVY (LEY DE LITTLE)")
+    print("=====================================================================")
+    capex_estimator = FleetCapexEstimator(
+        daily_dispatch_rate=DAILY_TRUCK_OUTBOUND,
+        unit_truck_cost=CAPEX_TRUCK_UNIT_COST,
+        utilization_buffer=DEFAULT_FLEET_BUFFER
+    )
+    resumen_capex = capex_estimator.generate_investment_summary(average_cycle_time_days=DEFAULT_CYCLE_TIME_DAYS)
+    
+    print(f"Salidas diarias constantes (lambda): {resumen_capex['daily_dispatch_rate']} viajes/dia")
+    print(f"Tiempo de ciclo logistico (W):       {resumen_capex['average_cycle_time_days']} dias")
+    print(f"Flota minima teorica requerida:      {resumen_capex['theoretical_fleet_base']} vehiculos")
+    print(f"Flota instalada final (real):        {resumen_capex['final_required_fleet']} vehiculos fisicos (buffer {DEFAULT_FLEET_BUFFER*100-100:.0f}%)")
+    print(f"INVERSION TOTAL CAPEX:               {resumen_capex['total_capex_investment']:,.2f} EUR\n")
 
 if __name__ == "__main__":
     main()

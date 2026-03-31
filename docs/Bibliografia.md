@@ -41,6 +41,9 @@ Este documento recopila las fuentes, normativas y estudios científicos que resp
 ### Observatorio de Costes (MITMA)
 *   **Referencia**: [Observatorio de Costes del Transporte de Mercancías por Carretera](https://www.transportes.gob.es/transporte-terrestre/servicios-al-transportista/observatorios-del-transporte/observatorio-de-costes-del-transporte-de-mercancias-por-carretera).
 *   **Aplicación**: Proporciona los porcentajes de distribución de costes estándar para el mercado español (ej. Camión de 40t: Combustible ~33%, Personal ~40%).
+*   **Actualización 2026**: Inclusión de la categoría de **Articulado de 44 toneladas de carga general**.
+*   **Impacto Normativo**: Basado en la [Orden TMA/215/2024](https://www.boe.es/eli/es/o/2024/03/15/tma215) y reportes de **FENADISMER** sobre el incremento de costes de mantenimiento y neumáticos (+12%) derivado de la masa máxima autorizada de 44t.
+*   **Valores 2026**: Coste anual de explotación para vehículo de 44t fijado en **168.543,75 €** (Referencia Q1 2026).
 
 ---
 

@@ -31,7 +31,40 @@ class Visualizer:
             color = self.route_colors[i % len(self.route_colors)]
             route_dist = 0
             empty_dist = 0
-            detail_html = "<ul style='padding-left: 15px; font-size: 11px; margin: 5px 0; color: #444; list-style-type: none;'>"
+            detail_html = "<ul style='padding-left: 5px; font-size: 11px; margin: 5px 0; color: #444; list-style-type: none;'>"
+            
+            # --- CÁLCULO DE CARGA (KGs) Y ESTADO POR TRAMO ---
+            from logistic_core.config import PAPER_LOAD_KG, PALLET_WEIGHT_KG
+            load_change = [0] * len(route)
+            paper_dropped = False
+            for idx, node in enumerate(route):
+                if node['type'] == 'depot' and idx == 0:
+                    load_change[idx] = PAPER_LOAD_KG
+                elif node['type'] == 'carton_plant':
+                    delta = 0
+                    if not paper_dropped:
+                        delta -= PAPER_LOAD_KG
+                        paper_dropped = True
+                    # Calcular pallets que se cargan en esta planta
+                    plant_id = str(node.get('id', ''))
+                    base_plant_id = plant_id.split('_clone')[0]
+                    
+                    matched_pallets = sum(c.get('demanda_pallets', 0) for c in route if c['type'] == 'customer' and base_plant_id in str(c.get('parent_cp','')))
+                    # Failsafe: Si no encuentra asociaciones de ID por renombramientos, la primera planta asume todo
+                    if matched_pallets == 0 and sum(load_change[:idx+1]) <= 0:
+                        matched_pallets = sum(c.get('demanda_pallets', 0) for c in route if c['type'] == 'customer')
+                    
+                    delta += matched_pallets * PALLET_WEIGHT_KG
+                    load_change[idx] += delta
+                elif node['type'] == 'customer':
+                    pallets = node.get('demanda_pallets', 0)
+                    load_change[idx] -= pallets * PALLET_WEIGHT_KG
+
+            loads_leaving = []
+            curr_l = 0
+            for chg in load_change:
+                curr_l += chg
+                loads_leaving.append(curr_l)
 
             for j in range(len(route) - 1):
                 start, end = route[j], route[j+1]
@@ -39,14 +72,35 @@ class Visualizer:
                 dist_km = dist_m / 1000
                 route_dist += dist_km
                 
+                # Estado de la carga en este tramo
+                weight_in_segment = max(0, loads_leaving[j])
+                estado_badge = ""
+                if weight_in_segment > 20000:
+                    estado_badge = f"<span style='background:#1f77b4; color:white; padding:1px 4px; border-radius:3px; font-size:9px;'>CARG. ({weight_in_segment:,.0f} kg)</span>"
+                elif weight_in_segment > 0:
+                    estado_badge = f"<span style='background:#f39c12; color:white; padding:1px 4px; border-radius:3px; font-size:9px;'>PARCIAL ({weight_in_segment:,.0f} kg)</span>"
+                else:
+                    estado_badge = f"<span style='background:#e74c3c; color:white; padding:1px 4px; border-radius:3px; font-size:9px;'>VACÍO (0 kg)</span>"
+                
                 # Check if returning to depot at the end of the route
                 if end['type'] == 'depot' and j == len(route) - 2:
                     empty_dist += dist_km
+                    # Forzar estado vacío al retornar por seguridad
+                    estado_badge = f"<span style='background:#e74c3c; color:white; padding:1px 4px; border-radius:3px; font-size:9px;'>VACÍO SAFARI</span>" # Debug just in case, wait no Safari
+                    estado_badge = f"<span style='background:#e74c3c; color:white; padding:1px 4px; border-radius:3px; font-size:9px;'>VACÍO (0 kg)</span>"
 
                 s_icon = "🏢" if start['type'] == 'depot' else "🏭" if start['type'] == 'carton_plant' else "🏪"
                 e_icon = "🏢" if end['type'] == 'depot' else "🏭" if end['type'] == 'carton_plant' else "🏪"
 
-                detail_html += f"<li>{s_icon} {start['name']} <span style='color:{color}'>→</span> {e_icon} {end['name']} <b style='float:right'>{dist_km:.1f} km</b></li>"
+                detail_html += (
+                    f"<li style='margin-bottom:6px; background:#fff; padding:4px; border:1px solid #eee; border-radius:4px;'>"
+                    f"  <div style='display:flex; justify-content:space-between; margin-bottom:2px;'>"
+                    f"    <span style='white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 75%;' title='{start['name']} → {end['name']}'>{s_icon} {start['name'].split()[0]} <span style='color:{color}'>→</span> {e_icon} {end['name'].split()[0]}</span>"
+                    f"    <b style='min-width: 40px; text-align:right;'>{dist_km:.1f} km</b>"
+                    f"  </div>"
+                    f"  <div style='text-align:right;'>{estado_badge}</div>"
+                    f"</li>"
+                )
 
             detail_html += "</ul>"
             total_km += route_dist

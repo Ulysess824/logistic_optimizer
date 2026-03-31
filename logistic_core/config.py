@@ -23,7 +23,7 @@ LOGS_DIR = BASE_DIR / "logs"
 
 # Solver config
 MAX_SEARCH_TIME = 90          # Segundos máximos de búsqueda del solver
-OSRM_URL = os.getenv("OSRM_URL", "http://localhost:5000")
+OSRM_URL = os.getenv("OSRM_URL", "http://localhost:5000/route/v1/driving/")
 DIST_LIMIT = 4_000_000        # Límite de distancia por vehículo (metros)
 DEFAULT_N_CLIENTES = 4        # Máximo de clientes por ruta (dimensión del solver)
 DEFAULT_MAX_PLANTS_PER_ROUTE = 1  # Plantas por ruta (1=VRPB clásico, >1=MC-VRPB)
@@ -73,18 +73,33 @@ if not GOOGLE_MAPS_API_KEY:
         "GOOGLE_MAPS_API_KEY no está configurada. Se usará estimación Haversine."
     )
 
-# --- Costes de Explotación (TCO) ---
-# Referencia: [docs/Bibliografia.md] (Basado en TCO/Observatorio MITMA)
+# --- Tarifas de Mercado y Costes Operativos (€/km) ---
+# Datos actualizados 2026 (Ref: [Observatorio MITMA / FENADISMER])
+# Vehículo Articulado de Carga General (44 Toneladas Euro VI)
+EXTERNAL_PROVIDER_RATE_PER_KM = 2.22 # Tarifa de mercado del proveedor externo por km (Punto a Punto)
+INTERNAL_OPERATIONAL_TCO_RATE = 1.157   # Tarifa técnica propia (Totalmente cargado TCO)
+
 TCO_FIXED_COSTS_ANNUAL = {
-    "amortizacion": 15000,
-    "seguro": 3000,
-    "personal_fijo": 35000,
-    "impuestos_tasas": 1200
+    "personal_y_dietas": 56967.0,      # Chófer, SS y dietas (33.8% del coste total)
+    "amortizacion_vehiculo": 16450.0,    # Depreciación tractora + semi (8 años)
+    "seguros_y_visados": 4200.0,        # Responsabilidad civil y mercancía
+    "costes_indirectos_adm": 12840.0,    # Gestión de flota, planners y alquileres
+    "fiscalidad_y_otros": 1850.0        # ITVs, Impuesto Tracción Mecánica e IAE
 }
+
 TCO_VARIABLE_COSTS_KM = {
-    "combustible": 0.45,
-    "mantenimiento": 0.08,
-    "neumaticos": 0.03,
-    "adblue": 0.02
+    "combustible_diesel": 0.395,       # Consumo aprox 34L/100km (44t)
+    "mantenimiento_reparacion": 0.092,  # Correctivo y preventivo
+    "neumaticos": 0.038,               # Desgaste por rodadura (alto impacto en 44t)
+    "adblue_y_lubricantes": 0.015       # Consumibles Euro VI
 }
+
+# Distancia de referencia anual para amortización de costes fijos
 TCO_ANNUAL_KM_PER_TRUCK = 120000
+
+# --- Estimación de Flota y CAPEX (Ley de Little) ---
+CAPEX_TRUCK_UNIT_COST = 145000.0  # Euros por cabeza tractora heavy duty
+DEFAULT_CYCLE_TIME_DAYS = 1.2     # Tiempo de ciclo logístico promedio en días (W)
+DAILY_TRUCK_OUTBOUND = 38.0       # Viajes o despachos diarios constantes (lambda)
+DEFAULT_FLEET_BUFFER = 1.10       # 10% margen operativo de seguridad (averías, descansos)
+SOFTWARE_TMS_CAPEX = 25000.0     # Inversión inicial en Software y Transformación Digital
