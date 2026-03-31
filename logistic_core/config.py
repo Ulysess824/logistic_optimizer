@@ -23,7 +23,8 @@ LOGS_DIR = BASE_DIR / "logs"
 
 # Solver config
 MAX_SEARCH_TIME = 90          # Segundos máximos de búsqueda del solver
-OSRM_URL = os.getenv("OSRM_URL", "http://localhost:5000/route/v1/driving/")
+OSRM_URL = os.getenv("OSRM_URL", "http://localhost:5000")
+ROAD_CORRECTION_FACTOR = 1.25 # Factor de "asfalto" para Haversine (GABM Std)
 DIST_LIMIT = 4_000_000        # Límite de distancia por vehículo (metros)
 DEFAULT_N_CLIENTES = 4        # Máximo de clientes por ruta (dimensión del solver)
 DEFAULT_MAX_PLANTS_PER_ROUTE = 1  # Plantas por ruta (1=VRPB clásico, >1=MC-VRPB)
@@ -76,7 +77,7 @@ if not GOOGLE_MAPS_API_KEY:
 # --- Tarifas de Mercado y Costes Operativos (€/km) ---
 # Datos actualizados 2026 (Ref: [Observatorio MITMA / FENADISMER])
 # Vehículo Articulado de Carga General (44 Toneladas Euro VI)
-EXTERNAL_PROVIDER_RATE_PER_KM = 2.22 # Tarifa de mercado del proveedor externo por km (Punto a Punto)
+EXTERNAL_PROVIDER_RATE_PER_KM = 1.61    # Tarifa de mercado del proveedor externo por km (Punto a Punto)
 INTERNAL_OPERATIONAL_TCO_RATE = 1.157   # Tarifa técnica propia (Totalmente cargado TCO)
 
 TCO_FIXED_COSTS_ANNUAL = {
@@ -98,8 +99,16 @@ TCO_VARIABLE_COSTS_KM = {
 TCO_ANNUAL_KM_PER_TRUCK = 120000
 
 # --- Estimación de Flota y CAPEX (Ley de Little) ---
-CAPEX_TRUCK_UNIT_COST = 145000.0  # Euros por cabeza tractora heavy duty
+CAPEX_TRUCK_UNIT_COST = 145_000.0  # Euros por cabeza tractora heavy duty
 DEFAULT_CYCLE_TIME_DAYS = 1.2     # Tiempo de ciclo logístico promedio en días (W)
 DAILY_TRUCK_OUTBOUND = 38.0       # Viajes o despachos diarios constantes (lambda)
 DEFAULT_FLEET_BUFFER = 1.10       # 10% margen operativo de seguridad (averías, descansos)
-SOFTWARE_TMS_CAPEX = 25000.0     # Inversión inicial en Software y Transformación Digital
+SOFTWARE_TMS_CAPEX = 25_000.0     # Inversión inicial en Software y Transformación Digital
+
+# --- Métricas Finacieras y Leasing (Modelo de Bobinas) ---
+LEASING_MONTHLY_FEE_COIL_TRUCK = 2650.0  # Cuota mensual "Full-Service" (Incl. Mantenimiento)
+LEASING_TERM_YEARS = 5                   # Horizonte de inversión estándar
+INVESTMENT_DISCOUNT_RATE = 0.08          # WACC (8% Coste de Capital / Tasa de Descuento)
+PURCHASE_RESALE_VALUE_PCT = 0.25         # Valor residual conservador (Activo especializado bobinas)
+PURCHASE_UPFRONT_PCT = 0.15              # Entrada mínima para compra financiada
+ANNUAL_MAINTENANCE_SURCHARGE_SPECIALIZED = 0.057 # Sobrecoste anual por desgaste carga pesada

@@ -27,7 +27,8 @@ from logistic_core.config import (
      DEFAULT_MAX_CUSTOMERS, DEFAULT_THRESHOLD_KM,
      INTERNAL_OPERATIONAL_TCO_RATE, EXTERNAL_PROVIDER_RATE_PER_KM,
      CAPEX_TRUCK_UNIT_COST, DEFAULT_CYCLE_TIME_DAYS, 
-     DAILY_TRUCK_OUTBOUND, DEFAULT_FLEET_BUFFER
+     DAILY_TRUCK_OUTBOUND, DEFAULT_FLEET_BUFFER,
+     SOFTWARE_TMS_CAPEX
 )
 from logistic_core.utils.geo import GeoUtils
 from logistic_core.utils.cost_estimator import CostEstimator
@@ -94,6 +95,7 @@ def generate_dashboard(summary_path, routes_path, output_path, hedonic_path=None
     # Totales Agregados
     t_dist_trad, t_empty_trad, t_co2_trad, t_cost_trad = 0.0, 0.0, 0.0, 0.0
     t_dist_vrpb, t_empty_vrpb, t_co2_vrpb, t_cost_vrpb = 0.0, 0.0, 0.0, 0.0
+    t_co2_savings_systemic = 0.0
     
     outsourcing_rows_html = []
 
@@ -121,8 +123,10 @@ def generate_dashboard(summary_path, routes_path, output_path, hedonic_path=None
         p_short = p_base_name.replace("Smurfit Westrock ", "").replace("CP_", "").upper()
 
         # 1. Escenario Tradicional Real (OSRM en lugar de Haversine)
-        # Camión 1: Mengíbar -> Planta -> Mengíbar
-        dist_m_p_m = geo.get_route_distance((depot["lat"], depot["lng"]), (last_plant["lat"], last_plant["lng"])) * 2 / 1000.0
+        # Camión 1: Mengíbar -> Planta y Planta -> Mengíbar (Real Inbound/Outbound)
+        dist_m_p = geo.get_route_distance((depot["lat"], depot["lng"]), (last_plant["lat"], last_plant["lng"])) / 1000.0
+        dist_p_m = geo.get_route_distance((last_plant["lat"], last_plant["lng"]), (depot["lat"], depot["lng"])) / 1000.0
+        dist_m_p_m = dist_m_p + dist_p_m
         
         # Camión 2: Planta -> Clientes (Solo IDA, no vuelve a planta)
         dist_p_c_only_out = 0
@@ -215,12 +219,15 @@ def generate_dashboard(summary_path, routes_path, output_path, hedonic_path=None
             
             ext_comp = ext_analyst.analyze_leg(dist_planta_a_clientes)
             systemic_saving_route = ext_comp.get("savings", 0)
+            systemic_co2_saving_route = ext_comp.get("co2_kg", 0)
         else:
             systemic_saving_route = 0.0
+            systemic_co2_saving_route = 0.0
 
         # Acumular para el KPI global
         header_alert = f'<p class="text-[11px] text-orange-600 mb-4 bg-orange-50 inline-block px-2 py-1 rounded">ℹ Análisis del segmento Linehaul (Entrega): Flota Propia ({fmt_std(price_km)} €/km) vs. Tarifa Externa ({fmt_std(ext_analyst.external_rate)} €/km).</p>'
         t_systemic_savings += systemic_saving_route
+        t_co2_savings_systemic += systemic_co2_saving_route
 
         if p_short not in plant_groups:
             # Calculamos métricas puramente para la fila gris base (1 camión inbound sin clientes)
@@ -280,7 +287,8 @@ def generate_dashboard(summary_path, routes_path, output_path, hedonic_path=None
             'co2_km': route_co2_km,
             'red_co2': route_red_co2,
             'empty_ret_saving': empty_ret_saving_money,
-            'systemic_saving': systemic_saving_route
+            'systemic_saving': systemic_saving_route,
+            'systemic_co2_saving': systemic_co2_saving_route
         })
 
         # --- 2. CÁLCULO LINEHAUL PARA COMPARATIVA EXTERNA ---
@@ -323,6 +331,7 @@ def generate_dashboard(summary_path, routes_path, output_path, hedonic_path=None
             f'<td class="py-2 px-3 text-center">{r["num_customers"]}</td>'
             f'<td class="py-2 px-3 font-mono text-center">{fmt_std(r["distance_km"])} km</td>'
             f'<td class="py-2 px-3 font-mono text-center text-purple-600 font-bold">{fmt_std(r.get("co2_emissions_kg", 0))} kg</td>'
+            f'<td class="py-2 px-3 font-mono text-center font-bold text-teal-600">+{fmt_std(systemic_co2_saving_route)} kg</td>'
             f'<td class="py-2 px-3 font-mono text-center font-bold text-blue-700">{fmt_std(route_cost_vrpb)} €</td>'
             f'<td class="py-2 px-3 font-mono text-center font-bold text-green-600">+{fmt_std(systemic_saving_route)} €</td>'
             f'</tr>'
@@ -368,6 +377,7 @@ def generate_dashboard(summary_path, routes_path, output_path, hedonic_path=None
             f'<td class="px-3 py-1 text-center font-mono">-</td>'
             f'<td class="px-3 py-1 text-center font-mono">-</td>'
             f'<td class="px-3 py-1 text-center font-mono">-</td>'
+            f'<td class="px-3 py-1 text-center font-mono">-</td>'
             f'<td class="px-3 py-1 text-center">-</td>'
             f'</tr>'
         )
@@ -387,6 +397,7 @@ def generate_dashboard(summary_path, routes_path, output_path, hedonic_path=None
                 f'<td class="px-3 py-1 text-center font-mono font-bold">{fmt_std(orout["cost"], 2)} €</td>'
                 f'<td class="px-3 py-1 text-center font-mono font-bold text-purple-700">{fmt_std(orout["co2_km"], 3)} kg/km</td>'
                 f'<td class="px-3 py-1 text-center font-mono font-bold text-fuchsia-700">{fmt_std(orout["co2_abs"], 1)} kg</td>'
+                f'<td class="px-3 py-1 text-center font-bold text-teal-600">+{fmt_std(orout["systemic_co2_saving"], 1)} kg</td>'
                 f'<td class="px-3 py-1 text-center {co2_class}">{co2_sign}{fmt_std(orout["red_co2"], 1)}%</td>'
                 f'<td class="px-3 py-1 text-center font-bold text-green-600 border-l border-green-100 italic">'
                 f'+{fmt_std(orout["imp"], 1)}%'
@@ -454,9 +465,25 @@ def generate_dashboard(summary_path, routes_path, output_path, hedonic_path=None
             html_res = _replace_kpi(html_res, "kpi-euros-km", f'{fmt_std(global_cost_km, 3)}')
             html_res = _replace_kpi(html_res, "kpi-co2-km", f'{fmt_std(global_co2_km, 3)}')
             html_res = _replace_kpi(html_res, "kpi-co2-total", f'{fmt_std(summary["total_co2_kg"], 0)}')
+            html_res = _replace_kpi(html_res, "kpi-red-co2-abs", f'{fmt_std(t_co2_savings_systemic, 1)} kg')
             html_res = _replace_kpi(html_res, "kpi-red-co2", red_label)
             html_res = _replace_kpi(html_res, "kpi-vacio-pct", f"~{fmt_std(total_pct, 1)}%")
             html_res = _replace_kpi(html_res, "kpi-systemic-saving", f"{fmt_std(t_systemic_savings, 0)} €")
+
+            # --- CÁLCULO DE ROI Y PAYBACK (Estrategia Eficiencia Software) ---
+            investment = SOFTWARE_TMS_CAPEX # 25,000 €
+            daily_saving = t_systemic_savings
+            
+            # Payback en días de operación
+            payback_days = investment / daily_saving if daily_saving > 0 else float('inf')
+            
+            # ROI Anualizado (Asumiendo 300 días laborables)
+            annual_saving = daily_saving * 300
+            roi_pct = ((annual_saving - investment) / investment) * 100 if investment > 0 else 0
+            
+            html_res = _replace_kpi(html_res, "kpi-software-investment", f"{fmt_std(investment, 0)} €")
+            html_res = _replace_kpi(html_res, "kpi-software-roi", f"{fmt_std(roi_pct, 0)}%")
+            html_res = _replace_kpi(html_res, "kpi-software-payback", f"{fmt_std(payback_days, 1)} días")
 
             # Inyectar Tabla Comparativa
             marker = 'id="comparison-tbody"'

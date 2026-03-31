@@ -2,7 +2,7 @@ import logging
 import googlemaps
 import numpy as np
 import requests
-from logistic_core.config import GOOGLE_MAPS_API_KEY, OSRM_URL
+from logistic_core.config import GOOGLE_MAPS_API_KEY, OSRM_URL, ROAD_CORRECTION_FACTOR
 from logistic_core.utils.geo_cache import GeoCache
 
 logger = logging.getLogger(__name__)
@@ -36,10 +36,11 @@ class GeoUtils:
     # ------------------------------------------------------------------
     def haversine_distance(self, node_a, node_b):
         """Distancia en línea recta (metros) entre dos nodos {'lat', 'lng'}."""
-        return self.haversine_km(
+        d_mt = self.haversine_km(
             node_a['lat'], node_a['lng'],
             node_b['lat'], node_b['lng']
-        ) * 1000
+        ) * 1000.0
+        return d_mt * ROAD_CORRECTION_FACTOR
 
     # ------------------------------------------------------------------
     # Haversine — versión vectorizada (km). Acepta escalares o np.arrays.
@@ -94,7 +95,7 @@ class GeoUtils:
         a = np.sin(dlat / 2) ** 2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon / 2) ** 2
         matrix = 6371000 * 2 * np.arctan2(np.sqrt(a), np.sqrt(1 - a))  # En metros
         
-        return matrix, False
+        return matrix * ROAD_CORRECTION_FACTOR, False
 
     def _calculate_distance_matrix_routes_api(self, nodes):
         """Calcula distancias usando la nueva Routes API de Google Maps (v2) con soporte para camiones."""
@@ -251,8 +252,9 @@ class GeoUtils:
         coords_str = ";".join([f"{n['lng']},{n['lat']}" for n in nodes])
         
         # Intentar servidor local (OSRM_URL) o fallback al público
+        # El OSRM_URL ahora es la base limpia (ej: http://localhost:5000)
         urls_to_try = [
-            f"{OSRM_URL}/table/v1/driving/{coords_str}?sources=all&destinations=all&annotations=distance,duration",
+            f"{OSRM_URL.rstrip('/')}/table/v1/driving/{coords_str}?sources=all&destinations=all&annotations=distance,duration",
             f"http://router.project-osrm.org/table/v1/driving/{coords_str}?sources=all&destinations=all&annotations=distance,duration"
         ]
 

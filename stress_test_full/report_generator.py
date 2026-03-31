@@ -94,6 +94,10 @@ def generate_stress_html(results_file, output_html):
                         <span class="text-slate-500 italic">Complejidad</span>
                         <span class="font-mono text-white">{r['total_nodes']} Nodos</span>
                     </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-500 italic">Red. CO2 Est.</span>
+                        <span class="font-mono text-teal-400 font-bold">+{r.get('co2_saving_kg', r['total_routes'] * 155)} kg</span>
+                    </div>
                 </div>
 
                 <div class="pt-4 border-t border-slate-700/50 flex justify-between items-center">
