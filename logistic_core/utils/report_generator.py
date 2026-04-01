@@ -877,7 +877,7 @@ def _generate_implementacion_tab(bodies_dir):
 <body class="p-8 pb-32">
     <div class="max-w-7xl mx-auto">
         <h1 class="text-3xl font-black text-slate-800 mb-2 border-b-2 border-slate-200 pb-4">Gestión del Cambio & Roll-Out Plan</h1>
-        <p class="text-slate-500 text-sm mb-12">Cronograma de despliegue a 6 meses y matriz estratégica de mitigación de riesgos operativos.</p>
+
 
         <!-- Riesgos: Matriz 2x2 simulada -->
         <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center"><span class="w-8 h-8 rounded bg-yellow-100 text-yellow-600 flex items-center justify-center mr-3 font-black text-lg">⚠</span> Matriz de Riesgos Principales</h2>
@@ -931,58 +931,7 @@ def _generate_implementacion_tab(bodies_dir):
             </div>
         </div>
 
-        <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center"><span class="w-8 h-8 rounded bg-indigo-100 text-indigo-600 flex items-center justify-center mr-3 font-black text-lg">✈</span> Roadmap (Roll-out a 6 Meses)</h2>
-        <div class="relative bg-white p-8 rounded-xl shadow border border-slate-200">
-            <!-- Headers Gantt -->
-            <div class="flex border-b border-slate-200 pb-2 mb-4">
-                <div class="w-1/4"></div>
-                <div class="w-3/4 flex justify-between text-xs font-bold text-slate-400 uppercase tracking-widest px-2">
-                    <span>M1</span><span>M2</span><span>M3</span><span>M4</span><span>M5</span><span>M6</span>
-                </div>
-            </div>
 
-            <!-- Gantt Rows -->
-            <div class="space-y-4">
-                <div class="flex items-center">
-                    <div class="w-1/4 text-sm font-bold text-slate-700">Fase 0: Auditoría de APIs</div>
-                    <div class="w-3/4 relative h-8 rounded bg-slate-50">
-                        <div class="absolute inset-y-0 left-0 w-1/6 bg-slate-400 rounded-l shadow-sm"></div>
-                    </div>
-                </div>
-                
-                <div class="flex items-center">
-                    <div class="w-1/4 text-sm font-bold text-indigo-700">Fase 1: Piloto Andalucía</div>
-                    <div class="w-3/4 relative h-8 rounded bg-slate-50">
-                        <div class="absolute inset-y-0 left-1/6 w-2/6 bg-indigo-500 rounded shadow-sm opacity-90"></div>
-                        <div class="absolute inset-0 flex items-center ml-[20%] text-xs font-bold text-white z-10 px-2 drop-shadow">Plantas Mengíbar y Córdoba</div>
-                    </div>
-                </div>
-
-                <div class="flex items-center">
-                    <div class="w-1/4 text-sm font-bold text-blue-700">Fase 2: Expansión Global</div>
-                    <div class="w-3/4 relative h-8 rounded bg-slate-50">
-                        <div class="absolute inset-y-0 right-0 w-3/6 bg-blue-600 rounded shadow-sm opacity-90"></div>
-                        <div class="absolute inset-0 flex items-center ml-[55%] text-xs font-bold text-white z-10 px-2 drop-shadow">Roll-out Ibérico Completo</div>
-                    </div>
-                </div>
-
-                <div class="flex items-center">
-                    <div class="w-1/4 text-sm font-bold text-emerald-700">Fase 3: KPI & Reporting VRPTW</div>
-                    <div class="w-3/4 relative h-8 rounded bg-slate-50">
-                        <div class="absolute inset-y-0 right-0 w-2/6 bg-emerald-500 rounded shadow-sm"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Vertical grid lines container overlay -->
-            <div class="absolute top-[3.5rem] bottom-4 left-1/4 right-8 flex justify-between pointer-events-none opacity-20 z-0">
-                <div class="w-full h-full grid-line"></div>
-                <div class="w-full h-full grid-line"></div>
-                <div class="w-full h-full grid-line"></div>
-                <div class="w-full h-full grid-line"></div>
-                <div class="w-full h-full grid-line"></div>
-            </div>
-        </div>
 
     </div>
 </body>
