@@ -77,26 +77,8 @@ if not GOOGLE_MAPS_API_KEY:
 # --- Tarifas de Mercado y Costes Operativos (€/km) ---
 # Datos actualizados 2026 (Ref: [Observatorio MITMA / FENADISMER])
 # Vehículo Articulado de Carga General (44 Toneladas Euro VI)
-EXTERNAL_PROVIDER_RATE_PER_KM = 1.61    # Tarifa de mercado del proveedor externo por km (Punto a Punto)
-INTERNAL_OPERATIONAL_TCO_RATE = 1.157   # Tarifa técnica propia (Totalmente cargado TCO)
-
-TCO_FIXED_COSTS_ANNUAL = {
-    "personal_y_dietas": 56967.0,      # Chófer, SS y dietas (33.8% del coste total)
-    "amortizacion_vehiculo": 16450.0,    # Depreciación tractora + semi (8 años)
-    "seguros_y_visados": 4200.0,        # Responsabilidad civil y mercancía
-    "costes_indirectos_adm": 12840.0,    # Gestión de flota, planners y alquileres
-    "fiscalidad_y_otros": 1850.0        # ITVs, Impuesto Tracción Mecánica e IAE
-}
-
-TCO_VARIABLE_COSTS_KM = {
-    "combustible_diesel": 0.395,       # Consumo aprox 34L/100km (44t)
-    "mantenimiento_reparacion": 0.092,  # Correctivo y preventivo
-    "neumaticos": 0.038,               # Desgaste por rodadura (alto impacto en 44t)
-    "adblue_y_lubricantes": 0.015       # Consumibles Euro VI
-}
-
-# Distancia de referencia anual para amortización de costes fijos
-TCO_ANNUAL_KM_PER_TRUCK = 120000
+EXTERNAL_PROVIDER_RATE_PER_KM = 1.70    # Tarifa de mercado del proveedor externo por km (Punto a Punto)
+INTERNAL_OPERATIONAL_TCO_RATE = 1.50    # Tarifa técnica propia (Valor final TCO)
 
 # --- Estimación de Flota y CAPEX (Ley de Little) ---
 CAPEX_TRUCK_UNIT_COST = 145_000.0  # Euros por cabeza tractora heavy duty

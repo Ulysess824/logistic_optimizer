@@ -82,54 +82,41 @@
             </div>
         </div>
 
-        <!-- Grupo 4: Costes TCO (Fijos) -->
-        <div class="space-y-6">
+        <!-- Grupo 4: Costes Operativos Finales -->
+        <div class="space-y-6 md:col-span-2 lg:col-span-3">
             <h2 class="text-lg font-bold text-slate-700 flex items-center">
                 <span class="w-8 h-8 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mr-3">4</span>
-                Costes Fijos (Anuales)
+                Estructura de Costes (Tarifa Técnica)
             </h2>
             <div class="param-card" style="border-top-color: #f59e0b;">
-                <table class="w-full text-sm">
-                    <tr><td class='p-2 border-b uppercase text-xs'>personal y dietas</td><td class='p-2 border-b font-mono text-right'>56,967 €</td></tr><tr><td class='p-2 border-b uppercase text-xs'>amortizacion vehiculo</td><td class='p-2 border-b font-mono text-right'>16,450 €</td></tr><tr><td class='p-2 border-b uppercase text-xs'>seguros y visados</td><td class='p-2 border-b font-mono text-right'>4,200 €</td></tr><tr><td class='p-2 border-b uppercase text-xs'>costes indirectos adm</td><td class='p-2 border-b font-mono text-right'>12,840 €</td></tr><tr><td class='p-2 border-b uppercase text-xs'>fiscalidad y otros</td><td class='p-2 border-b font-mono text-right'>1,850 €</td></tr>
-                    <tr class="font-bold">
-                        <td class="p-2 pt-4 label">Suma Total Fija</td>
-                        <td class="p-2 pt-4 font-mono text-right text-base text-amber-700">92,307 €</td>
-                    </tr>
-                </table>
+                <div class="flex flex-col md:flex-row justify-between items-center gap-8">
+                    <div class="text-center md:text-left">
+                        <p class="label">Tarifa Técnica Interna (TCO)</p>
+                        <p class="text-4xl font-black text-amber-700 font-mono">1.50<span class="text-lg unit">€/km</span></p>
+                        <p class="text-[10px] text-slate-400 mt-1 uppercase">Basado en Modelo MITMA 2026 (Ref. Notebook estimación)</p>
+                    </div>
+                    <div class="h-16 w-px bg-slate-100 hidden md:block"></div>
+                    <div class="bg-amber-50 p-4 rounded-lg flex-1">
+                        <p class="text-xs text-amber-800 font-bold mb-2 uppercase">Nota sobre el Desglose:</p>
+                        <p class="text-xs text-amber-700 leading-relaxed italic">
+                            Los costes fijos (Personal, Amortización, Seguros, Indirectos) y variables (Combustible, Mantenimiento) han sido desacoplados de la configuración global. 
+                            El detalle actuarial y la validación de SciPy residen exclusivamente en el activo técnico de control de costes.
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Grupo 5: Costes TCO (Variables) -->
+        <!-- Grupo 5: Filtros de Datos -->
         <div class="space-y-6">
             <h2 class="text-lg font-bold text-slate-700 flex items-center">
-                <span class="w-8 h-8 bg-red-100 text-red-600 rounded-full flex items-center justify-center mr-3">5</span>
-                Costes Variables (KM)
-            </h2>
-            <div class="param-card" style="border-top-color: #ef4444;">
-                <table class="w-full text-sm">
-                    <tr><td class='p-2 border-b uppercase text-xs'>combustible diesel</td><td class='p-2 border-b font-mono text-right'>0.395 €/km</td></tr><tr><td class='p-2 border-b uppercase text-xs'>mantenimiento reparacion</td><td class='p-2 border-b font-mono text-right'>0.092 €/km</td></tr><tr><td class='p-2 border-b uppercase text-xs'>neumaticos</td><td class='p-2 border-b font-mono text-right'>0.038 €/km</td></tr><tr><td class='p-2 border-b uppercase text-xs'>adblue y lubricantes</td><td class='p-2 border-b font-mono text-right'>0.015 €/km</td></tr>
-                    <tr class="font-bold">
-                        <td class="p-2 pt-4 label">Suma Variable</td>
-                        <td class="p-2 pt-4 font-mono text-right text-base text-red-700">0.540 €</td>
-                    </tr>
-                </table>
-            </div>
-        </div>
-
-        <!-- Grupo 6: Filtros de Datos -->
-        <div class="space-y-6">
-            <h2 class="text-lg font-bold text-slate-700 flex items-center">
-                <span class="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mr-3">6</span>
+                <span class="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mr-3">5</span>
                 Filtros y Backhauling
             </h2>
             <div class="param-card" style="border-top-color: #6366f1;">
                 <div class="mb-4">
                     <p class="label">Umbral de Desvío Máximo</p>
                     <p class="value">100<span class="unit">km</span></p>
-                </div>
-                <div class="mb-4">
-                    <p class="label">Km/Año por Camión</p>
-                    <p class="value">120<span class="unit">mil km</span></p>
                 </div>
                 <div class="mb-0">
                     <p class="label">Multi-Planta en Ruta</p>

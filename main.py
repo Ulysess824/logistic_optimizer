@@ -21,7 +21,7 @@ from logistic_core.config import (
     RESULTS_DIR, DATA_DIR, MAPS_DIR,
     GLEC_CO2_PER_LITER, GLEC_INTENSITY_GTKM, GLEC_EMPTY_FLOOR_KGKM,
     PAPER_LOAD_KG, PALLET_WEIGHT_KG, VEHICLE_MAX_LOAD_KG,
-    TCO_FIXED_COSTS_ANNUAL, TCO_VARIABLE_COSTS_KM, TCO_ANNUAL_KM_PER_TRUCK,
+    INTERNAL_OPERATIONAL_TCO_RATE,
     CAPEX_TRUCK_UNIT_COST, DEFAULT_CYCLE_TIME_DAYS, DAILY_TRUCK_OUTBOUND, DEFAULT_FLEET_BUFFER
 )
 
@@ -334,9 +334,7 @@ def _build_summary(routes, solver, max_pallets=35, threshold_km=50, n_candidatos
     total_empty_km = 0
     
     cost_estimator = CostEstimator(
-        fixed_costs_annual=TCO_FIXED_COSTS_ANNUAL,
-        variable_costs_km=TCO_VARIABLE_COSTS_KM,
-        annual_km_per_truck=TCO_ANNUAL_KM_PER_TRUCK
+        price_per_km=INTERNAL_OPERATIONAL_TCO_RATE
     )
 
     co2_estimator = FCREmissionEstimator(

@@ -3,7 +3,7 @@
   "total_km": 33295.34,
   "total_empty_km": 10910.04,
   "total_co2_kg": 29197.6,
-  "total_cost_eur": 43591.11,
+  "total_cost_eur": 49943.01,
   "parameters": {
     "max_pallets": 34,
     "threshold_km": 50,
@@ -20,7 +20,7 @@
       "distance_km": 707.82,
       "empty_km": 139.99,
       "co2_emissions_kg": 626.58,
-      "estimated_cost_eur": 926.7
+      "estimated_cost_eur": 1061.74
     },
     {
       "route_id": 2,
@@ -32,7 +32,7 @@
       "distance_km": 711.61,
       "empty_km": 173.52,
       "co2_emissions_kg": 630.02,
-      "estimated_cost_eur": 931.66
+      "estimated_cost_eur": 1067.42
     },
     {
       "route_id": 3,
@@ -44,7 +44,7 @@
       "distance_km": 701.79,
       "empty_km": 182.35,
       "co2_emissions_kg": 621.31,
-      "estimated_cost_eur": 918.79
+      "estimated_cost_eur": 1052.68
     },
     {
       "route_id": 4,
@@ -56,7 +56,7 @@
       "distance_km": 724.95,
       "empty_km": 184.19,
       "co2_emissions_kg": 637.84,
-      "estimated_cost_eur": 949.12
+      "estimated_cost_eur": 1087.42
     },
     {
       "route_id": 5,
@@ -68,7 +68,7 @@
       "distance_km": 722.32,
       "empty_km": 210.76,
       "co2_emissions_kg": 636.88,
-      "estimated_cost_eur": 945.68
+      "estimated_cost_eur": 1083.48
     },
     {
       "route_id": 6,
@@ -80,7 +80,7 @@
       "distance_km": 727.33,
       "empty_km": 233.54,
       "co2_emissions_kg": 639.18,
-      "estimated_cost_eur": 952.24
+      "estimated_cost_eur": 1090.99
     },
     {
       "route_id": 7,
@@ -92,7 +92,7 @@
       "distance_km": 771.09,
       "empty_km": 240.69,
       "co2_emissions_kg": 669.99,
-      "estimated_cost_eur": 1009.54
+      "estimated_cost_eur": 1156.64
     },
     {
       "route_id": 8,
@@ -104,7 +104,7 @@
       "distance_km": 733.97,
       "empty_km": 252.98,
       "co2_emissions_kg": 642.47,
-      "estimated_cost_eur": 960.93
+      "estimated_cost_eur": 1100.95
     },
     {
       "route_id": 9,
@@ -116,7 +116,7 @@
       "distance_km": 732.05,
       "empty_km": 253.15,
       "co2_emissions_kg": 642.09,
-      "estimated_cost_eur": 958.42
+      "estimated_cost_eur": 1098.07
     },
     {
       "route_id": 10,
@@ -128,7 +128,7 @@
       "distance_km": 194.16,
       "empty_km": 28.55,
       "co2_emissions_kg": 173.87,
-      "estimated_cost_eur": 254.2
+      "estimated_cost_eur": 291.24
     },
     {
       "route_id": 11,
@@ -140,7 +140,7 @@
       "distance_km": 192.77,
       "empty_km": 1.79,
       "co2_emissions_kg": 174.36,
-      "estimated_cost_eur": 252.38
+      "estimated_cost_eur": 289.16
     },
     {
       "route_id": 12,
@@ -152,7 +152,7 @@
       "distance_km": 192.43,
       "empty_km": 13.03,
       "co2_emissions_kg": 172.84,
-      "estimated_cost_eur": 251.93
+      "estimated_cost_eur": 288.64
     },
     {
       "route_id": 13,
@@ -164,7 +164,7 @@
       "distance_km": 652.1,
       "empty_km": 120.61,
       "co2_emissions_kg": 574.93,
-      "estimated_cost_eur": 853.75
+      "estimated_cost_eur": 978.15
     },
     {
       "route_id": 14,
@@ -176,7 +176,7 @@
       "distance_km": 638.64,
       "empty_km": 118.85,
       "co2_emissions_kg": 566.7,
-      "estimated_cost_eur": 836.12
+      "estimated_cost_eur": 957.95
     },
     {
       "route_id": 15,
@@ -188,7 +188,7 @@
       "distance_km": 638.94,
       "empty_km": 121.93,
       "co2_emissions_kg": 563.72,
-      "estimated_cost_eur": 836.52
+      "estimated_cost_eur": 958.42
     },
     {
       "route_id": 16,
@@ -200,7 +200,7 @@
       "distance_km": 631.73,
       "empty_km": 128.61,
       "co2_emissions_kg": 560.69,
-      "estimated_cost_eur": 827.07
+      "estimated_cost_eur": 947.59
     },
     {
       "route_id": 17,
@@ -212,7 +212,7 @@
       "distance_km": 643.71,
       "empty_km": 133.89,
       "co2_emissions_kg": 568.87,
-      "estimated_cost_eur": 842.76
+      "estimated_cost_eur": 965.56
     },
     {
       "route_id": 18,
@@ -224,7 +224,7 @@
       "distance_km": 1226.76,
       "empty_km": 493.12,
       "co2_emissions_kg": 1072.64,
-      "estimated_cost_eur": 1606.1
+      "estimated_cost_eur": 1840.14
     },
     {
       "route_id": 19,
@@ -236,7 +236,7 @@
       "distance_km": 1223.53,
       "empty_km": 498.27,
       "co2_emissions_kg": 1071.39,
-      "estimated_cost_eur": 1601.87
+      "estimated_cost_eur": 1835.29
     },
     {
       "route_id": 20,
@@ -248,7 +248,7 @@
       "distance_km": 1267.35,
       "empty_km": 496.41,
       "co2_emissions_kg": 1100.35,
-      "estimated_cost_eur": 1659.24
+      "estimated_cost_eur": 1901.02
     },
     {
       "route_id": 21,
@@ -260,7 +260,7 @@
       "distance_km": 1226.77,
       "empty_km": 498.28,
       "co2_emissions_kg": 1073.18,
-      "estimated_cost_eur": 1606.12
+      "estimated_cost_eur": 1840.16
     },
     {
       "route_id": 22,
@@ -272,7 +272,7 @@
       "distance_km": 1443.31,
       "empty_km": 630.42,
       "co2_emissions_kg": 1252.75,
-      "estimated_cost_eur": 1889.61
+      "estimated_cost_eur": 2164.96
     },
     {
       "route_id": 23,
@@ -284,7 +284,7 @@
       "distance_km": 1432.51,
       "empty_km": 632.36,
       "co2_emissions_kg": 1245.25,
-      "estimated_cost_eur": 1875.48
+      "estimated_cost_eur": 2148.76
     },
     {
       "route_id": 24,
@@ -296,7 +296,7 @@
       "distance_km": 850.83,
       "empty_km": 240.69,
       "co2_emissions_kg": 743.26,
-      "estimated_cost_eur": 1113.92
+      "estimated_cost_eur": 1276.24
     },
     {
       "route_id": 25,
@@ -308,7 +308,7 @@
       "distance_km": 867.54,
       "empty_km": 278.86,
       "co2_emissions_kg": 754.58,
-      "estimated_cost_eur": 1135.8
+      "estimated_cost_eur": 1301.3
     },
     {
       "route_id": 26,
@@ -320,7 +320,7 @@
       "distance_km": 862.02,
       "empty_km": 322.7,
       "co2_emissions_kg": 749.89,
-      "estimated_cost_eur": 1128.58
+      "estimated_cost_eur": 1293.03
     },
     {
       "route_id": 27,
@@ -332,7 +332,7 @@
       "distance_km": 422.62,
       "empty_km": 29.53,
       "co2_emissions_kg": 378.24,
-      "estimated_cost_eur": 553.3
+      "estimated_cost_eur": 633.92
     },
     {
       "route_id": 28,
@@ -344,7 +344,7 @@
       "distance_km": 418.44,
       "empty_km": 35.18,
       "co2_emissions_kg": 376.61,
-      "estimated_cost_eur": 547.84
+      "estimated_cost_eur": 627.67
     },
     {
       "route_id": 29,
@@ -356,7 +356,7 @@
       "distance_km": 432.56,
       "empty_km": 31.19,
       "co2_emissions_kg": 387.23,
-      "estimated_cost_eur": 566.32
+      "estimated_cost_eur": 648.84
     },
     {
       "route_id": 30,
@@ -368,7 +368,7 @@
       "distance_km": 435.12,
       "empty_km": 34.75,
       "co2_emissions_kg": 389.78,
-      "estimated_cost_eur": 569.67
+      "estimated_cost_eur": 652.68
     },
     {
       "route_id": 31,
@@ -380,7 +380,7 @@
       "distance_km": 439.26,
       "empty_km": 51.05,
       "co2_emissions_kg": 388.25,
-      "estimated_cost_eur": 575.1
+      "estimated_cost_eur": 658.9
     },
     {
       "route_id": 32,
@@ -392,7 +392,7 @@
       "distance_km": 1651.19,
       "empty_km": 641.55,
       "co2_emissions_kg": 1446.42,
-      "estimated_cost_eur": 2161.78
+      "estimated_cost_eur": 2476.79
     },
     {
       "route_id": 33,
@@ -404,7 +404,7 @@
       "distance_km": 1649.95,
       "empty_km": 652.36,
       "co2_emissions_kg": 1442.64,
-      "estimated_cost_eur": 2160.16
+      "estimated_cost_eur": 2474.93
     },
     {
       "route_id": 34,
@@ -416,7 +416,7 @@
       "distance_km": 1321.41,
       "empty_km": 493.54,
       "co2_emissions_kg": 1154.34,
-      "estimated_cost_eur": 1730.02
+      "estimated_cost_eur": 1982.11
     },
     {
       "route_id": 35,
@@ -428,7 +428,7 @@
       "distance_km": 1323.17,
       "empty_km": 493.94,
       "co2_emissions_kg": 1159.53,
-      "estimated_cost_eur": 1732.33
+      "estimated_cost_eur": 1984.76
     },
     {
       "route_id": 36,
@@ -440,7 +440,7 @@
       "distance_km": 1325.55,
       "empty_km": 497.26,
       "co2_emissions_kg": 1159.06,
-      "estimated_cost_eur": 1735.44
+      "estimated_cost_eur": 1988.32
     },
     {
       "route_id": 37,
@@ -452,7 +452,7 @@
       "distance_km": 1565.87,
       "empty_km": 653.89,
       "co2_emissions_kg": 1366.05,
-      "estimated_cost_eur": 2050.08
+      "estimated_cost_eur": 2348.8
     },
     {
       "route_id": 38,
@@ -464,7 +464,7 @@
       "distance_km": 1592.19,
       "empty_km": 666.26,
       "co2_emissions_kg": 1383.8,
-      "estimated_cost_eur": 2084.54
+      "estimated_cost_eur": 2388.29
     }
   ]
 }

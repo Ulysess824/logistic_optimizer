@@ -23,7 +23,6 @@ from logistic_core.config import (
      GLEC_CO2_PER_LITER, PAPER_LOAD_KG, PALLET_WEIGHT_KG, VEHICLE_MAX_LOAD_KG,
      TRAILER_LENGTH_M, TRAILER_WIDTH_M, TRAILER_HEIGHT_M,
      PALLET_LENGTH_M, PALLET_WIDTH_M, PALLET_HEIGHT_M,
-     TCO_FIXED_COSTS_ANNUAL, TCO_VARIABLE_COSTS_KM, TCO_ANNUAL_KM_PER_TRUCK,
      DEFAULT_MAX_CUSTOMERS, DEFAULT_THRESHOLD_KM,
      INTERNAL_OPERATIONAL_TCO_RATE, EXTERNAL_PROVIDER_RATE_PER_KM,
      CAPEX_TRUCK_UNIT_COST, DEFAULT_CYCLE_TIME_DAYS, 
@@ -70,9 +69,7 @@ def generate_dashboard(summary_path, routes_path, output_path, hedonic_path=None
 
     geo = GeoUtils()
     cost_est = CostEstimator(
-        fixed_costs_annual=TCO_FIXED_COSTS_ANNUAL,
-        variable_costs_km=TCO_VARIABLE_COSTS_KM,
-        annual_km_per_truck=TCO_ANNUAL_KM_PER_TRUCK
+        price_per_km=INTERNAL_OPERATIONAL_TCO_RATE
     )
     price_km = cost_est.price_per_km
     
@@ -381,26 +378,63 @@ def generate_dashboard(summary_path, routes_path, output_path, hedonic_path=None
             f'<td class="px-3 py-1 text-center">-</td>'
             f'</tr>'
         )
+        # NUEVO: Fila de Agregación Línea Base (Impacto Total Planta sin Optimizar)
+        num_routes = len(pg['opt_routes'])
+        agg_base_km = base_km * num_routes
+        agg_base_cost = base_cost * num_routes
+        agg_base_co2 = base_co2 * num_routes
+        agg_base_empty = (base_km / 2) * num_routes
+        
+        km_rows_html.append(
+            f'<tr class="bg-slate-100 text-slate-700 font-bold text-[11px] border-b border-slate-200">'
+            f'<td class="px-6 py-2 border-l-4 border-slate-300 uppercase tracking-tighter">'
+            f'LINEA BASE TOTAL PLANTA (Proyectada x{num_routes} rutas)'
+            f'</td>'
+            f'<td class="px-2 py-1 text-center">-</td>'
+            f'<td class="px-2 py-1 text-center font-bold text-slate-400">Escala</td>'
+            f'<td class="px-3 py-1 text-center font-mono">{fmt_std(agg_base_km)}</td>'
+            f'<td class="px-3 py-1 text-center font-mono italic text-slate-500">{fmt_std(agg_base_empty, 1)}</td>'
+            f'<td class="px-3 py-1 text-center font-mono bg-slate-200/40">{fmt_std(agg_base_cost, 2)} €</td>'
+            f'<td class="px-3 py-1 text-center font-mono">{fmt_std(base_co2_km, 3)} kg/km</td>'
+            f'<td class="px-3 py-1 text-center font-mono">{fmt_std(agg_base_co2, 1)} kg</td>'
+            f'<td class="px-3 py-1 text-center font-mono">-</td>'
+            f'<td class="px-3 py-1 text-center font-mono">-</td>'
+            f'<td class="px-3 py-1 text-center font-mono">-</td>'
+            f'<td class="px-3 py-1 text-center font-mono">-</td>'
+            f'<td class="px-3 py-1 text-center">Referencia</td>'
+            f'</tr>'
+        )
+        
         # Filas Optimizadas (Multiples)
+        total_p_dist, total_p_cost, total_p_co2, total_p_cust = 0, 0, 0, 0
+        total_p_sys_saving, total_p_sys_co2_saving = 0, 0
+        
         for orout in pg['opt_routes']:
+            total_p_dist += orout["dist"]
+            total_p_cost += orout["cost"]
+            total_p_co2 += orout["co2_abs"]
+            total_p_cust += orout["customers"]
+            total_p_sys_saving += orout["systemic_saving"]
+            total_p_sys_co2_saving += orout["systemic_co2_saving"]
+            
             # Estilo condicional para Reducción CO2
             co2_class = "text-green-600 font-bold" if orout["red_co2"] >= 0 else "text-red-500 font-bold"
             co2_sign = "+" if orout["red_co2"] >= 0 else ""
             
             km_rows_html.append(
                 f'<tr class="hover:bg-blue-50/20 border-b text-[12px] text-blue-800">'
-                f'<td class="px-6 py-2 font-semibold pl-10 underline decoration-blue-200">{orout["desc"]}</td>'
+                f'<td class="px-6 py-2 font-semibold pl-12">{orout["desc"]}</td>'
                 f'<td class="px-2 py-1 text-[10px] text-blue-600 uppercase font-bold text-center">Optimizado</td>'
                 f'<td class="px-3 py-1 text-center font-bold text-indigo-600">{orout["customers"]}</td>'
                 f'<td class="px-3 py-1 text-center font-mono font-bold">{fmt_std(orout["dist"])}</td>'
-                f'<td class="px-3 py-1 text-center font-mono text-gray-500 italic">{fmt_std(orout["empty"], 1)}</td>'
+                f'<td class="px-3 py-1 text-center font-mono text-gray-400 italic">{fmt_std(orout["empty"], 1)}</td>'
                 f'<td class="px-3 py-1 text-center font-mono font-bold">{fmt_std(orout["cost"], 2)} €</td>'
                 f'<td class="px-3 py-1 text-center font-mono font-bold text-purple-700">{fmt_std(orout["co2_km"], 3)} kg/km</td>'
                 f'<td class="px-3 py-1 text-center font-mono font-bold text-fuchsia-700">{fmt_std(orout["co2_abs"], 1)} kg</td>'
                 f'<td class="px-3 py-1 text-center font-bold text-teal-600">+{fmt_std(orout["systemic_co2_saving"], 1)} kg</td>'
                 f'<td class="px-3 py-1 text-center {co2_class}">{co2_sign}{fmt_std(orout["red_co2"], 1)}%</td>'
                 f'<td class="px-3 py-1 text-center font-bold text-green-600 border-l border-green-100 italic">'
-                f'+{fmt_std(orout["imp"], 1)}%'
+                f'+{fmt_std(orout['imp'], 1)}%'
                 f'</td>'
                 f'<td class="px-3 py-1 text-center font-bold text-green-600 bg-green-50/30">'
                 f'+{fmt_std(orout["empty_ret_saving"], 0)} €'
@@ -410,6 +444,28 @@ def generate_dashboard(summary_path, routes_path, output_path, hedonic_path=None
                 f'</td>'
                 f'</tr>'
             )
+            
+        # NUEVO: Fila de Agregación TOTAL Optimizado (Realidad tras Algoritmo)
+        p_avg_co2_km = total_p_co2 / total_p_dist if total_p_dist > 0 else 0
+        km_rows_html.append(
+            f'<tr class="bg-blue-100 text-blue-900 font-bold text-[11px] border-b border-blue-200">'
+            f'<td class="px-6 py-2 border-l-4 border-blue-400 uppercase tracking-tighter pl-10">'
+            f'TOTAL PLANTA (Optimizado Real)'
+            f'</td>'
+            f'<td class="px-2 py-1 text-center font-bold text-blue-600 underline">Realizado</td>'
+            f'<td class="px-3 py-1 text-center font-bold text-indigo-700">{total_p_cust}</td>'
+            f'<td class="px-3 py-1 text-center font-mono">{fmt_std(total_p_dist)}</td>'
+            f'<td class="px-3 py-1 text-center font-mono">-</td>'
+            f'<td class="px-3 py-1 text-center font-mono bg-blue-200/40">{fmt_std(total_p_cost, 2)} €</td>'
+            f'<td class="px-3 py-1 text-center font-mono">{fmt_std(p_avg_co2_km, 3)} kg/km</td>'
+            f'<td class="px-3 py-1 text-center font-mono">{fmt_std(total_p_co2, 1)} kg</td>'
+            f'<td class="px-3 py-1 text-center font-bold text-teal-700">+{fmt_std(total_p_sys_co2_saving, 1)} kg</td>'
+            f'<td class="px-3 py-1 text-center">-</td>'
+            f'<td class="px-3 py-1 text-center">-</td>'
+            f'<td class="px-3 py-1 text-center">-</td>'
+            f'<td class="px-3 py-1 text-center font-bold text-emerald-700 bg-emerald-100/50">+{fmt_std(total_p_sys_saving, 0)} €</td>'
+            f'</tr>'
+        )
 
     total_savings = total_empty_before - total_empty_after
     total_pct = (total_savings / total_empty_before * 100) if total_empty_before > 0 else 0
@@ -619,9 +675,6 @@ def _generate_parametros_tab(bodies_dir):
     """Genera la pestaña de parámetros técnicos y económicos."""
     output_path = bodies_dir / "tab_parametros.html"
     
-    # Formatear diccionarios TCO para visualización
-    fixed_rows = "".join([f"<tr><td class='p-2 border-b uppercase text-xs'>{k.replace('_', ' ')}</td><td class='p-2 border-b font-mono text-right'>{v:,.0f} €</td></tr>" for k, v in TCO_FIXED_COSTS_ANNUAL.items()])
-    var_rows = "".join([f"<tr><td class='p-2 border-b uppercase text-xs'>{k.replace('_', ' ')}</td><td class='p-2 border-b font-mono text-right'>{v:,.3f} €/km</td></tr>" for k, v in TCO_VARIABLE_COSTS_KM.items()])
 
     html_content = f"""<!DOCTYPE html>
 <html lang="es">
@@ -707,54 +760,41 @@ def _generate_parametros_tab(bodies_dir):
             </div>
         </div>
 
-        <!-- Grupo 4: Costes TCO (Fijos) -->
-        <div class="space-y-6">
+        <!-- Grupo 4: Costes Operativos Finales -->
+        <div class="space-y-6 md:col-span-2 lg:col-span-3">
             <h2 class="text-lg font-bold text-slate-700 flex items-center">
                 <span class="w-8 h-8 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mr-3">4</span>
-                Costes Fijos (Anuales)
+                Estructura de Costes (Tarifa Técnica)
             </h2>
             <div class="param-card" style="border-top-color: #f59e0b;">
-                <table class="w-full text-sm">
-                    {fixed_rows}
-                    <tr class="font-bold">
-                        <td class="p-2 pt-4 label">Suma Total Fija</td>
-                        <td class="p-2 pt-4 font-mono text-right text-base text-amber-700">{sum(TCO_FIXED_COSTS_ANNUAL.values()):,.0f} €</td>
-                    </tr>
-                </table>
+                <div class="flex flex-col md:flex-row justify-between items-center gap-8">
+                    <div class="text-center md:text-left">
+                        <p class="label">Tarifa Técnica Interna (TCO)</p>
+                        <p class="text-4xl font-black text-amber-700 font-mono">{INTERNAL_OPERATIONAL_TCO_RATE:,.2f}<span class="text-lg unit">€/km</span></p>
+                        <p class="text-[10px] text-slate-400 mt-1 uppercase">Basado en Modelo MITMA 2026 (Ref. Notebook estimación)</p>
+                    </div>
+                    <div class="h-16 w-px bg-slate-100 hidden md:block"></div>
+                    <div class="bg-amber-50 p-4 rounded-lg flex-1">
+                        <p class="text-xs text-amber-800 font-bold mb-2 uppercase">Nota sobre el Desglose:</p>
+                        <p class="text-xs text-amber-700 leading-relaxed italic">
+                            Los costes fijos (Personal, Amortización, Seguros, Indirectos) y variables (Combustible, Mantenimiento) han sido desacoplados de la configuración global. 
+                            El detalle actuarial y la validación de SciPy residen exclusivamente en el activo técnico de control de costes.
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Grupo 5: Costes TCO (Variables) -->
+        <!-- Grupo 5: Filtros de Datos -->
         <div class="space-y-6">
             <h2 class="text-lg font-bold text-slate-700 flex items-center">
-                <span class="w-8 h-8 bg-red-100 text-red-600 rounded-full flex items-center justify-center mr-3">5</span>
-                Costes Variables (KM)
-            </h2>
-            <div class="param-card" style="border-top-color: #ef4444;">
-                <table class="w-full text-sm">
-                    {var_rows}
-                    <tr class="font-bold">
-                        <td class="p-2 pt-4 label">Suma Variable</td>
-                        <td class="p-2 pt-4 font-mono text-right text-base text-red-700">{sum(TCO_VARIABLE_COSTS_KM.values()):,.3f} €</td>
-                    </tr>
-                </table>
-            </div>
-        </div>
-
-        <!-- Grupo 6: Filtros de Datos -->
-        <div class="space-y-6">
-            <h2 class="text-lg font-bold text-slate-700 flex items-center">
-                <span class="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mr-3">6</span>
+                <span class="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mr-3">5</span>
                 Filtros y Backhauling
             </h2>
             <div class="param-card" style="border-top-color: #6366f1;">
                 <div class="mb-4">
                     <p class="label">Umbral de Desvío Máximo</p>
                     <p class="value">{DEFAULT_THRESHOLD_KM}<span class="unit">km</span></p>
-                </div>
-                <div class="mb-4">
-                    <p class="label">Km/Año por Camión</p>
-                    <p class="value">{TCO_ANNUAL_KM_PER_TRUCK/1000:,.0f}<span class="unit">mil km</span></p>
                 </div>
                 <div class="mb-0">
                     <p class="label">Multi-Planta en Ruta</p>
