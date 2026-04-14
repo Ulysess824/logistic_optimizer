@@ -1,4 +1,5 @@
 import logging
+import concurrent.futures
 import googlemaps
 import numpy as np
 import requests
@@ -226,69 +227,121 @@ class GeoUtils:
         num_nodes = len(nodes)
         matrix = np.zeros((num_nodes, num_nodes))
         
-        # 1. Intentar llenar desde caché (Ignoramos truck_specs para OSM)
-        missing_pairs = []
-        for i in range(num_nodes):
-            for j in range(num_nodes):
-                if i == j:
-                    matrix[i][j] = 0
-                    continue
-                cached = self.cache.get_route(
-                    (nodes[i]['lat'], nodes[i]['lng']),
-                    (nodes[j]['lat'], nodes[j]['lng']),
-                    truck_specs={} # OSM ignora specs
-                )
-                if cached:
-                    matrix[i][j] = cached['distance_meters']
-                else:
-                    missing_pairs.append((i, j))
-
-        if not missing_pairs:
-            logger.info("Matriz OSM recuperada íntegramente de la caché.")
-            return matrix, True
-
-        # 2. Llamada a la API de OSRM (Table API)
-        # Formato: lon,lat;lon,lat...
-        coords_str = ";".join([f"{n['lng']},{n['lat']}" for n in nodes])
-        
-        # Intentar servidor local (OSRM_URL) o fallback al público
-        # El OSRM_URL ahora es la base limpia (ej: http://localhost:5000)
-        urls_to_try = [
-            f"{OSRM_URL.rstrip('/')}/table/v1/driving/{coords_str}?sources=all&destinations=all&annotations=distance,duration",
-            f"http://router.project-osrm.org/table/v1/driving/{coords_str}?sources=all&destinations=all&annotations=distance,duration"
-        ]
-
-        for url in urls_to_try:
-            try:
-                logger.info(f"Consultando OSRM en: {url}...")
-                response = requests.get(url, timeout=10)
-                if response.status_code == 200:
-                    data = response.json()
-                    if 'distances' in data and 'durations' in data:
-                        # OSRM devuelve una matriz [origen][destino]
-                        for i in range(num_nodes):
-                            for j in range(num_nodes):
-                                dist_val = data['distances'][i][j]
-                                dur_val = data['durations'][i][j]
-                                if dist_val is not None:
-                                    matrix[i][j] = dist_val
-                                    # Guardar en caché para futuras ejecuciones
-                                    if i != j:
-                                        self.cache.store_route(
-                                            (nodes[i]['lat'], nodes[i]['lng']),
-                                            (nodes[j]['lat'], nodes[j]['lng']),
-                                            dist_val, duration=dur_val, truck_specs={}
-                                        )
-                                else:
-                                    matrix[i][j] = self.haversine_distance(nodes[i], nodes[j])
-                        return matrix, True
-            except Exception as e:
-                logger.debug(f"Servidor OSRM {url} no disponible: {e}")
-                continue
-        
-        logger.warning(f"Ningún servidor OSRM respondió. Usando Haversine.")
-        return self._fallback_haversine_matrix(nodes)
+        # 1. OPTIMIZACIÓN: Saltamos búsqueda individual de caché para matrices grandes (>50 nodos)
+        # La Table API de OSRM local es más rápida que hacer 115k consultas a SQLite (I/O).
+        if num_nodes < 50:
+            missing_pairs = []
+            for i in range(num_nodes):
+                for j in range(num_nodes):
+                    if i == j:
+                        matrix[i][j] = 0
+                        continue
+                    cached = self.cache.get_route(
+                        (nodes[i]['lat'], nodes[i]['lng']),
+                        (nodes[j]['lat'], nodes[j]['lng']),
+                        truck_specs={} # OSM ignora specs
+                    )
+                    if cached:
+                        matrix[i][j] = cached['distance_meters']
+                    else:
+                        missing_pairs.append((i, j))
             
+            if not missing_pairs:
+                logger.debug("Matriz OSM (Pequeña) recuperada íntegramente de la caché.")
+                return matrix, True
+
+        # 2. Llamada a la API de OSRM (Table API) con Batching Paralelizado y Transacciones Masivas
+        # Lotes mayores para Docker local (100x100 es eficiente en OSRM)
+        BATCH_SIZE = 100
+        logger.info(f"Calculando matriz OSRM ({num_nodes} nodos) via Docker local. Lotes: {BATCH_SIZE}x{BATCH_SIZE}")
+        
+        # Generar todas las tareas (cuadrantes de la matriz)
+        tasks = []
+        for i_start in range(0, num_nodes, BATCH_SIZE):
+            for j_start in range(0, num_nodes, BATCH_SIZE):
+                tasks.append((i_start, j_start))
+
+        def process_batch(task):
+            i_start, j_start = task
+            i_end = min(i_start + BATCH_SIZE, num_nodes)
+            j_end = min(j_start + BATCH_SIZE, num_nodes)
+            
+            # Nodos para este cuadrante
+            batch_origins = nodes[i_start:i_end]
+            batch_destinations = nodes[j_start:j_end]
+            
+            if i_start == j_start:
+                combined_nodes = batch_origins
+                src_indices = list(range(len(batch_origins)))
+                dst_indices = list(range(len(batch_origins)))
+            else:
+                combined_nodes = batch_origins + batch_destinations
+                src_indices = list(range(len(batch_origins)))
+                dst_indices = list(range(len(batch_origins), len(combined_nodes)))
+            
+            coords_str = ";".join([f"{n['lng']},{n['lat']}" for n in combined_nodes])
+            src_str = ";".join(map(str, src_indices))
+            dst_str = ";".join(map(str, dst_indices))
+            
+            path = f"/table/v1/driving/{coords_str}?sources={src_str}&destinations={dst_str}&annotations=distance,duration"
+            urls_to_try = [f"{OSRM_URL.rstrip('/')}{path}", f"http://localhost:5000{path}", f"http://router.project-osrm.org{path}"]
+            
+            for url in urls_to_try:
+                try:
+                    response = requests.get(url, timeout=30)
+                    if response.status_code == 200:
+                        data = response.json()
+                        if 'distances' in data:
+                            return (i_start, j_start, data.get('distances'), data.get('durations'))
+                except:
+                    continue
+            return (i_start, j_start, None, None)
+
+        try:
+            # Ejecutar peticiones en paralelo (5 workers para no saturar I/O local)
+            with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+                results = list(executor.map(process_batch, tasks))
+
+            # Procesar y ensamblar resultados
+            for i_start, j_start, distances, durations in results:
+                i_end = min(i_start + BATCH_SIZE, num_nodes)
+                j_end = min(j_start + BATCH_SIZE, num_nodes)
+
+                if distances is not None:
+                    cache_entries = []
+                    for row_idx, dists in enumerate(distances):
+                        for col_idx, dist_val in enumerate(dists):
+                            global_i = i_start + row_idx
+                            global_j = j_start + col_idx
+                            
+                            if dist_val is not None:
+                                matrix[global_i][global_j] = dist_val
+                                if global_i != global_j:
+                                    cache_entries.append({
+                                        'origin': (nodes[global_i]['lat'], nodes[global_i]['lng']),
+                                        'destination': (nodes[global_j]['lat'], nodes[global_j]['lng']),
+                                        'distance': dist_val,
+                                        'duration': durations[row_idx][col_idx] if durations else 0
+                                    })
+                            else:
+                                matrix[global_i][global_j] = self.haversine_distance(nodes[global_i], nodes[global_j])
+                    
+                    # Persistencia masiva del cuadrante (Ej: hasta 10,000 registros en un solo commit)
+                    if cache_entries:
+                        self.cache.store_batch(cache_entries)
+                else:
+                    logger.warning(f"Lote OSRM {i_start, j_start} falló. Fallback a Haversine en cuadrante.")
+                    for gi in range(i_start, i_end):
+                        for gj in range(j_start, j_end):
+                            if matrix[gi][gj] == 0:
+                                matrix[gi][gj] = self.haversine_distance(nodes[gi], nodes[gj])
+            
+            return matrix, True
+            
+        except Exception as e:
+            logger.error(f"Error crítico en matriz OSRM optimizada: {e}")
+            return self._fallback_haversine_matrix(nodes)
+
     def _calculate_distance_matrix_google_maps(self, nodes):
         """
         Implementación original usando la clásica Google Maps Distance Matrix API.
@@ -297,7 +350,6 @@ class GeoUtils:
         matrix = np.zeros((num_nodes, num_nodes))
         
         use_roadmap = self.gmaps is not None and not GeoUtils._api_disabled
-
         if use_roadmap:
             BATCH_SIZE = 25  # Límite de Google Maps Distance Matrix API
             logger.info("Obteniendo distancias reales de Google Maps Clásico (lotes de %d)...", BATCH_SIZE)

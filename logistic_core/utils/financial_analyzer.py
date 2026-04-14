@@ -147,6 +147,16 @@ class FinancialAnalyzer:
             
         return results
 
+    def calculate_avoided_sunk_cost(self, empty_km_saved, tco_rate):
+        """
+        Calcula el retorno monetario de los kilómetros en vacío evitados.
+        Este coste se iba a asumir de todos modos (costo hundido del retorno),
+        por lo que evitarlo se traduce directamente en ganancia neta operativa.
+        """
+        if empty_km_saved <= 0:
+            return 0.0
+        return empty_km_saved * tco_rate
+
 if __name__ == "__main__":
     # Script de prueba rápida para validar la lógica (Ejemplo TFM)
     analyzer = FinancialAnalyzer()

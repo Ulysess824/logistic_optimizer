@@ -33,7 +33,7 @@ class LogisticsSolver:
         if precomputed_matrix is not None:
             self.distance_matrix = precomputed_matrix
             self.is_real_road = True
-            logger.info("Matriz de distancias inyectada externamente (%dx%d). Salto de recalculo OSRM.", 
+            logger.info("[bold cyan]Geometría:[/bold cyan] Matriz precalculada inyectada (%dx%d).", 
                         precomputed_matrix.shape[0], precomputed_matrix.shape[1])
         else:
             self.distance_matrix, self.is_real_road = self.geo.calculate_distance_matrix(self.nodes)
@@ -77,7 +77,7 @@ class LogisticsSolver:
 
         n_plants = sum(1 for n in nodes if n['type'] == 'carton_plant')
         n_custs = sum(1 for n in nodes if n['type'] == 'customer')
-        logger.info("Nodos parseados: %d (1 depósito, %d plantas, %d clientes)",
+        logger.info("[bold cyan]Nodos:[/bold cyan] Parseados %d (1 DEPOT, %d PT, %d CL)",
                      len(nodes), n_plants, n_custs)
         return nodes
 
@@ -129,7 +129,7 @@ class LogisticsSolver:
         plant_indices_orig = [i for i, n in enumerate(self.nodes) if n['type'] == 'carton_plant']
 
         if not plant_indices_orig:
-            logger.error("No se detectaron plantas de cartón válidas.")
+            logger.error("[bold red]Error:[/bold red] No se detectaron plantas de cartón válidas.")
             return None
 
         num_plants_orig = len(plant_indices_orig)
@@ -196,11 +196,11 @@ class LogisticsSolver:
         depot_idx = 0
         manager = pywrapcp.RoutingIndexManager(len(dist_matrix), num_vehicles, depot_idx)
 
-        logger.info("Nodos parseados para optimizar (con muelles virtuales): %d", len(current_nodes))
+        logger.info("[bold cyan]Muelles Virtuales:[/bold cyan] Nodos totales a optimizar: %d", len(current_nodes))
 
         logger.info(
-            "Modo: %s | max_plantas_ruta=%d | n_clientes=%d | vehículos=%d",
-            "FLOTA ESPECÍFICA (Clonación de Nodos)" if flota_por_planta else ("MC-VRPB" if varias_plantas else "VRPB Clásico"),
+            "[bold yellow]Modo:[/bold yellow] %s | Plantas/Ruta=%d | Max_CL=%d | Vehículos Totales=%d",
+            "Flota Dinámica" if flota_por_planta else "Estándar",
             max_plantas_ruta, n_clientes, num_vehicles,
         )
 
@@ -337,12 +337,13 @@ class LogisticsSolver:
         search_params.local_search_metaheuristic = routing_enums_pb2.LocalSearchMetaheuristic.GUIDED_LOCAL_SEARCH
         search_params.time_limit.seconds = max_search_time
 
-        logger.info("Iniciando optimización (%d vehículos, límite %ds, algoritmo: %s)...", num_vehicles, max_search_time, metaheuristic)
+
+        logger.info("[bold green]Optimizador:[/bold green] Iniciando búsqueda (Límite: %ds | Algoritmo: %s)...", max_search_time, metaheuristic)
         
         # Log de matriz para asegurar que no sea todo ceros
         mat_min = np.min(self.distance_matrix[self.distance_matrix > 0]) if np.any(self.distance_matrix > 0) else 0
         mat_max = np.max(self.distance_matrix)
-        logger.info(f"Estadísticas de Matriz: Min(>0)={mat_min:.1f}m, Max={mat_max:.1f}m")
+        logger.debug(f"Estadísticas de Matriz: Min(>0)={mat_min:.1f}m, Max={mat_max:.1f}m")
         
         solution = routing.SolveWithParameters(search_params)
 
@@ -353,7 +354,7 @@ class LogisticsSolver:
 
         if solution:
             status_code = routing.status()
-            logger.info(f"Solver terminó con éxito (status {status_code}).")
+            logger.info(f"[bold green]Solver:[/bold green] Optimización completada (Status: {status_code}).")
             routes = self._extract_routes(manager, routing, solution, current_nodes)
             self._last_routes = routes
             
@@ -441,7 +442,7 @@ class LogisticsSolver:
             if any(n['type'] == 'customer' for n in route):
                 all_routes.append(route)
 
-        logger.info("Solución encontrada: %d rutas activas.", len(all_routes))
+        logger.info("[bold green]Rutas Activas Construidas:[/bold green] %d", len(all_routes))
         return all_routes
 
     # ------------------------------------------------------------------

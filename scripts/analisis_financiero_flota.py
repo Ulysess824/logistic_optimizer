@@ -17,20 +17,26 @@ class FleetFinancialModel:
     Compara Compra Financiada, Leasing Financiero y Renting Operativo.
     """
     
-    def __init__(self, n_trucks=51, unit_price=140_000, horizon_years=5, wacc=0.09, is_rate=0.25,
+    def __init__(self, n_trucks=51, unit_price=140_000, subsidy_per_unit=0, 
+                 infra_capex=0, horizon_years=5, wacc=0.09, is_rate=0.25,
                  maint_year=8_500.0, ins_year=3_200.0, tires_year=2_400.0, 
-                 admin_purchase=600.0, admin_leasing=300.0, renting_fee=2_800.0,
-                 loan_tae=0.055, lease_tae=0.048, residual_val_pct=0.35):
+                 fuel_energy_year=0.0, admin_purchase=600.0, admin_leasing=300.0, 
+                 renting_fee=2_800.0, loan_tae=0.055, lease_tae=0.048, 
+                 residual_val_pct=0.35, tech_name="Diesel"):
         self.n_trucks = n_trucks
         self.unit_price = unit_price
+        self.subsidy_per_unit = subsidy_per_unit
+        self.infra_capex = infra_capex
         self.horizon_years = horizon_years
         self.wacc = wacc
         self.is_rate = is_rate
+        self.tech_name = tech_name
         
         # Nuevas variables operativas
         self.maint_year = maint_year
         self.ins_year = ins_year
         self.tires_year = tires_year
+        self.fuel_energy_year = fuel_energy_year
         self.admin_purchase = admin_purchase
         self.admin_leasing = admin_leasing
         self.renting_fee = renting_fee
@@ -40,7 +46,9 @@ class FleetFinancialModel:
         self.lease_tae = lease_tae
         self.residual_val_pct = residual_val_pct
         
-        self.total_investment = n_trucks * unit_price
+        # Inversión Neta (Precio - Subvención)
+        self.net_unit_price = max(0, unit_price - subsidy_per_unit)
+        self.total_investment = (n_trucks * self.net_unit_price) + infra_capex
         
         self.fleet_estimator = FleetCapexEstimator(
             daily_dispatch_rate=51, # No afecta al cálculo financiero directo de este script
@@ -82,30 +90,33 @@ class FleetFinancialModel:
         return breakdown
 
     def analyze_purchase(self):
-        """Opción 1: Compra con financiación bancaria (Down payment configurable)."""
-        unit_down = self.unit_price * 0.20
-        loan_principal = self.unit_price * 0.80
+        """Opción 1: Compra con financiación bancaria (20% entrada sobre neto)."""
+        unit_down = self.net_unit_price * 0.20
+        loan_principal = self.net_unit_price * 0.80
         
-        # Amortización AEAT (16% max anual)
+        # Amortización AEAT (16% max anual sobre precio BRUTO, pero depreciamos el neto)
+        # Nota: La base amortizable suele ser el coste de adquisición neto de subvenciones si son a fondo perdido
         linear_depr_rate = 0.16
-        annual_depr = self.unit_price * linear_depr_rate
+        annual_depr = self.net_unit_price * linear_depr_rate
         
         loan_data = self.get_loan_breakdown(loan_principal, self.loan_tae, self.horizon_years)
         
         flows = []
-        # Año 0: Invesión inicial (Entrada)
-        flows.append({"year": 0, "outflow": unit_down * self.n_trucks, "tax_shield": 0, "residual": 0})
+        # Año 0: Inversión inicial (Entrada camiones + Toda la Infraestructura)
+        flows.append({"year": 0, "outflow": (unit_down * self.n_trucks) + self.infra_capex, "tax_shield": 0, "residual": 0})
         
         for y in range(1, self.horizon_years + 1):
             # Costes Operativos dinámicos
-            opex = (self.maint_year + self.ins_year + self.tires_year + self.admin_purchase) * self.n_trucks
+            opex = (self.maint_year + self.ins_year + self.tires_year + self.fuel_energy_year + self.admin_purchase) * self.n_trucks
             # Servicio deuda
             interest = loan_data[y-1]["interest"] * self.n_trucks
             principal = loan_data[y-1]["principal"] * self.n_trucks
             
             # Escudo Fiscal: (Depreciación + Intereses + Opex) * IS
-            # Nota: Solo depreciamos hasta el valor contable residual
-            depr_year = annual_depr * self.n_trucks if y <= 6 else 0 
+            # Depreciación de infraestructura (asumimos 10 años / 10% anual)
+            infra_depr = self.infra_capex * 0.10 if y <= 10 else 0
+            
+            depr_year = (annual_depr * self.n_trucks) + infra_depr
             tax_shield = (depr_year + interest + opex) * self.is_rate
             
             total_outflow = opex + interest + principal
@@ -114,7 +125,7 @@ class FleetFinancialModel:
             residual = 0
             if y == self.horizon_years:
                 raw_residual = self.unit_price * self.residual_val_pct * self.n_trucks
-                book_value = (self.unit_price - (annual_depr * self.horizon_years)) * self.n_trucks
+                book_value = (self.net_unit_price - (annual_depr * self.horizon_years)) * self.n_trucks
                 gain = raw_residual - book_value
                 tax_on_gain = gain * self.is_rate
                 residual = raw_residual - tax_on_gain # Neto de impuestos
@@ -130,26 +141,29 @@ class FleetFinancialModel:
 
     def analyze_leasing(self):
         """Opción 2: Leasing Financiero (10% entrada)."""
-        unit_down = self.unit_price * 0.10
-        # El principal a financiar es el precio menos la entrada y el valor residual final (opción compra)
-        financed_amount = self.unit_price * 0.90
+        unit_down = self.net_unit_price * 0.10
+        financed_amount = self.net_unit_price * 0.90
         
         lease_data = self.get_loan_breakdown(financed_amount, self.lease_tae, self.horizon_years)
         
         flows = []
-        flows.append({"year": 0, "outflow": unit_down * self.n_trucks, "tax_shield": 0, "residual": 0})
+        # La infraestructura se paga al inicio (CAPEX directo) o no se financia vía leasing de camiones
+        flows.append({"year": 0, "outflow": (unit_down * self.n_trucks) + self.infra_capex, "tax_shield": 0, "residual": 0})
         
         for y in range(1, self.horizon_years + 1):
-            opex = (self.maint_year + self.ins_year + self.tires_year + self.admin_leasing) * self.n_trucks
+            opex = (self.maint_year + self.ins_year + self.tires_year + self.fuel_energy_year + self.admin_leasing) * self.n_trucks
             interest = lease_data[y-1]["interest"] * self.n_trucks
             principal = lease_data[y-1]["principal"] * self.n_trucks
             
             # FISCALIDAD LEASING (Art 106 LIS): 
             # Deducimos carga financiera + principal pagado (limite 2x amort contable)
-            linear_depr_limit = self.unit_price * 0.16 * 2 * self.n_trucks
+            linear_depr_limit = self.net_unit_price * 0.16 * 2 * self.n_trucks
             principal_deductible = min(principal, linear_depr_limit)
             
-            tax_shield = (interest + principal_deductible + opex) * self.is_rate
+            # Añadimos depreciación de infraestructura
+            infra_depr = self.infra_capex * 0.10 if y <= 10 else 0
+            
+            tax_shield = (interest + principal_deductible + opex + infra_depr) * self.is_rate
             
             total_outflow = opex + interest + principal
             
@@ -157,7 +171,6 @@ class FleetFinancialModel:
             residual = 0
             if y == self.horizon_years:
                 raw_residual = self.unit_price * self.residual_val_pct * self.n_trucks
-                # El valor contable tras leasing acelerado es casi 0
                 gain = raw_residual - 0 
                 tax_on_gain = gain * self.is_rate
                 residual = raw_residual - tax_on_gain
@@ -176,14 +189,21 @@ class FleetFinancialModel:
         annual_fee = self.renting_fee * 12 * self.n_trucks
         
         flows = []
-        flows.append({"year": 0, "outflow": 0, "tax_shield": 0, "residual": 0})
+        # En renting la infraestructura se suele pagar aparte (CAPEX inicial)
+        flows.append({"year": 0, "outflow": self.infra_capex, "tax_shield": 0, "residual": 0})
         
         for y in range(1, self.horizon_years + 1):
-            # En renting no hay otros costes operativos, ni entrada, ni residual
-            tax_shield = annual_fee * self.is_rate
+            # OPEX de combustible/energía no suele estar incluido en el renting de vehículo
+            opex_variable = self.fuel_energy_year * self.n_trucks
+            
+            # Depreciación infraestructura
+            infra_depr = self.infra_capex * 0.10 if y <= 10 else 0
+            
+            tax_shield = (annual_fee + opex_variable + infra_depr) * self.is_rate
+            
             flows.append({
                 "year": y, 
-                "outflow": annual_fee, 
+                "outflow": annual_fee + opex_variable, 
                 "tax_shield": tax_shield, 
                 "residual": 0
             })
@@ -220,6 +240,7 @@ class FleetFinancialModel:
             tir = npf.irr(df["net_cf"]) if df.iloc[0]["outflow"] > 0 else np.nan
             
             summary.append({
+                "Tecnología": self.tech_name,
                 "Escenario": name,
                 "TCO Flota 5A (Bruto)": tco_bruto,
                 "Ahorro Fiscal Acum.": total_tax_shield,

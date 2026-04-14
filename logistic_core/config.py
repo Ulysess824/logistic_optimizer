@@ -2,8 +2,7 @@ import os
 import logging
 from dotenv import load_dotenv
 from pathlib import Path
-
-# Load environment variables
+from logistic_core.utils.logging_setup import LogManager
 load_dotenv()
 
 # Base project path
@@ -56,22 +55,12 @@ for folder in [OUTPUT_DIR, RESULTS_DIR, MAPS_DIR, LOGS_DIR]:
     folder.mkdir(parents=True, exist_ok=True)
 
 # --- Logging Configuration ---
-LOG_FORMAT = "%(asctime)s | %(levelname)-8s | %(name)s | %(message)s"
-LOG_FILE = LOGS_DIR / "optimizer.log"
-
-logging.basicConfig(
-    level=logging.INFO,
-    format=LOG_FORMAT,
-    handlers=[
-        logging.FileHandler(LOG_FILE, encoding="utf-8"),
-        logging.StreamHandler()
-    ]
-)
+LogManager.setup_logging(LOGS_DIR)
 
 # Warn if API key is missing
 if not GOOGLE_MAPS_API_KEY:
     logging.getLogger("config").warning(
-        "GOOGLE_MAPS_API_KEY no está configurada. Se usará estimación Haversine."
+        "[bold yellow]GOOGLE_MAPS_API_KEY no está configurada. Se usará estimación Haversine.[/bold yellow]"
     )
 
 # --- Tarifas de Mercado y Costes Operativos (€/km) ---
@@ -94,3 +83,47 @@ INVESTMENT_DISCOUNT_RATE = 0.08          # WACC (8% Coste de Capital / Tasa de D
 PURCHASE_RESALE_VALUE_PCT = 0.25         # Valor residual conservador (Activo especializado bobinas)
 PURCHASE_UPFRONT_PCT = 0.15              # Entrada mínima para compra financiada
 ANNUAL_MAINTENANCE_SURCHARGE_SPECIALIZED = 0.057 # Sobrecoste anual por desgaste carga pesada
+
+# --- Escenario Flota Híbrida / Eléctrica ---
+ELECTRIC_PLANTS_LIST = ["HUELVA", "ALMERIA", "CÓRDOBA", "ALICANTE"] # Plantas piloto para electrificación (Zero Direct Emissions)
+EV_CONS_EMPTY = 1.05                          # Consumo kWh/km en vacío (HD 44t BEV)
+EV_CONS_FULL = 1.70                           # Consumo kWh/km a plena carga (25t carga)
+
+# =============================================================================
+# PARÁMETROS TCO POR TECNOLOGÍA Y MODALIDAD DE ADQUISICIÓN (Horizonte: 5 años)
+# Ref: Observatorio MITMA 2025, ACEA 2024, ANFAC/MOVES III
+# =============================================================================
+
+TCO_HORIZON_YEARS = 5
+TCO_WACC = 0.07                               # Tasa de descuento (WACC)
+TCO_INFLACION_ANUAL = 0.02                    # Inflación interanual proyectada
+TCO_TAX_RATE = 0.25                           # Impuesto de Sociedades (España)
+KMS_ANUALES_POR_CAMION = 130_000              # Distancia anual por unidad (intensivo)
+
+# --- Camión Diésel 44t (Euro VI) ---
+DIESEL_CAPEX = 140_000                        # Precio de adquisición (cabeza tractora)
+DIESEL_RESIDUAL_PCT = 0.30                    # Valor residual a 5 años (30%)
+DIESEL_CONSUMO_L_100KM = 33.0                # Consumo medio (L/100km)
+DIESEL_COSTE_COMBUSTIBLE_L = 1.45             # Precio gasoil profesional (€/L)
+DIESEL_ADBLUE_L_100KM = 1.5                  # Consumo AdBlue (L/100km)
+DIESEL_COSTE_ADBLUE_L = 0.50                 # Precio AdBlue (€/L)
+DIESEL_MANT_ANUAL = 6_000                     # Mantenimiento preventivo/correctivo anual
+DIESEL_NEUMATICOS_ANUAL = 3_000               # Sustitución de neumáticos anual
+DIESEL_SEGURO_ANUAL = 3_500                   # Seguro anual (Compra/Leasing)
+DIESEL_RENTING_MENSUAL = 2_800                # Renting Full-Service (incl. mant+seguro)
+DIESEL_LEASING_MENSUAL = 2_600                # Leasing financiero (mant+seguro aparte)
+
+# --- Camión Eléctrico 44t (BEV HD) ---
+EV_CAPEX = 340_000                            # Precio de adquisición (cabeza tractora BEV)
+EV_MOVES_AYUDA = 0                            # Subvención MOVES III eliminada por petición (Escenario sin ayudas)
+EV_RESIDUAL_PCT = 0.25                        # Valor residual a 5 años (25%)
+EV_CONSUMO_KWH_KM = 1.30                     # Consumo medio ponderado (kWh/km)
+EV_COSTE_KWH = 0.18                          # Precio medio kWh (depot + ruta)
+EV_MANT_ANUAL = 4_000                        # Mantenimiento anual (35% menos que diésel)
+EV_SEGURO_ANUAL = 4_500                       # Seguro anual (Compra/Leasing)
+EV_RENTING_MENSUAL = 5_600                    # Renting Full-Service BEV
+EV_LEASING_MENSUAL = 5_200                    # Leasing financiero BEV
+
+# --- Composición de Flota Mixta (resultado del solver) ---
+FLEET_MIX_DIESEL = 7                          # Camiones diésel requeridos
+FLEET_MIX_EV = 4                              # Camiones eléctricos requeridos

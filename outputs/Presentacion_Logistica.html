@@ -36,6 +36,7 @@
         <div class="flex space-x-2 mb-4 border-b border-gray-300 bg-white rounded-t-lg px-4">
             <button class="tab-btn active" onclick="openTab('resumen')">Resumen Ejecutivo</button>
             <button class="tab-btn" onclick="openTab('finanzas')">Business Case</button>
+            <button class="tab-btn" onclick="openTab('tesis_financiera')">Tesis de Inversión</button>
             <button class="tab-btn" onclick="openTab('implementacion')">Roll-out y Riesgos</button>
             <button class="tab-btn" onclick="openTab('baseline')">Condiciones Normales</button>
             <button class="tab-btn" onclick="openTab('metodologia')">Metodología</button>
@@ -54,6 +55,10 @@
 
         <div id="finanzas" class="tab-content shadow-lg rounded-b-lg bg-white" style="height: 850px;">
             <iframe src="HTML_Bodies/tab_finanzas.html?update=1" style="width: 100%; height: 850px;"></iframe>
+        </div>
+
+        <div id="tesis_financiera" class="tab-content shadow-lg rounded-b-lg bg-white" style="height: 850px;">
+            <iframe src="HTML_Bodies/tab_tesis_financiera.html" style="width: 100%; height: 850px;"></iframe>
         </div>
 
         <div id="implementacion" class="tab-content shadow-lg rounded-b-lg bg-white" style="height: 850px;">

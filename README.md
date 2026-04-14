@@ -14,7 +14,7 @@ Si eres una IA trabajando en este repositorio, **DEBES leer los siguientes archi
 4. `logistic_core/engine/solver.py`: **El corazón de la optimización.** Implementación de OR-Tools.
 
 > [!IMPORTANT]
-> **Consistencia de Distancias**: Siempre que calcules un escenario "Base" frente a uno "Optimizado", asegúrate de usar distancias reales de ida y vuelta por separado (OSRM) para evitar errores por asimetría vial.
+> **Estructura Organizada**: A partir del 10/04/2026, el proyecto sigue una jerarquía estricta: `logistic_core` (lógica), `scripts` (utilidades), `docs` (especificaciones) y `outputs` (resultados). Evita colocar archivos sueltos en la raíz.
 
 ---
 
@@ -23,45 +23,48 @@ Si eres una IA trabajando en este repositorio, **DEBES leer los siguientes archi
 Actualmente, el proyecto cuenta con un sistema maduro, empaquetado y altamente visual que automatiza los procesos complejos de la cadena de suministro:
 
 1. **Motor de VRP de Alta Resiliencia**: Usamos Google OR-Tools con una arquitectura de **Restricciones Blandas (Disjunctions)**.
-2. **Sistema de GPS Real (OSRM Automático)**: Integración precisa para recuperar distancias terrestres. El sistema calcula rutas de ida y vuelta de forma independiente para evitar asimetrías viales.
+2. **Sistema de GPS Real (OSRM Automático)**: Integración precisa para recuperar distancias terrestres. El sistema calcula rutas de ida y vuelta de forma independiente.
 3. **Métricas de Retorno de Inversión (Software ROI)**: Evaluación financiera que calcula el **ROI Anualizado** y el **Payback Period** de la inversión en software.
-4. **Reducción Sistémica de CO2 (Absoluta)**: Cuantificación de la huella de carbono evitada al desplazar el transporte externo por el interno en el tramo *Linehaul* (Planta -> Clientes).
-5. **Dashboard Interactivo Profesional**: Visualización modularizada (`Presentacion_Logistica.html`) con KPIs financieros, ambientales y operativos.
-6. **Optimización Multi-Planta (Backhauling Avanzado)**: Soporte para múltiples recogidas en una misma ruta (`MC-VRPB`).
-7. **Simulación Dinámica de Flotas (SOTA)**: Modelado con **SimPy**.
-8. **Optimización Volumétrica 3D**: Validador de capacidad física real (13.6m / 34 pallets EPAL) con lógica de apilamiento dinámico.
+4. **Reducción Sistémica de CO2 (Absoluta)**: Cuantificación de la huella de carbono evitada en el tramo *Linehaul*.
+5. **Simulación Anual (250 Días Laborales)**: Capacidad de proyectar el ahorro y la eficiencia operativa a lo largo de un año completo (Novedad).
+6. **Dashboard Interactivo con Slicer Temporal**: Un nuevo visor (`Presentacion_Anual.html`) que permite filtrar resultados por fecha específica y ver métricas acumuladas anuales (ROI, Ahorro TCO, Toneladas CO2).
+7. **Optimización Volumétrica 3D**: Validador de capacidad física real (34 pallets EPAL).
+8. **KPI "Clientes Totales"**: Nueva métrica que contabiliza el éxito real del ruteo consolidado frente al pool de candidatos.
 
 ---
 
-## 🔄 ¿Cómo usar este modelo en OTROS CONTEXTOS?
+## 📂 Estructura del Proyecto
 
-Aunque originalmente se diseñó para la industria del cartón, esta herramienta es **totalmente adaptable a cualquier logística de distribución con backhauling**.
+```text
+/logistics_optimizer
+├── data/               # Bases de datos de clientes, plantas y demanda (.json, .xlsx)
+├── docs/               # Especificaciones técnicas, contexto y guías del proyecto
+├── logistic_core/      # El motor central (Engine, Utils, Config, Simulation)
+├── scripts/            # Utilidades de mantenimiento, tests y ejecutores de simulación
+├── outputs/            # Resultados finales (HTML, Maps, Results JSON, Logs)
+├── main.py             # Entrada principal para optimización diaria
+└── README.md           # Esta guía de uso
+```
 
-### 1. Prepara tus datos (.json)
-El modelo espera archivos en la carpeta `data/`:
-* **Plantas/Nodos Estratégicos:** Origen (`depot`) y paradas de carga (`carton_plants`).
-* **Clientes Finales:** Base de datos de destinos con coordenadas.
+---
 
-### 2. Configura las Reglas en `main.py`
-Ajusta las constantes en la parte superior:
-- `N_CLIENTES`: Límite máximo de clientes por ruta.
-- `MAX_PALLETS`: Límite de capacidad física total por camión.
-- `THRESHOLD_KM`: Desvío máximo permitido para aceptar un cliente en la ruta de retorno.
+## 🔄 Simulación Anual de 250 Días
 
-### 3. Ejecución y Dualidad de Escenarios
-* **Escenario de Producción (Optimizado)**: `python main.py`
-  - Actualiza las pestañas de **"Resumen Ejecutivo"**, **"Detalle Operativo"** y **"Mapa"**.
+Para evaluar el impacto estratégico a largo plazo, el sistema permite correr una simulación batch:
 
-### 4. Dashboard Modularizado
-El punto de entrada principal es `outputs/Presentacion_Logistica.html`. 
-Esta interfaz unificada consume piezas HTML independientes generadas por los scripts anteriores.
+1. **Generar Escenario**: `python scripts/generate_yearly_data.py` (Crea 250 días de demanda sintética con volatilidad).
+2. **Ejecutar Ciclo**: `python scripts/run_yearly_simulation.py` (Corre el optimizador para cada día y consolida estadísticas).
+3. **Visualizar**: `python logistic_core/utils/yearly_report_generator.py` (Genera el dashboard interactivo con slicer).
 
 ---
 
 ## 🍃 Sostenibilidad e Impacto Ambiental (GLEC v3.0)
+
 El motor utiliza el modelo **FCR (Fuel Consumption Rate)** aliado con el marco **GLEC v3.0**:
 - **Factores VECTO**: Calibrado para vehículos de 40t (Subgrupo 5-LH).
 - **Consumo Realista**: Distingue entre tramos en vacío (0.652 kg/km) y cargado (1.085 kg/km).
+
+---
 
 ## 🧠 Modelo de Selección Geográfica (Dual-Pass)
 

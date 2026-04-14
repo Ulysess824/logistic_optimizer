@@ -63,6 +63,28 @@ class GeoCache:
             conn.commit()
             logger.debug("Cache STORE for route %s -> %s", origin, destination)
 
+    def store_batch(self, entries):
+        """Almacena múltiples rutas en una sola transacción para eficiencia.
+        
+        'entries' debe ser una lista de tuplas/dicts con origin, destination, distance, duration, polyline.
+        """
+        if not entries: return
+        
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            for e in entries:
+                key = self._generate_key(
+                    e['origin'], e['destination'], 
+                    e.get('travel_mode', 'DRIVE'), 
+                    e.get('truck_specs', {})
+                )
+                cursor.execute("""
+                    INSERT OR REPLACE INTO route_cache (key, distance_meters, duration_seconds, polyline)
+                    VALUES (?, ?, ?, ?)
+                """, (key, e['distance'], e['duration'], e.get('polyline')))
+            conn.commit()
+            logger.info("Cache BATCH_STORE: %d rutas persistidas en una transacción.", len(entries))
+
     def get_polyline(self, origin, destination, travel_mode="DRIVE", truck_specs=None):
         res = self.get_route(origin, destination, travel_mode, truck_specs)
         return res["polyline"] if res else None

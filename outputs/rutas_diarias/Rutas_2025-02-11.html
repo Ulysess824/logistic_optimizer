@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_c4822211857fbfb886513a121652eee6 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+        
+</head>
+<body>
+    
+    
+        <div id="sidebar" style="
+            position: fixed; top: 10px; right: 10px; width: 380px; height: 95%;
+            background-color: rgba(255, 255, 255, 0.98); z-index: 1000;
+            border-radius: 15px; box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+            padding: 20px; overflow-y: auto; font-family: 'Segoe UI', Roboto, sans-serif;
+            border: 1px solid #e0e0e0;">
+
+            <h2 style="color: #2c3e50; text-align: center; margin-top: 0; padding-bottom: 15px; border-bottom: 3px solid #3498db;">
+                📦 Logística Estratégica
+            </h2>
+
+            <div id="stats-summary" style="margin: 20px 0; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); padding: 15px; border-radius: 10px; border-left: 5px solid #3498db;">
+                <p style="margin: 5px 0;"><strong>🗺️ Rutas Activas:</strong> 1</p>
+                <p style="margin: 5px 0;"><strong>🏁 Kilómetros Totales:</strong> <span style="font-size: 1.2em; color: #2c3e50;">194.16</span> km</p>
+                <p style="margin: 5px 0;"><strong>🚚 Kilómetros en Vacío:</strong> <span style="font-size: 1.1em; color: #e74c3c;">28.55</span> km</p>
+                <p style="margin: 5px 0; font-size: 0.9em; color: #666;">📍 Base: Mengíbar (Papel)</p>
+            </div>
+
+            <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                <thead>
+                    <tr style="background-color: #34495e; color: white; text-align: left;">
+                        <th style="padding: 12px 10px;">#</th>
+                        <th style="padding: 12px 10px;">Destino Principal</th>
+                        <th style="padding: 12px 10px; text-align: right;">Distancia</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+            <tr onclick="toggleRoute(0)" style="cursor: pointer; border-bottom: 1px solid #ddd; background-color: #1f77b411;">
+                <td style="padding: 10px; font-weight: bold; color: #1f77b4;">#1</td>
+                <td style="padding: 10px;">Córdoba</td>
+                <td style="padding: 10px; text-align: right;">194.2 km<br><span style="font-size: 0.85em; color: #7f8c8d;">(28.6 km en vacío)</span></td>
+            </tr>
+            <tr id="detail-0" style="display: none; background-color: #f9f9f9;">
+                <td colspan="3" style="padding: 0 10px 10px 10px;">
+                    <ul style='padding-left: 5px; font-size: 11px; margin: 5px 0; color: #444; list-style-type: none;'><li style='margin-bottom:6px; background:#fff; padding:4px; border:1px solid #eee; border-radius:4px;'>  <div style='display:flex; justify-content:space-between; margin-bottom:2px;'>    <span style='white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 75%;' title='Mengíbar → Córdoba'>🏢 Mengíbar <span style='color:#1f77b4'>→</span> 🏭 Córdoba</span>    <b style='min-width: 40px; text-align:right;'>95.8 km</b>  </div>  <div style='text-align:right;'><span style='background:#1f77b4; color:white; padding:1px 4px; border-radius:3px; font-size:9px;'>CARG. (25,000 kg)</span></div></li><li style='margin-bottom:6px; background:#fff; padding:4px; border:1px solid #eee; border-radius:4px;'>  <div style='display:flex; justify-content:space-between; margin-bottom:2px;'>    <span style='white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 75%;' title='Córdoba → Andujar'>🏭 Córdoba <span style='color:#1f77b4'>→</span> 🏪 Andujar</span>    <b style='min-width: 40px; text-align:right;'>69.8 km</b>  </div>  <div style='text-align:right;'><span style='background:#f39c12; color:white; padding:1px 4px; border-radius:3px; font-size:9px;'>PARCIAL (3,915 kg)</span></div></li><li style='margin-bottom:6px; background:#fff; padding:4px; border:1px solid #eee; border-radius:4px;'>  <div style='display:flex; justify-content:space-between; margin-bottom:2px;'>    <span style='white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 75%;' title='Andujar → Mengíbar'>🏪 Andujar <span style='color:#1f77b4'>→</span> 🏢 Mengíbar</span>    <b style='min-width: 40px; text-align:right;'>28.6 km</b>  </div>  <div style='text-align:right;'><span style='background:#e74c3c; color:white; padding:1px 4px; border-radius:3px; font-size:9px;'>VACÍO (0 kg)</span></div></li></ul>
+                </td>
+            </tr>
+            
+                </tbody>
+            </table>
+
+            <script>
+                function toggleRoute(id) {
+                    var el = document.getElementById('detail-' + id);
+                    if (el.style.display === 'none') {
+                        el.style.display = 'table-row';
+                    } else {
+                        el.style.display = 'none';
+                    }
+                }
+            </script>
+
+            <div style="margin-top: 30px; font-size: 11px; color: #95a5a6; text-align: center; font-style: italic;">
+                Haz clic en una ruta para ver el desglose punto a punto.
+            </div>
+        </div>
+        
+    
+            <div class="folium-map" id="map_c4822211857fbfb886513a121652eee6" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_c4822211857fbfb886513a121652eee6 = L.map(
+                "map_c4822211857fbfb886513a121652eee6",
+                {
+                    center: [40.4167, -3.7037],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 6,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_f623a6ee8d8d9f2a6eae884f1e69d037 = L.tileLayer(
+                "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 20,
+  "maxNativeZoom": 20,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors \u0026copy; \u003ca href=\"https://carto.com/attributions\"\u003eCARTO\u003c/a\u003e",
+  "subdomains": "abcd",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_f623a6ee8d8d9f2a6eae884f1e69d037.addTo(map_c4822211857fbfb886513a121652eee6);
+        
+    
+            var poly_line_bea141a1b1afec448e85f376c0b22799 = L.polyline(
+                [[37.98148, -3.80058], [37.93214, -4.67292]],
+                {"bubblingMouseEvents": true, "color": "#1f77b4", "dashArray": "5, 10", "dashOffset": null, "fill": false, "fillColor": "#1f77b4", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.8, "smoothFactor": 1.0, "stroke": true, "weight": 4}
+            ).addTo(map_c4822211857fbfb886513a121652eee6);
+        
+    
+            poly_line_bea141a1b1afec448e85f376c0b22799.bindTooltip(
+                `<div>
+                     Mengíbar → Córdoba (Directo)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_f5f59660995a89a0a39ade1a2f21a037 = L.polyline(
+                [[37.93214, -4.67292], [38.0392, -4.0508]],
+                {"bubblingMouseEvents": true, "color": "#1f77b4", "dashArray": "5, 10", "dashOffset": null, "fill": false, "fillColor": "#1f77b4", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.8, "smoothFactor": 1.0, "stroke": true, "weight": 4}
+            ).addTo(map_c4822211857fbfb886513a121652eee6);
+        
+    
+            poly_line_f5f59660995a89a0a39ade1a2f21a037.bindTooltip(
+                `<div>
+                     Córdoba → Andujar (Directo)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_8383b1a106edb3a56f9c73661645553a = L.polyline(
+                [[38.0392, -4.0508], [37.98148, -3.80058]],
+                {"bubblingMouseEvents": true, "color": "#1f77b4", "dashArray": "5, 10", "dashOffset": null, "fill": false, "fillColor": "#1f77b4", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.8, "smoothFactor": 1.0, "stroke": true, "weight": 4}
+            ).addTo(map_c4822211857fbfb886513a121652eee6);
+        
+    
+            poly_line_8383b1a106edb3a56f9c73661645553a.bindTooltip(
+                `<div>
+                     Andujar → Mengíbar (Directo)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_81cf85b525ef105042d9bcdc8dfd16a8 = L.marker(
+                [37.98148, -3.80058],
+                {
+}
+            ).addTo(map_c4822211857fbfb886513a121652eee6);
+        
+    
+            var icon_d80bb6fc553f090b52b90f81d0aca761 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "home",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_7e8a7fe8646e23b271d182687530cfdf = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_995d56866ca29b08bbf3ae3ee5906747 = $(`<div id="html_995d56866ca29b08bbf3ae3ee5906747" style="width: 100.0%; height: 100.0%;">🏛️ <b>DEPÓSITO PAPEL:</b> Mengíbar</div>`)[0];
+                popup_7e8a7fe8646e23b271d182687530cfdf.setContent(html_995d56866ca29b08bbf3ae3ee5906747);
+            
+        
+
+        marker_81cf85b525ef105042d9bcdc8dfd16a8.bindPopup(popup_7e8a7fe8646e23b271d182687530cfdf)
+        ;
+
+        
+    
+    
+                marker_81cf85b525ef105042d9bcdc8dfd16a8.setIcon(icon_d80bb6fc553f090b52b90f81d0aca761);
+            
+    
+            var marker_8abc5d8102665f6d0005b5b8602e4f6e = L.marker(
+                [37.93214, -4.67292],
+                {
+}
+            ).addTo(map_c4822211857fbfb886513a121652eee6);
+        
+    
+            var icon_8e28670ff4d996a016662cd3758494f9 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "green",
+  "iconColor": "white",
+  "icon": "industry",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_ab3743815b4461289db37ac1be24205f = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_cf4fa3c36be5a14f8bf107c9fb3b52af = $(`<div id="html_cf4fa3c36be5a14f8bf107c9fb3b52af" style="width: 100.0%; height: 100.0%;">🏭 <b>PLANTA CARTÓN:</b> Córdoba</div>`)[0];
+                popup_ab3743815b4461289db37ac1be24205f.setContent(html_cf4fa3c36be5a14f8bf107c9fb3b52af);
+            
+        
+
+        marker_8abc5d8102665f6d0005b5b8602e4f6e.bindPopup(popup_ab3743815b4461289db37ac1be24205f)
+        ;
+
+        
+    
+    
+                marker_8abc5d8102665f6d0005b5b8602e4f6e.setIcon(icon_8e28670ff4d996a016662cd3758494f9);
+            
+    
+            var marker_adc50bca07026a58cc0b6e30f004c551 = L.marker(
+                [38.0392, -4.0508],
+                {
+}
+            ).addTo(map_c4822211857fbfb886513a121652eee6);
+        
+    
+            var icon_92b5c7f4b91032a5b9063dd1dbfd93b3 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "orange",
+  "iconColor": "white",
+  "icon": "shopping-cart",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_aefb9031c767a83e511b79c23d44219c = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_392237ac8b4622824eedfa9bf47b78b4 = $(`<div id="html_392237ac8b4622824eedfa9bf47b78b4" style="width: 100.0%; height: 100.0%;">🏪 <b>CLIENTE:</b> Andujar</div>`)[0];
+                popup_aefb9031c767a83e511b79c23d44219c.setContent(html_392237ac8b4622824eedfa9bf47b78b4);
+            
+        
+
+        marker_adc50bca07026a58cc0b6e30f004c551.bindPopup(popup_aefb9031c767a83e511b79c23d44219c)
+        ;
+
+        
+    
+    
+                marker_adc50bca07026a58cc0b6e30f004c551.setIcon(icon_92b5c7f4b91032a5b9063dd1dbfd93b3);
+            
+    
+            var marker_6804055025f1f3a205b7b4cd6b7a4d71 = L.marker(
+                [37.98148, -3.80058],
+                {
+}
+            ).addTo(map_c4822211857fbfb886513a121652eee6);
+        
+    
+            var icon_94eeda2fccd60775146b041000b8ac54 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "home",
+  "prefix": "glyphicon",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_50a066e020435f9f0ff0fd4628576e6a = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_1d4dafe75d6c0d7a571da71e566c4ed9 = $(`<div id="html_1d4dafe75d6c0d7a571da71e566c4ed9" style="width: 100.0%; height: 100.0%;">🏛️ <b>DEPÓSITO PAPEL:</b> Mengíbar</div>`)[0];
+                popup_50a066e020435f9f0ff0fd4628576e6a.setContent(html_1d4dafe75d6c0d7a571da71e566c4ed9);
+            
+        
+
+        marker_6804055025f1f3a205b7b4cd6b7a4d71.bindPopup(popup_50a066e020435f9f0ff0fd4628576e6a)
+        ;
+
+        
+    
+    
+                marker_6804055025f1f3a205b7b4cd6b7a4d71.setIcon(icon_94eeda2fccd60775146b041000b8ac54);
+            
+</script>
+</html>

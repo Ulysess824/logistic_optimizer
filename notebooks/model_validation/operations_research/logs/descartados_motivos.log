@@ -1,0 +1,32 @@
+
+[2026-04-13 20:06:02] REPORTE DEL MOTOR: AUDITORIA DE EXCLUSIONES
+================================================================================
+
+PLANTA: CP_CP002
+----------------------------------------
+PEDIDOS RECHAZADOS EN ESTA PLANTA:
+  RECHAZADO: Cliente 7 de CP002
+     - Carga: 5 pallets
+     - Diagnostico: El algoritmo prioritizó otros nodos por eficiencia general.
+
+  RECHAZADO: Cliente 8 de CP002
+     - Carga: 5 pallets
+     - Diagnostico: El algoritmo prioritizó otros nodos por eficiencia general.
+
+  RECHAZADO: Cliente 9 de CP002
+     - Carga: 5 pallets
+     - Diagnostico: El algoritmo prioritizó otros nodos por eficiencia general.
+
+  RECHAZADO: Cliente 10 de CP002
+     - Carga: 5 pallets
+     - Diagnostico: El algoritmo prioritizó otros nodos por eficiencia general.
+
+  RECHAZADO: Cliente 11 de CP002
+     - Carga: 5 pallets
+     - Diagnostico: El algoritmo prioritizó otros nodos por eficiencia general.
+
+  RECHAZADO: Cliente 12 de CP002
+     - Carga: 5 pallets
+     - Diagnostico: El algoritmo prioritizó otros nodos por eficiencia general.
+
+================================================================================

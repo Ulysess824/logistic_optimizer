@@ -4,17 +4,26 @@
     <meta charset="UTF-8">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f3f4f6; margin: 0; padding: 1.5rem; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f3f4f6; margin: 0; padding: 1rem; }
     </style>
 </head>
-<body>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 h-[650px]">
-        <div class="h-full border rounded shadow-sm relative bg-white flex flex-col">
-            <h3 class="font-bold text-gray-800 p-3 border-b bg-gray-50">Comparativa: Tradicional vs Optimizada (KMs en vacío)</h3>
-            <iframe src="../tables/tabla_comparativa_vacios.html" class="w-full flex-grow border-0"></iframe>
+<body class="bg-gray-100">
+    <div class="flex flex-col gap-6">
+        <!-- Tabla Comparativa (Arriba) -->
+        <div class="w-full bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden" style="height: 600px;">
+            <div class="bg-slate-800 text-white p-4 flex justify-between items-center">
+                <h3 class="font-bold text-sm uppercase tracking-wider">Comparativa: Tradicional vs Optimizada (KMs en vacío)</h3>
+                <span class="text-[10px] bg-slate-700 px-2 py-1 rounded">VECTO 5 / GLEC v3.0</span>
+            </div>
+            <iframe src="../tables/tabla_comparativa_vacios.html" class="w-full h-full border-0"></iframe>
         </div>
-        <div class="h-full border rounded shadow-sm relative">
-            <span class="absolute top-2 left-2 bg-white/80 px-2 py-1 text-[10px] font-bold text-blue-600 z-10 rounded">MAPA BASICA (1 CAMIÓN/1 CLIENTE)</span>
+
+        <!-- Mapa Baseline (Abajo) -->
+        <div class="w-full bg-white border border-gray-200 rounded-xl shadow-lg relative overflow-hidden" style="height: 500px;">
+            <div class="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-3 py-1.5 text-[11px] font-bold text-blue-700 z-10 rounded-lg shadow-md border border-blue-100 flex items-center gap-2">
+                <span class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
+                ESCENARIO BASE: SINERGIAS NO CAPTURADAS (1 CAMIÓN / 1 CLIENTE)
+            </div>
             <iframe src="../maps/mapa_rutas_baseline.html" class="w-full h-full border-0"></iframe>
         </div>
     </div>

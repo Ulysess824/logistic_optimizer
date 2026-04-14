@@ -1,0 +1,2090 @@
+{
+  "2025-01-01": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-01-02": {
+    "routes_generated": 36,
+    "total_km": 30874.61,
+    "empty_km": 11465.9,
+    "total_co2_kg": 26880.78,
+    "total_cost_eur": 46311.92,
+    "total_customers": 56
+  },
+  "2025-01-03": {
+    "routes_generated": 36,
+    "total_km": 30874.61,
+    "empty_km": 11465.9,
+    "total_co2_kg": 26880.78,
+    "total_cost_eur": 46311.92,
+    "total_customers": 56
+  },
+  "2025-01-06": {
+    "routes_generated": 36,
+    "total_km": 30861.97,
+    "empty_km": 11465.9,
+    "total_co2_kg": 26871.75,
+    "total_cost_eur": 46292.95,
+    "total_customers": 55
+  },
+  "2025-01-07": {
+    "routes_generated": 36,
+    "total_km": 31035.72,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27004.15,
+    "total_cost_eur": 46553.59,
+    "total_customers": 66
+  },
+  "2025-01-08": {
+    "routes_generated": 36,
+    "total_km": 31153.75,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27087.74,
+    "total_cost_eur": 46730.64,
+    "total_customers": 69
+  },
+  "2025-01-09": {
+    "routes_generated": 36,
+    "total_km": 30820.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 26819.03,
+    "total_cost_eur": 46230.57,
+    "total_customers": 42
+  },
+  "2025-01-10": {
+    "routes_generated": 36,
+    "total_km": 30820.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 26819.03,
+    "total_cost_eur": 46230.57,
+    "total_customers": 42
+  },
+  "2025-01-13": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-01-14": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-01-15": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-01-16": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-01-17": {
+    "routes_generated": 36,
+    "total_km": 30827.5,
+    "empty_km": 11465.9,
+    "total_co2_kg": 26837.69,
+    "total_cost_eur": 46241.24,
+    "total_customers": 49
+  },
+  "2025-01-20": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-01-21": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-01-22": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-01-23": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-01-24": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-01-27": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-01-28": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-01-29": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-01-30": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-01-31": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-02-03": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-02-04": {
+    "routes_generated": 36,
+    "total_km": 31153.75,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27087.74,
+    "total_cost_eur": 46730.64,
+    "total_customers": 69
+  },
+  "2025-02-05": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-02-06": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-02-07": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-02-10": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-02-11": {
+    "routes_generated": 36,
+    "total_km": 30820.3,
+    "empty_km": 11465.9,
+    "total_co2_kg": 26812.63,
+    "total_cost_eur": 46230.44,
+    "total_customers": 37
+  },
+  "2025-02-12": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-02-13": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-02-14": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-02-17": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-02-18": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-02-19": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-02-20": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-02-21": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-02-24": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-02-25": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-02-26": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-02-27": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-02-28": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-03-03": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-03-04": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-03-05": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-03-06": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-03-07": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-03-10": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-03-11": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-03-12": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-03-13": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-03-14": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-03-17": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-03-18": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-03-19": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-03-20": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-03-21": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-03-24": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-03-25": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-03-26": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-03-27": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-03-28": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-03-31": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-04-01": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-04-02": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-04-03": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-04-04": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-04-07": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-04-08": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-04-09": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-04-10": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-04-11": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-04-14": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-04-15": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-04-16": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-04-17": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-04-18": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-04-21": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-04-22": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-04-23": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-04-24": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-04-25": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-04-28": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-04-29": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-04-30": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-05-01": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-05-02": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-05-05": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-05-06": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-05-07": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-05-08": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-05-09": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-05-12": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-05-13": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-05-14": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-05-15": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-05-16": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-05-19": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-05-20": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-05-21": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-05-22": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-05-23": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-05-26": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-05-27": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-05-28": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-05-29": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-05-30": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-06-02": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-06-03": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-06-04": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-06-05": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-06-06": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-06-09": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-06-10": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-06-11": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-06-12": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-06-13": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-06-16": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-06-17": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-06-18": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-06-19": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-06-20": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-06-23": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-06-24": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-06-25": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-06-26": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-06-27": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-06-30": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-07-01": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-07-02": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-07-03": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-07-04": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-07-07": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-07-08": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-07-09": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-07-10": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-07-11": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-07-14": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-07-15": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-07-16": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-07-17": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-07-18": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-07-21": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-07-22": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-07-23": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-07-24": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-07-25": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-07-28": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-07-29": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-07-30": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-07-31": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-08-01": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-08-04": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-08-05": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-08-06": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-08-07": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-08-08": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-08-11": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-08-12": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-08-13": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-08-14": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-08-15": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-08-18": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-08-19": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-08-20": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-08-21": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-08-22": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-08-25": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-08-26": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-08-27": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-08-28": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-08-29": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-09-01": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-09-02": {
+    "routes_generated": 36,
+    "total_km": 31035.72,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27004.15,
+    "total_cost_eur": 46553.59,
+    "total_customers": 66
+  },
+  "2025-09-03": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-09-04": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-09-05": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-09-08": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-09-09": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-09-10": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-09-11": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-09-12": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-09-15": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-09-16": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-09-17": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-09-18": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-09-19": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-09-22": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-09-23": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-09-24": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-09-25": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-09-26": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-09-29": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-09-30": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-10-01": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-10-02": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-10-03": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-10-06": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-10-07": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-10-08": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-10-09": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-10-10": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-10-13": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-10-14": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-10-15": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-10-16": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-10-17": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-10-20": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-10-21": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-10-22": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-10-23": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-10-24": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-10-27": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-10-28": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-10-29": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-10-30": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-10-31": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-11-03": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-11-04": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-11-05": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-11-06": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-11-07": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-11-10": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-11-11": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-11-12": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-11-13": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-11-14": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-11-17": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-11-18": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-11-19": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-11-20": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-11-21": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-11-24": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-11-25": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-11-26": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-11-27": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-11-28": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-12-01": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-12-02": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-12-03": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-12-04": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-12-05": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-12-08": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-12-09": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-12-10": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-12-11": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-12-12": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-12-15": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-12-16": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-12-17": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-12-18": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-12-19": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-12-22": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-12-23": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-12-24": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-12-25": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-12-26": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-12-29": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-12-30": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  },
+  "2025-12-31": {
+    "routes_generated": 36,
+    "total_km": 31225.38,
+    "empty_km": 11465.9,
+    "total_co2_kg": 27139.63,
+    "total_cost_eur": 46838.09,
+    "total_customers": 70
+  }
+}

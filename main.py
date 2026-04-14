@@ -25,7 +25,6 @@ from logistic_core.config import (
     CAPEX_TRUCK_UNIT_COST, DEFAULT_CYCLE_TIME_DAYS, DAILY_TRUCK_OUTBOUND, DEFAULT_FLEET_BUFFER
 )
 
-logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)
 
 
@@ -202,7 +201,7 @@ def generate_logistics_dashboard(routes, solver, output_path="logistics_dashboar
 
 # 1. Archivos de datos
 PLANTS_FILE = DATA_DIR / "locations_smurfit.json"
-CLIENTS_FILE = DATA_DIR / "demanda_simulada.json"
+CLIENTS_FILE = DATA_DIR / "cliente_ubi.json"
 
 # 2. Restricciones físicas y de negocio (Dinámicas)
 estimator = TruckCapacityEstimator(
@@ -319,9 +318,10 @@ def run_optimization(
     )
 
     if not routes:
-        return None, None
+        return None, None, None
 
-    summary = _build_summary(routes, solver, max_pallets=max_pallets, threshold_km=threshold_km, n_candidatos=n_candidatos)
+    summary = _build_summary(routes, solver, max_pallets=max_pallets, threshold_km=threshold_km, 
+                             n_candidatos=n_candidatos)
     
     return routes, summary, solver
 
@@ -406,6 +406,7 @@ def _build_summary(routes, solver, max_pallets=35, threshold_km=50, n_candidatos
             "threshold_km": threshold_km,
             "n_candidatos": n_candidatos
         },
+        "total_customers": sum(r["num_customers"] for r in route_summaries),
         "routes": route_summaries
     }
 
