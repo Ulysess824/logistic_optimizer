@@ -73,13 +73,15 @@ class DataManager:
             "lng": lng,
             "demanda_pallets": eff_pallets,
             "n_pallets_original": n_pallets,
-            "remontar": remontar
+            "remontar": remontar,
+            "year": int(dest.get('year', 0)),
+            "month": int(dest.get('month', 0))
         }
 
     # ------------------------------------------------------------------
     # Selección inteligente de clientes (Filtro de Retorno)
     # ------------------------------------------------------------------
-    def get_optimized_locations(self, max_customers_per_plant=None, threshold_km=None, max_radius_km=None, mandatory_customers=None, sorting_strategy="detour", default_limit=None, max_pallets=None):
+    def get_optimized_locations(self, max_customers_per_plant=None, threshold_km=None, max_radius_km=None, mandatory_customers=None, sorting_strategy="detour", default_limit=None, max_pallets=None, target_year=None, target_month=None):
         """
         Selecciona clientes mediante doble filtro:
         1. Filtro local (Haversine): Clientes dentro de max_radius_km.
@@ -110,7 +112,12 @@ class DataManager:
             for dest in destinations:
                 validated = self._validate_client(dest, zip_code)
                 if validated:
-                    flattened_clients.append(validated)
+                    # Aplicar filtro temporal si se especifica
+                    match_year = (target_year is None) or (validated['year'] == target_year)
+                    match_month = (target_month is None) or (validated['month'] == target_month)
+                    
+                    if match_year and match_month:
+                        flattened_clients.append(validated)
 
         if not flattened_clients:
             logger.error("No se encontraron clientes válidos.")

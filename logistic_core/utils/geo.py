@@ -478,7 +478,7 @@ class GeoUtils:
 
         for url in urls_to_try:
             try:
-                response = requests.get(url, timeout=5)
+                response = requests.get(url, timeout=20)
                 if response.status_code == 200:
                     data = response.json()
                     if "routes" in data and len(data["routes"]) > 0:

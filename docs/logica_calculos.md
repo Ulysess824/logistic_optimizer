@@ -198,3 +198,19 @@ $$TCO_{flota}^{mod} = N_{diesel} \times TCO_{diesel}^{mod} + N_{ev} \times TCO_{
 | Renting Mensual | 2,800 EUR/mes | 5,600 EUR/mes | Ofertas mercado 2025 |
 | Leasing Mensual | 2,600 EUR/mes | 5,200 EUR/mes | TAE ~6.5% |
 | Subvencion MOVES | - | 90,000 EUR | MOVES III (parametrizable) |
+|   |   |   |   |
+
+---
+
+## 10. Indicadores de Eficiencia y Unit Economics (TFM)
+
+Esta sección detalla los indicadores de rendimiento (KPIs) de segundo nivel utilizados para la auditoría operativa del algoritmo en el marco del TFM.
+
+### A. Fill Rate (%) - Saturación de Flota
+Mide el aprovechamiento de la capacidad de carga del vehículo en el conjunto de rutas optimizadas.
+*   **Fórmula**:
+    $$\text{Fill Rate \%} = \frac{\text{Total Pallets Movidos}}{\text{Num Rutas} \times \text{Capacidad Máxima (34)}} \times 100$$
+*   *Interpretación*: Un valor cercano al 100% indica una consolidación de carga óptima, minimizando el número de camiones necesarios.
+
+*   *Nota*: En este modelo, el tramo vacío es el trayecto desde el último cliente hasta el Depósito (Mengíbar).
+

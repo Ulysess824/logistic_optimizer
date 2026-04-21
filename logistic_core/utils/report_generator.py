@@ -40,8 +40,8 @@ from logistic_core.utils.geo import GeoUtils
 from logistic_core.utils.cost_estimator import CostEstimator
 from logistic_core.utils.fcr_estimator import FCREmissionEstimator
 from logistic_core.utils.external_cost_analyst import ExternalCostAnalyst
-from logistic_core.utils.financial_analyzer import FinancialAnalyzer
-from logistic_core.utils.investment_analyzer import InvestmentAnalyzer
+from logistic_core.utils.operational_analyzer import OperationalAnalyzer
+from logistic_core.utils.strategic_analyzer import StrategicAnalyzer
 
 logger = logging.getLogger(__name__)
 
@@ -289,10 +289,7 @@ def generate_dashboard(summary_path, routes_path, output_path, hedonic_path=None
         plant_groups[p_short]['trad_co2'] += co2_trad_systemic
         plant_groups[p_short]['trad_cost'] += cost_trad_systemic
         
-        # Muelle descriptivo para la sub-fila
         muelle_info = ""
-        if "(" in p_full_name:
-            muelle_info = " (" + p_full_name.split('(')[1]
         
         # Ahorro individual contra la base sistémica (ambos camiones iban vacíos al retorno)
         empty_trad_systemic = (dist_m_p_m / 2.0) + (dist_p_c_p / 2.0)
@@ -304,32 +301,26 @@ def generate_dashboard(summary_path, routes_path, output_path, hedonic_path=None
         empty_ret_saving_money = empty_trad_cost - empty_opt_cost
         
         # Nuevas KPIs de Eficiencia (Unitaria)
-        route_cost_km = route_cost_vrpb / dist_vrpb if dist_vrpb > 0 else 0
-        route_co2_km  = r.get("co2_emissions_kg", 0) / dist_vrpb if dist_vrpb > 0 else 0
+        route_fill_rate = (r.get("total_pallets", 0) / 34) * 100 if 34 > 0 else 0
+        route_milla_vacia_pct = (empty_after_osrm / dist_vrpb) * 100 if dist_vrpb > 0 else 0
         
-        trad_systemic_co2_km = co2_trad_systemic / dist_trad_systemic if dist_trad_systemic > 0 else 0
-        if is_ev:
-            route_red_co2 = 0.0
-        else:
-            route_red_co2 = (1 - (route_co2_km / trad_systemic_co2_km)) * 100 if trad_systemic_co2_km > 0 else 0
-            
         plant_groups[p_short]['opt_routes'].append({
-            'desc': f'MC-VRPB Ruta #{r["route_id"]}{muelle_info}',
-            'dist': r["distance_km"],
+            'route_id': r.get("route_id", 0),
+            'desc': f'Ruta #{r.get("route_id", i+1)}',
+            'dist': dist_vrpb,
             'empty': empty_after_osrm,
-            'customers': r.get("num_customers", 0),
-            'co2': r.get("co2_emissions_kg", 0),
-            'co2_abs': r.get("co2_emissions_kg", 0),
+            'fill_rate': route_fill_rate,
+            'milla_vacia': route_milla_vacia_pct,
+            'customers': r.get("num_customers", len(customers_in_route)),
+            'total_pallets': total_pallets,
+            'co2': route_co2_kg,
             'cost': route_cost_vrpb,
             'imp': route_imp,
-            'cost_km': route_cost_km,
-            'co2_km': route_co2_km,
-            'red_co2': route_red_co2,
             'empty_ret_saving': empty_ret_saving_money,
             'systemic_saving': systemic_saving_route,
             'systemic_co2_saving': systemic_co2_saving_route,
             'is_ev': is_ev,
-            'kwh': r.get("kwh_consumed", 0.0)
+            'kwh': route_kwh_sum
         })
 
         # --- 2. CÁLCULO LINEHAUL PARA COMPARATIVA EXTERNA (REAL DISTANCE) ---
@@ -392,7 +383,7 @@ def generate_dashboard(summary_path, routes_path, output_path, hedonic_path=None
         
         km_rows_html.append(
             f'<tr class="bg-gray-100 font-bold text-gray-700 text-[11px] uppercase tracking-wider">'
-            f'<td colspan="12" class="px-3 py-1">'
+            f'<td colspan="15" class="px-3 py-1">'
             f'<span>PLANTA: {pg["name_display"]}</span>'
             f'<div class="{motor_class} text-[9px] font-medium tracking-normal mt-0.5">{motor_label}</div>'
             f'</td>'
@@ -418,10 +409,12 @@ def generate_dashboard(summary_path, routes_path, output_path, hedonic_path=None
         km_rows_html.append(
             f'<tr class="bg-gray-50/50 italic text-gray-500 text-[11px] border-b">'
             f'<td class="px-6 py-1 border-l-4 border-gray-300" title="Ruta de un camión que sale del depot, va a la planta y regresa vacío">Escenario Base Inbound (Sin clientes)</td>'
-            f'<td class="px-2 py-1 text-center">-</td>'
-            f'<td class="px-2 py-1 text-center">-</td>'
+            f'<td class="px-2 py-1 text-center font-bold text-slate-400">Referencia</td>'
+            f'<td class="px-2 py-1 text-center font-bold text-slate-400">Total Op.</td>'
+            f'<td class="px-3 py-1 text-center font-mono font-bold text-indigo-400 bg-indigo-50/20">~88%</td>'
             f'<td class="px-3 py-1 text-center font-mono">{fmt_std(base_km)}</td>'
             f'<td class="px-3 py-1 text-center font-mono">{fmt_std(base_km / 2, 1)}</td>'
+            f'<td class="px-3 py-1 text-center font-mono font-bold text-red-400 bg-red-50/20">50.0%</td>'
             f'<td class="px-3 py-1 text-center font-mono">{fmt_std(base_cost, 2)} €</td>'
             f'{b_co2_km_td}'
             f'{b_co2_td}'
@@ -429,7 +422,7 @@ def generate_dashboard(summary_path, routes_path, output_path, hedonic_path=None
             f'<td class="px-3 py-1 text-center font-mono">-</td>'
             f'<td class="px-3 py-1 text-center font-mono">-</td>'
             f'<td class="px-3 py-1 text-center font-mono">-</td>'
-            f'<td class="px-3 py-1 text-center">-</td>'
+            f'<td class="px-3 py-1 text-center">Referencia</td>'
             f'</tr>'
         )
         # NUEVO: Fila de Agregación Línea Base (Impacto Total Planta sin Optimizar)
@@ -452,8 +445,10 @@ def generate_dashboard(summary_path, routes_path, output_path, hedonic_path=None
             f'</td>'
             f'<td class="px-2 py-1 text-center">-</td>'
             f'<td class="px-2 py-1 text-center font-bold text-slate-400">Escala</td>'
+            f'<td class="px-3 py-1 text-center font-mono font-bold text-indigo-400 bg-indigo-50/10">~88%</td>'
             f'<td class="px-3 py-1 text-center font-mono">{fmt_std(agg_base_km)}</td>'
             f'<td class="px-3 py-1 text-center font-mono italic text-slate-500">{fmt_std(agg_base_empty, 1)}</td>'
+            f'<td class="px-3 py-1 text-center font-mono font-bold text-red-400 bg-red-50/10">50.0%</td>'
             f'<td class="px-3 py-1 text-center font-mono bg-slate-200/40">{fmt_std(agg_base_cost, 2)} €</td>'
             f'{b_co2_km_td}'
             f'{agg_b_co2_td}'
@@ -471,52 +466,54 @@ def generate_dashboard(summary_path, routes_path, output_path, hedonic_path=None
         total_p_ret_saving = 0
         
         for orout in pg['opt_routes']:
-            total_p_dist += orout["dist"]
-            total_p_cost += orout["cost"]
-            total_p_co2 += orout["co2_abs"]
-            total_p_cust += orout["customers"]
-            total_p_sys_saving += orout["systemic_saving"]
-            total_p_sys_co2_saving += orout["systemic_co2_saving"]
-            total_p_ret_saving += orout["empty_ret_saving"]
+            r_dist = orout['dist']
+            r_cost = orout['cost']
+            r_co2 = orout['co2']
+            r_cust = orout['customers']
+            r_empty = orout['empty']
+            r_fill_rate = orout['fill_rate']
+            r_milla_vacia = orout['milla_vacia']
             
-            # Estilo condicional para Reducción CO2
-            co2_class = "text-green-600 font-bold" if orout["red_co2"] >= 0 else "text-red-500 font-bold"
-            co2_sign = "+" if orout["red_co2"] >= 0 else ""
+            total_p_dist += r_dist
+            total_p_cost += r_cost
+            total_p_co2 += r_co2
+            total_p_cust += r_cust
+            total_p_sys_saving += orout['systemic_saving']
+            total_p_sys_co2_saving += orout['systemic_co2_saving']
+            total_p_ret_saving += orout['empty_ret_saving']
             
-            if orout["is_ev"]:
-                o_co2_km_td = f'<td class="px-3 py-1 text-center font-mono font-bold text-fuchsia-700">0 (EV)</td>'
-                o_co2_td = f'<td class="px-3 py-1 text-center font-mono font-bold text-fuchsia-700">{fmt_std(orout["kwh"], 1)} kWh</td>'
+            # Formateo de CO2 para la ruta
+            r_co2_km = r_co2 / r_dist if r_dist > 0 else 0
+            if is_plant_ev:
+                o_co2_km_td = f'<td class="px-3 py-1 text-center font-mono text-fuchsia-700 font-bold">0 (EV)</td>'
+                o_co2_td = f'<td class="px-3 py-1 text-center font-mono text-fuchsia-700 font-bold">{fmt_std(orout["kwh"], 1)} kWh</td>'
             else:
-                o_co2_km_td = f'<td class="px-3 py-1 text-center font-mono font-bold text-purple-700">{fmt_std(orout["co2_km"], 3)} kg/km</td>'
-                o_co2_td = f'<td class="px-3 py-1 text-center font-mono font-bold text-fuchsia-700">{fmt_std(orout["co2_abs"], 1)} kg</td>'
-                
+                o_co2_km_td = f'<td class="px-3 py-1 text-center font-mono">{fmt_std(r_co2_km, 3)} kg/km</td>'
+                o_co2_td = f'<td class="px-3 py-1 text-center font-mono">{fmt_std(r_co2, 1)} kg</td>'
+            
             km_rows_html.append(
                 f'<tr class="hover:bg-blue-50/20 border-b text-[12px] text-blue-800">'
                 f'<td class="px-6 py-2 font-semibold pl-12">{orout["desc"]}</td>'
                 f'<td class="px-2 py-1 text-[10px] text-blue-600 uppercase font-bold text-center">Optimizado</td>'
-                f'<td class="px-3 py-1 text-center font-bold text-indigo-600">{orout["customers"]}</td>'
-                f'<td class="px-3 py-1 text-center font-mono font-bold">{fmt_std(orout["dist"])}</td>'
-                f'<td class="px-3 py-1 text-center font-mono text-gray-400 italic">{fmt_std(orout["empty"], 1)}</td>'
-                f'<td class="px-3 py-1 text-center font-mono font-bold">{fmt_std(orout["cost"], 2)} €</td>'
-                f'{o_co2_km_td}'
-                f'{o_co2_td}'
+                f'<td class="px-3 py-1 text-center font-bold text-indigo-600">{r_cust}</td>'
+                f'<td class="px-3 py-1 text-center font-bold text-indigo-500 bg-indigo-50/30">{fmt_std(r_fill_rate, 1)}%</td>'
+                f'<td class="px-3 py-1 text-center font-mono font-bold">{fmt_std(r_dist)}</td>'
+                f'<td class="px-3 py-1 text-center font-mono text-gray-400 italic">{fmt_std(r_empty, 1)}</td>'
+                f'<td class="px-3 py-1 text-center font-bold text-red-500 bg-red-50/30">{fmt_std(r_milla_vacia, 1)}%</td>'
+                f'<td class="px-3 py-1 text-center font-mono font-bold">{fmt_std(r_cost, 2)} €</td>'
+                f"{o_co2_km_td}"
+                f"{o_co2_td}"
                 f'<td class="px-3 py-1 text-center font-bold text-teal-600">+{fmt_std(orout["systemic_co2_saving"], 1)} kg</td>'
-                f'<td class="px-3 py-1 text-center {co2_class}">{co2_sign}{fmt_std(orout["red_co2"], 1)}%</td>'
-                f'<td class="px-3 py-1 text-center font-bold text-green-600 border-l border-green-100 italic">'
-                f'+{fmt_std(orout["imp"], 1)}%'
-                f'</td>'
-                f'<td class="px-3 py-1 text-center font-bold text-green-600 bg-green-50/30">'
-                f'+{fmt_std(orout["empty_ret_saving"], 0)} €'
-                f'</td>'
-                f'<td class="px-3 py-1 text-center font-bold text-emerald-600 bg-emerald-50/50">'
-                f'+{fmt_std(orout["systemic_saving"], 0)} €'
-                f'</td>'
+                f'<td class="px-3 py-1 text-center font-bold text-green-600">-</td>'
+                f'<td class="px-3 py-1 text-center font-bold text-green-600 border-l border-green-100 italic">+{fmt_std(orout["imp"], 1)}%</td>'
+                f'<td class="px-3 py-1 text-center font-bold text-green-600 bg-green-50/30">+{fmt_std(orout["empty_ret_saving"], 0)} €</td>'
+                f'<td class="px-3 py-1 text-center font-bold text-emerald-600 bg-emerald-50/50">+{fmt_std(orout["systemic_saving"], 0)} €</td>'
                 f'</tr>'
             )
             
         # NUEVO: Fila de Agregación TOTAL Optimizado (Realidad tras Algoritmo)
         p_avg_co2_km = total_p_co2 / total_p_dist if total_p_dist > 0 else 0
-        p_total_empty_after = sum([orout["empty"] for orout in pg['opt_routes']])
+        p_total_empty_after = sum([orout.get("empty_km", orout.get("empty", 0)) for orout in pg['opt_routes']])
         p_total_savings_empty = agg_base_empty - p_total_empty_after
         p_total_pct_empty = (p_total_savings_empty / agg_base_empty * 100) if agg_base_empty > 0 else 0
 
@@ -527,6 +524,11 @@ def generate_dashboard(summary_path, routes_path, output_path, hedonic_path=None
             p_co2_km_td = f'<td class="px-3 py-1 text-center font-mono">{fmt_std(p_avg_co2_km, 3)} kg/km</td>'
             p_co2_td = f'<td class="px-3 py-1 text-center font-mono">{fmt_std(total_p_co2, 1)} kg</td>'
 
+        # Cálculo de Fill Rate y Milla Vacía agregados por planta
+        p_total_pallets = sum([r.get("total_pallets", 0) for r in pg["opt_routes"]])
+        p_avg_fill_rate = (p_total_pallets / (len(pg["opt_routes"]) * 34)) * 100 if pg["opt_routes"] else 0
+        p_avg_milla_vacia = (p_total_empty_after / total_p_dist * 100) if total_p_dist > 0 else 0
+
         km_rows_html.append(
             f'<tr class="bg-blue-100 text-blue-900 font-bold text-[11px] border-b border-blue-200">'
             f'<td class="px-6 py-2 border-l-4 border-blue-400 uppercase tracking-tighter pl-10">'
@@ -534,11 +536,13 @@ def generate_dashboard(summary_path, routes_path, output_path, hedonic_path=None
             f'</td>'
             f'<td class="px-2 py-1 text-center font-bold text-blue-600 underline">Realizado</td>'
             f'<td class="px-3 py-1 text-center font-bold text-indigo-700">{total_p_cust}</td>'
+            f'<td class="px-3 py-1 text-center font-bold text-indigo-800 bg-blue-200/50">{fmt_std(p_avg_fill_rate, 1)}%</td>'
             f'<td class="px-3 py-1 text-center font-mono">{fmt_std(total_p_dist)}</td>'
             f'<td class="px-3 py-1 text-center font-mono">-</td>'
+            f'<td class="px-3 py-1 text-center font-bold text-red-800 bg-red-200/50">{fmt_std(p_avg_milla_vacia, 1)}%</td>'
             f'<td class="px-3 py-1 text-center font-mono bg-blue-200/40">{fmt_std(total_p_cost, 2)} €</td>'
-            f'{p_co2_km_td}'
-            f'{p_co2_td}'
+            f"{p_co2_km_td}"
+            f"{p_co2_td}"
             f'<td class="px-3 py-1 text-center font-bold text-teal-700">+{fmt_std(total_p_sys_co2_saving, 1)} kg</td>'
             f'<td class="px-3 py-1 text-center">-</td>'
             f'<td class="px-3 py-1 text-center font-bold text-green-700 italic">+{fmt_std(p_total_pct_empty, 1)}%</td>'
@@ -582,7 +586,13 @@ def generate_dashboard(summary_path, routes_path, output_path, hedonic_path=None
             global_co2_km_trad = total_co2_trad / (total_empty_before * 2) if total_empty_before > 0 else 0
             reduction_co2_rel = (1 - (global_co2_km / global_co2_km_trad)) * 100 if global_co2_km_trad > 0 else 0
 
+            # KPIs Globales para Footer
+            g_fill_rate = (summary.get("total_pallets_moved", 0) / (summary["num_routes"] * 34)) * 100 if summary["num_routes"] > 0 else 0
+            g_milla_vacia = (t_empty_vrpb / summary["total_km"] * 100) if summary["total_km"] > 0 else 0
+
             html_table = html_table.replace('{{T_CUST}}', str(summary.get("total_customers", 0)))
+            html_table = html_table.replace('{{T_FILL}}', f'{fmt_std(g_fill_rate, 1)}%')
+            html_table = html_table.replace('{{T_MV_PCT}}', f'{fmt_std(g_milla_vacia, 1)}%')
             html_table = html_table.replace('{{T_DIST}}', f'{fmt_std(t_dist_vrpb)} km')
             html_table = html_table.replace('{{T_EMPTY}}', f'{fmt_std(t_empty_vrpb)} km')
             html_table = html_table.replace('{{T_CO2}}', f'{fmt_std(summary["total_co2_kg"], 0)} kg')
@@ -665,8 +675,8 @@ def generate_dashboard(summary_path, routes_path, output_path, hedonic_path=None
             roi_pct = ((annual_saving - investment) / investment) * 100 if investment > 0 else 0
             
             # Ganancia neta por backhauling (costo hundido evitado)
-            fin_analyzer = FinancialAnalyzer()
-            backhauling_profit = fin_analyzer.calculate_avoided_sunk_cost(total_savings, price_km)
+            op_analyzer = OperationalAnalyzer()
+            backhauling_profit = op_analyzer.calculate_avoided_sunk_cost(total_savings, price_km)
 
             html_res = _replace_kpi(html_res, "kpi-software-investment", f"{fmt_std(investment, 0)} €")
             html_res = _replace_kpi(html_res, "kpi-software-roi", f"{fmt_std(roi_pct, 0)}%")
@@ -693,6 +703,10 @@ def generate_dashboard(summary_path, routes_path, output_path, hedonic_path=None
                 start = html_res.find('>', idx) + 1
                 end = html_res.find('</tbody>', start)
                 html_res = html_res[:start] + "\n" + "\n".join(outsourcing_rows_html) + "\n" + html_res[end:]
+
+            # Los KPIs de Eficiencia (Ocupación y Milla Vacía) ya están integrados en las filas de km_rows_html
+            # que se inyectan en comparison-tbody. Eliminamos la tabla redundante que se inyectaba aquí.
+            pass
 
             with open(resumen_path, "w", encoding="utf-8") as f:
                 f.write(html_res)
@@ -1047,7 +1061,7 @@ def _generate_parametros_tab(bodies_dir):
 
 def _generate_finanzas_tab(bodies_dir, km_baseline, km_opt, ext_rate, int_rate, num_routes):
     # --- Seccion 1: Business Case (Asset-Light vs Asset-Heavy) ---
-    analyzer = FinancialAnalyzer(
+    analyzer = StrategicAnalyzer(
         days_per_year=250, 
         software_capex=25000, 
         truck_unit_cost=CAPEX_TRUCK_UNIT_COST,
@@ -1056,10 +1070,21 @@ def _generate_finanzas_tab(bodies_dir, km_baseline, km_opt, ext_rate, int_rate, 
         fleet_buffer=DEFAULT_FLEET_BUFFER
     )
     bc = analyzer.generate_business_case(km_baseline, km_opt, int_rate, ext_rate, num_routes)
+    
+    # --- Seccion 1B: TCO Flota Mixta vs Diesel ---
+    try:
+        mixed_tco = analyzer.evaluate_mixed_fleet_transition(FLEET_MIX_DIESEL, FLEET_MIX_EV, KMS_ANUALES_POR_CAMION)
+        m_tco = mixed_tco['mixed_fleet']
+        c_tco = mixed_tco['comparative']
+        color_tco = "text-emerald-300" if c_tco['ahorro_tco_5y'] >= 0 else "text-red-400"
+    except Exception as e:
+        logger.error(f"Error generando TCO misto: {e}")
+        m_tco = {'capex_neto': 0, 'opex_anual': 0}
+        c_tco = {'payback_years': 0, 'ahorro_tco_5y': 0}
+        color_tco = "text-red-400"
 
     # --- Seccion 2: Tabla de Inversion Mixta (Compra/Leasing/Renting) ---
-    inv_analyzer = InvestmentAnalyzer()
-    tabla = inv_analyzer.generar_tabla_comparativa()
+    tabla = analyzer.generar_tabla_comparativa()
     rec = tabla["recomendacion"]
     n_d = tabla["flota_mixta"]["compra"]["n_diesel"]
     n_e = tabla["flota_mixta"]["compra"]["n_ev"]
@@ -1115,9 +1140,9 @@ def _generate_finanzas_tab(bodies_dir, km_baseline, km_opt, ext_rate, int_rate, 
 <body class="p-8 pb-32">
     <div class="max-w-7xl mx-auto">
         <h1 class="text-3xl font-black text-slate-800 mb-2 border-b-2 border-slate-200 pb-4">Business Case & Modelos de Flota</h1>
-        <p class="text-slate-500 text-sm mb-8">Evaluacion estrategica: modalidades de adquisicion y TCO a {TCO_HORIZON_YEARS} anos para una flota mixta de {n_t} camiones ({n_d} diesel + {n_e} electricos).</p>
+        <p class="text-slate-500 text-sm mb-8">Evaluacion estrategica: modalidades de adquisicion y TCO a {TCO_HORIZON_YEARS} anos para una flota de {n_t} camiones.</p>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
             <!-- Asset-Light Mode -->
             <div class="bg-white rounded-2xl p-8 border-t-8 border-blue-500 shadow-xl relative overflow-hidden">
                 <div class="absolute -right-10 -top-10 bg-blue-50 w-32 h-32 rounded-full z-0 opacity-50"></div>
@@ -1140,26 +1165,58 @@ def _generate_finanzas_tab(bodies_dir, km_baseline, km_opt, ext_rate, int_rate, 
                 <div class="relative z-10">
                     <span class="bg-indigo-900/50 border border-indigo-500/30 text-indigo-300 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Estrategia B (Asset-Heavy)</span>
                     <h2 class="text-2xl font-bold mt-4 mb-1 text-white">Adquisicion Propia</h2>
-                    <p class="text-slate-400 text-sm mb-6">Inversion en flota propia calculada mediante <strong>Ley de Little (L = lam x W)</strong> para soportar {fmt_std(bc['operational']['daily_dispatch'], 0)} despachos/dia.</p>
+                    <p class="text-slate-400 text-sm mb-6">Inversion en flota calculada para soportar {fmt_std(bc['operational']['daily_dispatch'], 0)} despachos/dia.</p>
                     <div class="grid grid-cols-2 gap-4 mb-4">
                         <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
-                            <p class="text-xs uppercase tracking-wider font-bold text-slate-500">CAPEX Flota (Heavy)</p>
+                            <p class="text-xs uppercase tracking-wider font-bold text-slate-500">CAPEX Flota</p>
                             <p class="text-xl font-mono font-bold text-slate-300">{fmt_std(bc['asset_heavy'].get('fleet_capex', 0), 0)} EUR</p>
                         </div>
                         <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
-                            <p class="text-xs uppercase tracking-wider font-bold text-slate-500">CAPEX Total (Inc. SW)</p>
+                            <p class="text-xs uppercase tracking-wider font-bold text-slate-500">CAPEX Total</p>
                             <p class="text-xl font-mono font-bold text-slate-100">{fmt_std(bc['asset_heavy']['capex_eur'], 0)} EUR</p>
                         </div>
                     </div>
                     <div class="bg-indigo-900/20 p-4 rounded-xl border border-indigo-500/20 mb-6">
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <p class="text-[10px] uppercase tracking-wider font-bold text-indigo-400">Flota Requerida</p>
+                                <p class="text-[10px] uppercase tracking-wider font-bold text-indigo-400">Flota 100% Diésel</p>
                                 <p class="text-lg font-bold text-indigo-200">{bc['operational']['fleet_size_required']} <span class="text-xs opacity-60">camiones</span></p>
                             </div>
                             <div class="text-right">
-                                <p class="text-[10px] uppercase tracking-wider font-bold text-indigo-400">Precio Unitario</p>
-                                <p class="text-lg font-bold text-indigo-200">{fmt_std(CAPEX_TRUCK_UNIT_COST, 0)} EUR/u</p>
+                                <p class="text-[10px] uppercase tracking-wider font-bold text-indigo-400">Precio Diésel u.</p>
+                                <p class="text-lg font-bold text-indigo-200">{fmt_std(DIESEL_CAPEX, 0)} EUR</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Estrategia C: Transición Mixta -->
+            <div class="bg-gradient-to-br from-emerald-900 to-slate-900 rounded-2xl p-8 border-t-8 border-emerald-500 shadow-2xl relative overflow-hidden">
+                <div class="absolute -right-10 -top-10 bg-emerald-800 w-32 h-32 rounded-full z-0 opacity-40"></div>
+                <div class="relative z-10">
+                    <span class="bg-emerald-900/50 border border-emerald-500/30 text-emerald-300 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Estrategia C (Transicion)</span>
+                    <h2 class="text-2xl font-bold mt-4 mb-1 text-white">Flota Mixta (ESG)</h2>
+                    <p class="text-slate-400 text-sm mb-6">Inversion parcial en electrificacion ({FLEET_MIX_DIESEL} Diesel / {FLEET_MIX_EV} EV) apoyada en metodo TCO.</p>
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50">
+                            <p class="text-[10px] uppercase tracking-wider font-bold text-slate-500">CAPEX Inversión</p>
+                            <p class="text-xl font-mono font-bold text-slate-300">{fmt_std(m_tco['capex_neto'], 0)} EUR</p>
+                        </div>
+                        <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50">
+                            <p class="text-[10px] uppercase tracking-wider font-bold text-slate-500">OPEX Anual</p>
+                            <p class="text-xl font-mono font-bold text-emerald-300">{fmt_std(m_tco['opex_anual'], 0)} EUR</p>
+                        </div>
+                    </div>
+                    <div class="bg-emerald-900/30 p-4 rounded-xl border border-emerald-500/30 mb-6">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-[10px] uppercase tracking-wider font-bold text-emerald-400">Payback vs Diésel</p>
+                                <p class="text-lg font-bold text-emerald-100">{fmt_std(c_tco['payback_years'], 1)} <span class="text-xs opacity-60">años</span></p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-[10px] uppercase tracking-wider font-bold text-emerald-400">Ahorro TCO 5Y</p>
+                                <p class="text-lg font-bold {color_tco}">{fmt_std(c_tco['ahorro_tco_5y'], 0)} €</p>
                             </div>
                         </div>
                     </div>
@@ -1172,7 +1229,7 @@ def _generate_finanzas_tab(bodies_dir, km_baseline, km_opt, ext_rate, int_rate, 
         <!-- ================================================================ -->
         <div class="mb-8">
             <h2 class="text-2xl font-black text-slate-800 mb-2">Analisis de Inversion por Modalidad</h2>
-            <p class="text-slate-500 text-sm mb-6">TCO (Valor Actual Neto) a {TCO_HORIZON_YEARS} anos para {n_t} camiones. WACC: {inv_analyzer.wacc*100:.0f}% | Inflacion: {inv_analyzer.inflacion*100:.0f}% | {fmt_std(KMS_ANUALES_POR_CAMION, 0)} km/ano por unidad.</p>
+            <p class="text-slate-500 text-sm mb-6">TCO (Valor Actual Neto) a {TCO_HORIZON_YEARS} anos para {n_t} camiones. WACC: {analyzer.wacc*100:.0f}% | Inflación: {analyzer.inflación*100:.0f}% | {fmt_std(KMS_ANUALES_POR_CAMION, 0)} km/año por unidad.</p>
         </div>
 
         <div class="overflow-x-auto rounded-2xl shadow-xl border border-slate-200 mb-8">

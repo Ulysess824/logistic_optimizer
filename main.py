@@ -199,7 +199,9 @@ def generate_logistics_dashboard(routes, solver, output_path="logistics_dashboar
 #              PARAMETROS DE EJECUCION — Modifica estos valores
 # =====================================================================
 
-# 1. Archivos de datos
+# 1. Archivos de datos y Periodo de Análisis (TFM Echandi)
+ANALYSIS_YEAR = 2025
+ANALYSIS_MONTH = 4
 PLANTS_FILE = DATA_DIR / "locations_smurfit.json"
 CLIENTS_FILE = DATA_DIR / "cliente_ubi.json"
 
@@ -271,6 +273,8 @@ def run_optimization(
     flota_por_planta=None,
     sorting_strategy="far_plant_close_depot",
     mandatory_customers=None,
+    target_year=None,
+    target_month=None,
     silent=False
 ):
     """
@@ -299,7 +303,9 @@ def run_optimization(
         max_radius_km=MAX_RADIUS_KM,
         mandatory_customers=mandatory_customers or MANDATORY_CUSTOMERS,
         sorting_strategy=sorting_strategy,
-        max_pallets=max_pallets
+        max_pallets=max_pallets,
+        target_year=target_year,
+        target_month=target_month
     )
 
     # Preparar flota
@@ -407,12 +413,13 @@ def _build_summary(routes, solver, max_pallets=35, threshold_km=50, n_candidatos
             "n_candidatos": n_candidatos
         },
         "total_customers": sum(r["num_customers"] for r in route_summaries),
+        "total_pallets_moved": sum(r["total_pallets"] for r in route_summaries),
         "routes": route_summaries
     }
 
 def main():
     print("=====================================================================")
-    print(" LOGISTICS OPTIMIZER - EJECUCION ESTANDAR")
+    print(f" LOGISTICS OPTIMIZER - Periodo: {ANALYSIS_MONTH}/{ANALYSIS_YEAR}")
     print("=====================================================================\n")
 
     print(f"Capacidad Detectada: {MAX_PALLETS} pallets ({cap_info['summary']})")
@@ -422,7 +429,9 @@ def main():
         max_pallets=MAX_PALLETS,
         threshold_km=THRESHOLD_KM_DETOUR,
         n_candidatos=N_CANDIDATOS_PLANTA,
-        api_type=API_TYPE
+        api_type=API_TYPE,
+        target_year=ANALYSIS_YEAR,
+        target_month=ANALYSIS_MONTH
     )
 
     if not routes:

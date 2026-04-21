@@ -183,6 +183,20 @@ class Visualizer:
 
                 if encoded_poly and encoded_poly != "BILLING_ERROR":
                     decoded_points = polyline.decode(encoded_poly)
+                    
+                    # --- OPTIMIZACIÓN: Simplificación inteligente para reducir peso HTML ---
+                    points_count = len(decoded_points)
+                    if points_count > 500:
+                        # Sub-muestreo: Mantener extremos y tomar 1 de cada N puntos
+                        # Para 4000 puntos, un factor de 5 deja 800 puntos (fino para 800km)
+                        step = max(1, points_count // 800) 
+                        if step > 1:
+                           simplified = decoded_points[::step]
+                           # Asegurar que el último punto original se incluye
+                           if simplified[-1] != decoded_points[-1]:
+                               simplified.append(decoded_points[-1])
+                           decoded_points = simplified
+                    
                     folium.PolyLine(decoded_points, color=color, weight=4, opacity=0.8,
                                    tooltip=f"{start['name']} → {end['name']}").add_to(m)
                 else:

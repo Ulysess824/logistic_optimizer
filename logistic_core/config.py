@@ -76,7 +76,7 @@ DAILY_TRUCK_OUTBOUND = 38.0       # Viajes o despachos diarios constantes (lambd
 DEFAULT_FLEET_BUFFER = 1.10       # 10% margen operativo de seguridad (averías, descansos)
 SOFTWARE_TMS_CAPEX = 25_000.0     # Inversión inicial en Software y Transformación Digital
 
-# --- Métricas Finacieras y Leasing (Modelo de Bobinas) ---
+# --- Métricas Financieras y Leasing (Modelo de Bobinas) ---
 LEASING_MONTHLY_FEE_COIL_TRUCK = 2650.0  # Cuota mensual "Full-Service" (Incl. Mantenimiento)
 LEASING_TERM_YEARS = 5                   # Horizonte de inversión estándar
 INVESTMENT_DISCOUNT_RATE = 0.08          # WACC (8% Coste de Capital / Tasa de Descuento)
@@ -85,7 +85,7 @@ PURCHASE_UPFRONT_PCT = 0.15              # Entrada mínima para compra financiad
 ANNUAL_MAINTENANCE_SURCHARGE_SPECIALIZED = 0.057 # Sobrecoste anual por desgaste carga pesada
 
 # --- Escenario Flota Híbrida / Eléctrica ---
-ELECTRIC_PLANTS_LIST = ["HUELVA", "ALMERIA", "CÓRDOBA", "ALICANTE"] # Plantas piloto para electrificación (Zero Direct Emissions)
+ELECTRIC_PLANTS_LIST = ["HUELVA", "ALMERIA", "CÓRDOBA"] # Plantas piloto para electrificación (Zero Direct Emissions)
 EV_CONS_EMPTY = 1.05                          # Consumo kWh/km en vacío (HD 44t BEV)
 EV_CONS_FULL = 1.70                           # Consumo kWh/km a plena carga (25t carga)
 
@@ -114,8 +114,9 @@ DIESEL_RENTING_MENSUAL = 2_800                # Renting Full-Service (incl. mant
 DIESEL_LEASING_MENSUAL = 2_600                # Leasing financiero (mant+seguro aparte)
 
 # --- Camión Eléctrico 44t (BEV HD) ---
-EV_CAPEX = 340_000                            # Precio de adquisición (cabeza tractora BEV)
-EV_MOVES_AYUDA = 0                            # Subvención MOVES III eliminada por petición (Escenario sin ayudas)
+EV_CAPEX = 350_000                            # Precio de adquisición (cabeza tractora BEV actualizado)
+EV_CHARGER_CAPEX = 50_000                     # Inversión por cargador ultra-rápido (Behind-the-meter)
+EV_MOVES_AYUDA = 90_000                       # Subvención MOVES III reinstaurada para TCO
 EV_RESIDUAL_PCT = 0.25                        # Valor residual a 5 años (25%)
 EV_CONSUMO_KWH_KM = 1.30                     # Consumo medio ponderado (kWh/km)
 EV_COSTE_KWH = 0.18                          # Precio medio kWh (depot + ruta)
@@ -124,6 +125,6 @@ EV_SEGURO_ANUAL = 4_500                       # Seguro anual (Compra/Leasing)
 EV_RENTING_MENSUAL = 5_600                    # Renting Full-Service BEV
 EV_LEASING_MENSUAL = 5_200                    # Leasing financiero BEV
 
-# --- Composición de Flota Mixta (resultado del solver) ---
-FLEET_MIX_DIESEL = 7                          # Camiones diésel requeridos
-FLEET_MIX_EV = 4                              # Camiones eléctricos requeridos
+# --- Composición de Flota Mixta (Distribución 51 camiones Excel) ---
+FLEET_MIX_DIESEL = 33                          # Camiones diésel requeridos
+FLEET_MIX_EV = 18                              # Camiones eléctricos requeridos

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { margin: 0; padding: 1.5rem; background-color: #f3f4f6; font-family: 'Segoe UI', sans-serif; }
+    </style>
+</head>
+<body>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 h-[650px]">
+        <div class="h-full border rounded shadow-sm relative">
+            <span class="absolute top-2 left-2 bg-white/80 px-2 py-1 text-[10px] font-bold text-gray-400 z-10 rounded">COMPLEJIDAD GLOBAL (SIN FILTRAR)</span>
+            <iframe src="../results/Logistics_Global_Complexity.html?v=5.2" class="w-full h-full border-0 bg-white"></iframe>
+        </div>
+        <div class="h-full border rounded shadow-sm relative">
+            <span class="absolute top-2 left-2 bg-white/80 px-2 py-1 text-[10px] font-bold text-blue-600 z-10 rounded">GRAFO OPTIMIZADO (VRP)</span>
+            <iframe src="../results/Logistics_Graph.html?v=5.2" class="w-full h-full border-0 bg-white"></iframe>
+        </div>
+    </div>
+</body>
+</html>

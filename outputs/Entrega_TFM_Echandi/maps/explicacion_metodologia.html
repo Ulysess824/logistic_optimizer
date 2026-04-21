@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metodología Detallada - Logistics Optimizer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, { delimiters: [ {left: '$$', right: '$$', display: true}, {left: '\\[', right: '\\]', display: true}, {left: '\\(', right: '\\)', display: false} ] });"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #1e293b; }
+        .math-block { background: #ffffff; border-left: 4px solid #3b82f6; padding: 1.5rem; border-radius: 0.5rem; margin: 1.5rem 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .variable-tag { background: #eff6ff; color: #1e40af; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-weight: 600; }
+        h2 { border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; margin-top: 2rem; margin-bottom: 1rem; color: #1e3a8a; font-weight: 700; }
+        .step-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 0.75rem; padding: 1.25rem; transition: transform 0.2s; }
+        .step-card:hover { transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+    </style>
+</head>
+<body class="p-6 md:p-10">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-extrabold text-slate-900 mb-2 text-center">Fundamentos Técnicos del Optimizador</h1>
+        <p class="text-slate-500 text-center mb-8">Arquitectura de Decisión y Modelado Matemático VRPB</p>
+
+        <!-- 1. Arquitectura Dual-Pass -->
+        <h2>1. Arquitectura de Decisión Dual-Pass</h2>
+        <p class="mb-4 leading-relaxed">Para gestionar eficientemente miles de puntos de entrega sin comprometer el rendimiento de la API vial, el sistema implementa una arquitectura de filtrado en dos niveles:</p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="step-card">
+                <div class="flex items-center mb-3">
+                    <span class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold mr-3 shrink-0">1</span>
+                    <h3 class="font-bold text-slate-800">Filtrado Espacial (Haversine)</h3>
+                </div>
+                <p class="text-sm text-slate-600">Se pre-procesan los clientes calculando la distancia en línea recta sobre la esfera terrestre.
+                Solamente los clientes dentro de <span class="variable-tag">MAX_RADIUS</span> son considerados candidatos.</p>
+                <div class="mt-2 text-xs font-mono bg-slate-50 p-2 rounded">
+                    \[ d = 2R \cdot \arcsin\left(\sqrt{\sin^2\left(\frac{\Delta\phi}{2}\right) + \cos\phi_1 \cdot \cos\phi_2 \cdot \sin^2\left(\frac{\Delta\lambda}{2}\right)}\right) \]
+                </div>
+            </div>
+
+            <div class="step-card">
+                <div class="flex items-center mb-3">
+                    <span class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold mr-3 shrink-0">2</span>
+                    <h3 class="font-bold text-slate-800">Validación Vial (OSRM/Google)</h3>
+                </div>
+                <p class="text-sm text-slate-600">Los candidatos se validan mediante la red vial real. Se calcula el <strong>Desvío (Detour)</strong> respecto a la ruta directa de retorno.</p>
+                <div class="mt-3 bg-blue-50 p-2 rounded border-l-4 border-blue-400">
+                    <p class="text-xs font-bold text-blue-800 uppercase mb-1">Criterio de Aceptación:</p>
+                    <p class="text-sm text-blue-900">$$ Detour = (d_{P,C} + d_{C,D}) - d_{P,D} \le \text{Threshold} $$</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Estrategias de Selección (Sorting) -->
+        <h2>2. Estrategias de Selección (Sorting)</h2>
+        <p class="mb-4 leading-relaxed">El sistema permite elegir cómo priorizar a los clientes candidatos cuando el número de solicitudes supera la capacidad de la flota:</p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="p-4 border border-slate-200 rounded-lg bg-white">
+                <h4 class="font-bold text-blue-700 text-sm mb-2">A. Estrategia "Detour" (Mínimo Desvío)</h4>
+                <p class="text-xs text-slate-600 mb-2">Prioriza clientes que menos penalizan la ruta de retorno directa. Ideal para eficiencia general.</p>
+                <div class="bg-slate-50 p-2 rounded text-center text-xs font-mono">
+                    $$ \text{Score} = (d_{P,C} + d_{C,D}) - d_{P,D} $$
+                </div>
+            </div>
+            <div class="p-4 border border-blue-200 rounded-lg bg-blue-50/30">
+                <h4 class="font-bold text-blue-700 text-sm mb-2">B. Estrategia "Far Plant / Close Depot"</h4>
+                <p class="text-xs text-slate-600 mb-2">Maximiza el tramo de viaje con carga. Busca clientes muy alejados de la planta pero muy cercanos al depósito final.</p>
+                <div class="bg-slate-50 p-2 rounded text-center text-xs font-mono border border-blue-100">
+                    $$ \text{Score} = d_{C,D} - d_{P,C} $$
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Modelado Matemático -->
+        <h2>3. Modelado Matemático (MC-VRPB)</h2>
+        <p class="mb-4 leading-relaxed">El motor de resolución se basa en el problema de <strong>Rutas de Vehículos con Backhauling Multi-Planta</strong>. Se define formalmente como:</p>
+
+        <h3 class="font-bold text-slate-700 mt-6 mb-2">Variables de Decisión</h3>
+        <ul class="list-disc ml-6 space-y-2 text-sm text-slate-600">
+            <li><span class="variable-tag">x_{ij}^k</span>: Variable binaria. \(1\) si el vehículo \(k\) recorre el arco desde el nodo \(i\) al nodo \(j\).</li>
+            <li><span class="variable-tag">u_i^k</span>: Variable de acumulación (distancia o paradas) en el nodo \(i\) para el vehículo \(k\).</li>
+        </ul>
+
+        <h3 class="font-bold text-slate-700 mt-6 mb-2">Función Objetivo</h3>
+        <div class="math-block text-center">
+            <p class="text-blue-800 mb-2 font-bold italic">Minimizar Coste de Transporte Total</p>
+            $$ \text{Min } Z = \sum_{k \in V} \sum_{i,j \in N} (x_{ij}^k \cdot c_{ij}) + \sum_{c \in C} (1 - y_c) \cdot P_c $$
+            <p class="text-[10px] text-slate-400 mt-3 text-left">Donde \(c_{ij}\) es la distancia vial, \(y_c\) indica si el cliente \(c\) es visitado, y \(P_c\) es la penalización por no visita (priorización).</p>
+        </div>
+
+        <h3 class="font-bold text-slate-700 mt-6 mb-2">Restricciones Principales</h3>
+        <div class="space-y-4">
+            <div class="p-4 bg-white border rounded shadow-sm">
+                <p class="font-bold text-slate-800 text-sm mb-1">Vinculación Planta-Cliente (Coupling):</p>
+                <p class="text-sm text-slate-600 mb-2">Un cliente debe ser visitado estrictamente por el vehículo asignado a su planta de origen.</p>
+                <div class="text-center bg-slate-50 p-2 rounded text-sm mb-1">$$ \text{Vehicle}(Cliente_c) = \text{Vehicle}(Planta_p) $$</div>
+            </div>
+
+            <div class="p-4 bg-white border rounded shadow-sm">
+                <p class="font-bold text-slate-800 text-sm mb-1">Precedencia Lineal (Backhauling):</p>
+                <p class="text-sm text-slate-600 mb-2">La carga en la planta debe ocurrir obligatoriamente antes que la descarga en el cliente.</p>
+                <div class="text-center bg-slate-50 p-2 rounded text-sm">$$ d_{\text{Cumulativa}}(Planta_p) \le d_{\text{Cumulativa}}(Cliente_c) $$</div>
+            </div>
+
+            <div class="p-4 bg-white border rounded shadow-sm">
+                <p class="font-bold text-slate-800 text-sm mb-1">Capacidad de Ruta:</p>
+                <p class="text-sm text-slate-600">Límite de paradas por camión para asegurar cumplimiento de tiempos de descanso y jornada laboral.</p>
+                <div class="text-center bg-slate-50 p-2 rounded text-sm mt-1">$$ \sum_{j \in N} x_{ij}^k \le N_{\text{Clientes}} $$</div>
+            </div>
+        </div>
+
+        <!-- 4. Glosario de Parámetros -->
+        <h2>4. Parámetros de Control</h2>
+        <div class="overflow-x-auto border border-slate-200 rounded-lg bg-white shadow-sm">
+            <table class="min-w-full divide-y divide-slate-200 text-[11px] md:text-sm">
+                <thead class="bg-slate-50">
+                    <tr>
+                        <th class="px-3 py-3 text-left font-bold text-slate-700 uppercase">Parámetro</th>
+                        <th class="px-3 py-3 text-left font-bold text-slate-700 uppercase">Descripción</th>
+                        <th class="px-3 py-3 text-left font-bold text-slate-700 uppercase">Input / Ejemplo</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200 text-slate-600">
+                    <tr>
+                        <td class="px-3 py-3 font-mono text-blue-600">MAX_PALLETS</td>
+                        <td class="px-3 py-3">Capacidad máxima de carga por camión.</td>
+                        <td class="px-3 py-3 font-mono text-xs">35</td>
+                    </tr>
+                    <tr>
+                        <td class="px-3 py-3 font-mono text-blue-600">THRESHOLD_KM</td>
+                        <td class="px-3 py-3">Desvío máximo permitido (km) respecto a la ruta directa.</td>
+                        <td class="px-3 py-3 font-mono text-xs">50.0</td>
+                    </tr>
+                    <tr>
+                        <td class="px-3 py-3 font-mono text-blue-600">MAX_RADIUS</td>
+                        <td class="px-3 py-3">Radio máximo de búsqueda desde la planta (km).</td>
+                        <td class="px-3 py-3 font-mono text-xs">400</td>
+                    </tr>
+                    <tr>
+                        <td class="px-3 py-3 font-mono text-blue-600">N_CANDIDATOS</td>
+                        <td class="px-3 py-3">Número de candidatos pre-seleccionados por planta.</td>
+                        <td class="px-3 py-3 font-mono text-xs">30</td>
+                    </tr>
+                    <tr>
+                        <td class="px-3 py-3 font-mono text-blue-600">SORTING_STRATEGY</td>
+                        <td class="px-3 py-3">Criterio de ordenación ("detour" o "far_plant_close_depot").</td>
+                        <td class="px-3 py-3 font-mono text-xs">"detour"</td>
+                    </tr>
+                    <tr>
+                        <td class="px-3 py-3 font-mono text-blue-600">FLOTA_POR_PLANTA</td>
+                        <td class="px-3 py-3">Número de camiones físicos disponibles por ID de planta.</td>
+                        <td class="px-3 py-3 font-mono text-[10px]">{"CP_ALCALA": 2}</td>
+                    </tr>
+                    <tr>
+                        <td class="px-3 py-3 font-mono text-blue-600">MANDATORY_CUSTOMERS</td>
+                        <td class="px-3 py-3">Clientes que se fuerzan en la ruta ignorando filtros.</td>
+                        <td class="px-3 py-3 font-mono text-[10px]">{"Alcala": ["Sanchinarro"]}</td>
+                    </tr>
+                    <tr>
+                        <td class="px-3 py-3 font-mono text-blue-600">API_TYPE</td>
+                        <td class="px-3 py-3">Motor de enrutamiento ("osrm", "google_maps", "routes_api").</td>
+                        <td class="px-3 py-3 font-mono text-xs">"osrm"</td>
+                    </tr>
+                    <tr>
+                        <td class="px-3 py-3 font-mono text-blue-600">MAX_SEARCH_TIME</td>
+                        <td class="px-3 py-3">Tiempo límite de búsqueda del optimizador (segundos).</td>
+                        <td class="px-3 py-3 font-mono text-xs">120</td>
+                    </tr>
+                    <tr>
+                        <td class="px-3 py-3 font-mono text-blue-600">TRUCK_SPECS</td>
+                        <td class="px-3 py-3">Especificaciones físicas del vehículo para restricciones viales.</td>
+                        <td class="px-3 py-3 font-mono text-[10px]">{"heightCm": 400}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="mt-12 pt-8 border-t text-center opacity-40 grayscale pointer-events-none">
+            <p class="text-xs">Generated by Antigravity v5.2 - Confidential Property of Smurfit Westrock</p>
+        </div>
+    </div>
+</body>
+</html>

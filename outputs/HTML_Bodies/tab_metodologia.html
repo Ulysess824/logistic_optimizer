@@ -142,14 +142,18 @@
                     <div class="formula-box bg-blue-50 border-blue-500">
                         $$N_{\max} = \left\lfloor \frac{L_{cam}}{\ell_{pal}} \right\rfloor \times \left\lfloor \frac{W_{cam}}{w_{pal}} \right\rfloor \times C_{R}$$
                     </div>
-                    <p class="text-sm text-gray-600 text-justify">Validación del límite físico de carga (Knapsack Limit). Garantiza que ninguna ruta propuesta por el algoritmo supere la capacidad de acomodación métrica del vehículo.</p>
-                    <ul class="variable-list list-disc pl-5">
-                        <li>$N_{\max}$: Cantidad máxima teórica de pallets admitidos.</li>
-                        <li>$L_{cam}, W_{cam}$: Largo y ancho útil interior del remolque (m).</li>
-                        <li>$\ell_{pal}, w_{pal}$: Dimensiones base estándar del pallet utilizado (m).</li>
-                        <li>$C_{R}$: Coeficiente de Remontabilidad (1 si no apilable, $\approx 2$ si es apilable).</li>
-                    </ul>
+                    <p class="text-sm text-gray-600 text-justify">Garantiza que ninguna ruta supere la capacidad física del vehículo.</p>
                 </div>
+
+                <!-- Fórmula 6 (NUEVA) -->
+                <div>
+                    <h3 class="formula-title">6. Función de Coste de Arco (Priorización)</h3>
+                    <div class="formula-box border-indigo-500">
+                        $$C_{ij} = d_{ij} \times TCO_{Int} \times (1 - \beta \cdot U_{ij})$$
+                    </div>
+                    <p class="text-sm text-gray-600 text-justify">Define cómo el solver valora cada trayecto. El factor de utilización $\beta$ reduce el coste efectivo si el arco $ij$ contribuye al retorno de carga.</p>
+                </div>
+            </div>
             </div>
 
         </div>
@@ -210,11 +214,22 @@
                 <div>
                     <h3 class="formula-title">4. Retorno de Inversión (Software TMS)</h3>
                     <div class="formula-box bg-slate-50 border-slate-400">
-                        $$ROI = \frac{\pi_{total\_anual} - \text{Inv}_{TMS}}{\text{Inv}_{TMS}} \times 100$$
-                        $$P_{period} = \frac{\text{Inv}_{TMS}}{\pi_{diaria}} \text{ (días)}$$
+                        $$ROI = \frac{\pi_{anual} - \text{Inv}_{TMS}}{\text{Inv}_{TMS}}$$
+                        $$P_{period} = \frac{\text{Inv}_{TMS}}{\pi_{diaria}}$$
                     </div>
-                    <p class="text-sm text-gray-600 text-justify">Validación del impacto financiero directo. Permite demostrar que el gasto en Inteligencia Artificial y GABM (TMS) se amortiza velozmente mediante los ahorros operativos de vacío mitigado.</p>
+                    <p class="text-sm text-gray-600 text-justify">Validación del impacto financiero directo y periodo de recuperación.</p>
                 </div>
+
+                <!-- Fórmula 5 (NUEVA: Impacto Relativo) -->
+                <div>
+                    <h3 class="formula-title">5. Métricas de Impacto Relativo (Captura Dashboard)</h3>
+                    <div class="formula-box bg-green-50 border-green-600">
+                        $$\eta_{BH} = \frac{\sum d_{v}^{base} - \sum d_{v}^{opt}}{\sum d_{v}^{base}} \times 100$$
+                        $$\Delta CO_2 = CO_{2}^{base} - CO_{2}^{opt}$$
+                    </div>
+                    <p class="text-sm text-gray-600 text-justify">Cálculo del ahorro relativo en kilómetros de vacío ($\eta$) y mitigación neta de emisiones de carbono ($\Delta$).</p>
+                </div>
+            </div>
             </div>
 
         </div>

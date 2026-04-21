@@ -1,0 +1,5 @@
+Tramo,KM,Carga Útil (kg),Descripción,CO2 (kg),KPI (kg/km)
+1. Recogida Papel (PP -> CP),310,25000,Bobinas de papel,486.7,1.57
+2. Reparto Inicial (CP -> C1),45,4640,Entrega 32 pallets,41.88,0.931
+3. Reparto Final (C1 -> C2),60,2900,Entrega parcial,52.56,0.876
+4. Retorno Vacío (C2 -> PP),290,0,Camión vacío,227.65,0.785

@@ -1,15 +1,16 @@
 {
-  "num_routes": 37,
-  "total_km": 34218.79,
-  "total_empty_km": 12382.81,
-  "total_co2_kg": 29853.46,
-  "total_cost_eur": 51328.18,
+  "num_routes": 38,
+  "total_km": 34531.42,
+  "total_empty_km": 11981.27,
+  "total_co2_kg": 30224.37,
+  "total_cost_eur": 51797.11,
   "parameters": {
     "max_pallets": 34,
     "threshold_km": 50,
     "n_candidatos": 30
   },
-  "total_customers": 54,
+  "total_customers": 42,
+  "total_pallets_moved": 1016,
   "routes": [
     {
       "route_id": 1,
@@ -17,11 +18,11 @@
         "Alcalá"
       ],
       "num_customers": 1,
-      "total_pallets": 25,
-      "distance_km": 713.46,
-      "empty_km": 180.85,
-      "co2_emissions_kg": 621.87,
-      "estimated_cost_eur": 1070.18
+      "total_pallets": 26,
+      "distance_km": 684.52,
+      "empty_km": 154.84,
+      "co2_emissions_kg": 603.31,
+      "estimated_cost_eur": 1026.78
     },
     {
       "route_id": 2,
@@ -30,10 +31,10 @@
       ],
       "num_customers": 2,
       "total_pallets": 34,
-      "distance_km": 686.99,
-      "empty_km": 209.67,
-      "co2_emissions_kg": 597.34,
-      "estimated_cost_eur": 1030.49
+      "distance_km": 690.12,
+      "empty_km": 175.35,
+      "co2_emissions_kg": 602.86,
+      "estimated_cost_eur": 1035.18
     },
     {
       "route_id": 3,
@@ -41,11 +42,11 @@
         "Alcalá (Muelle 3)"
       ],
       "num_customers": 1,
-      "total_pallets": 33,
-      "distance_km": 691.15,
-      "empty_km": 218.42,
-      "co2_emissions_kg": 606.37,
-      "estimated_cost_eur": 1036.73
+      "total_pallets": 22,
+      "distance_km": 695.6,
+      "empty_km": 180.98,
+      "co2_emissions_kg": 607.72,
+      "estimated_cost_eur": 1043.39
     },
     {
       "route_id": 4,
@@ -53,23 +54,23 @@
         "Alcalá (Muelle 4)"
       ],
       "num_customers": 1,
-      "total_pallets": 33,
-      "distance_km": 676.51,
-      "empty_km": 246.89,
-      "co2_emissions_kg": 593.25,
-      "estimated_cost_eur": 1014.77
+      "total_pallets": 18,
+      "distance_km": 713.46,
+      "empty_km": 180.85,
+      "co2_emissions_kg": 618.36,
+      "estimated_cost_eur": 1070.19
     },
     {
       "route_id": 5,
       "plants": [
         "Alicante"
       ],
-      "num_customers": 2,
-      "total_pallets": 34,
-      "distance_km": 863.93,
-      "empty_km": 268.37,
-      "co2_emissions_kg": 756.8,
-      "estimated_cost_eur": 1295.89
+      "num_customers": 1,
+      "total_pallets": 23,
+      "distance_km": 834.99,
+      "empty_km": 260.85,
+      "co2_emissions_kg": 732.91,
+      "estimated_cost_eur": 1252.49
     },
     {
       "route_id": 6,
@@ -77,35 +78,35 @@
         "Alicante (Muelle 2)"
       ],
       "num_customers": 1,
-      "total_pallets": 19,
-      "distance_km": 847.02,
-      "empty_km": 268.39,
-      "co2_emissions_kg": 739.36,
-      "estimated_cost_eur": 1270.53
+      "total_pallets": 26,
+      "distance_km": 846.87,
+      "empty_km": 268.36,
+      "co2_emissions_kg": 742.14,
+      "estimated_cost_eur": 1270.3
     },
     {
       "route_id": 7,
       "plants": [
         "Alicante (Muelle 3)"
       ],
-      "num_customers": 2,
-      "total_pallets": 33,
-      "distance_km": 847.98,
-      "empty_km": 320.94,
-      "co2_emissions_kg": 741.47,
-      "estimated_cost_eur": 1271.96
+      "num_customers": 1,
+      "total_pallets": 26,
+      "distance_km": 847.0,
+      "empty_km": 268.39,
+      "co2_emissions_kg": 742.23,
+      "estimated_cost_eur": 1270.49
     },
     {
       "route_id": 8,
       "plants": [
         "Alicante (Muelle 4)"
       ],
-      "num_customers": 2,
-      "total_pallets": 32,
-      "distance_km": 848.78,
-      "empty_km": 287.03,
-      "co2_emissions_kg": 742.67,
-      "estimated_cost_eur": 1273.17
+      "num_customers": 1,
+      "total_pallets": 27,
+      "distance_km": 845.26,
+      "empty_km": 284.36,
+      "co2_emissions_kg": 740.32,
+      "estimated_cost_eur": 1267.9
     },
     {
       "route_id": 9,
@@ -113,23 +114,23 @@
         "Alicante (Muelle 5)"
       ],
       "num_customers": 1,
-      "total_pallets": 19,
-      "distance_km": 845.29,
-      "empty_km": 284.37,
-      "co2_emissions_kg": 737.38,
-      "estimated_cost_eur": 1267.94
+      "total_pallets": 27,
+      "distance_km": 846.66,
+      "empty_km": 285.66,
+      "co2_emissions_kg": 741.23,
+      "estimated_cost_eur": 1269.99
     },
     {
       "route_id": 10,
       "plants": [
         "Córdoba"
       ],
-      "num_customers": 3,
-      "total_pallets": 33,
-      "distance_km": 232.92,
+      "num_customers": 1,
+      "total_pallets": 31,
+      "distance_km": 209.98,
       "empty_km": 39.27,
-      "co2_emissions_kg": 200.87,
-      "estimated_cost_eur": 349.38
+      "co2_emissions_kg": 187.28,
+      "estimated_cost_eur": 314.97
     },
     {
       "route_id": 11,
@@ -137,11 +138,11 @@
         "Córdoba (Muelle 2)"
       ],
       "num_customers": 1,
-      "total_pallets": 23,
-      "distance_km": 210.41,
-      "empty_km": 13.96,
-      "co2_emissions_kg": 187.72,
-      "estimated_cost_eur": 315.62
+      "total_pallets": 19,
+      "distance_km": 200.53,
+      "empty_km": 12.74,
+      "co2_emissions_kg": 179.94,
+      "estimated_cost_eur": 300.8
     },
     {
       "route_id": 12,
@@ -149,23 +150,23 @@
         "Córdoba (Muelle 3)"
       ],
       "num_customers": 1,
-      "total_pallets": 24,
-      "distance_km": 240.31,
-      "empty_km": 30.48,
-      "co2_emissions_kg": 208.26,
-      "estimated_cost_eur": 360.47
+      "total_pallets": 23,
+      "distance_km": 210.41,
+      "empty_km": 13.96,
+      "co2_emissions_kg": 187.72,
+      "estimated_cost_eur": 315.61
     },
     {
       "route_id": 13,
       "plants": [
         "Huelva"
       ],
-      "num_customers": 3,
+      "num_customers": 1,
       "total_pallets": 27,
-      "distance_km": 652.32,
+      "distance_km": 616.13,
       "empty_km": 114.63,
-      "co2_emissions_kg": 561.86,
-      "estimated_cost_eur": 978.49
+      "co2_emissions_kg": 547.98,
+      "estimated_cost_eur": 924.19
     },
     {
       "route_id": 14,
@@ -173,47 +174,47 @@
         "Huelva (Muelle 2)"
       ],
       "num_customers": 1,
-      "total_pallets": 29,
-      "distance_km": 618.42,
+      "total_pallets": 27,
+      "distance_km": 622.68,
       "empty_km": 116.47,
-      "co2_emissions_kg": 548.95,
-      "estimated_cost_eur": 927.63
+      "co2_emissions_kg": 552.57,
+      "estimated_cost_eur": 934.02
     },
     {
       "route_id": 15,
       "plants": [
         "Huelva (Muelle 3)"
       ],
-      "num_customers": 2,
-      "total_pallets": 33,
-      "distance_km": 613.98,
-      "empty_km": 139.87,
-      "co2_emissions_kg": 539.71,
-      "estimated_cost_eur": 920.98
+      "num_customers": 1,
+      "total_pallets": 24,
+      "distance_km": 627.04,
+      "empty_km": 126.23,
+      "co2_emissions_kg": 553.59,
+      "estimated_cost_eur": 940.57
     },
     {
       "route_id": 16,
       "plants": [
         "Huelva (Muelle 4)"
       ],
-      "num_customers": 3,
-      "total_pallets": 33,
-      "distance_km": 630.4,
-      "empty_km": 158.15,
-      "co2_emissions_kg": 551.8,
-      "estimated_cost_eur": 945.6
+      "num_customers": 1,
+      "total_pallets": 30,
+      "distance_km": 632.86,
+      "empty_km": 127.41,
+      "co2_emissions_kg": 560.65,
+      "estimated_cost_eur": 949.29
     },
     {
       "route_id": 17,
       "plants": [
         "Huelva (Muelle 5)"
       ],
-      "num_customers": 2,
-      "total_pallets": 23,
-      "distance_km": 638.97,
-      "empty_km": 159.71,
-      "co2_emissions_kg": 557.98,
-      "estimated_cost_eur": 958.46
+      "num_customers": 1,
+      "total_pallets": 30,
+      "distance_km": 635.46,
+      "empty_km": 128.71,
+      "co2_emissions_kg": 562.44,
+      "estimated_cost_eur": 953.19
     },
     {
       "route_id": 18,
@@ -221,11 +222,11 @@
         "Burgos"
       ],
       "num_customers": 1,
-      "total_pallets": 21,
-      "distance_km": 1131.1,
-      "empty_km": 377.8,
-      "co2_emissions_kg": 989.67,
-      "estimated_cost_eur": 1696.65
+      "total_pallets": 29,
+      "distance_km": 1224.76,
+      "empty_km": 498.27,
+      "co2_emissions_kg": 1071.13,
+      "estimated_cost_eur": 1837.15
     },
     {
       "route_id": 19,
@@ -233,11 +234,11 @@
         "Burgos (Muelle 2)"
       ],
       "num_customers": 1,
-      "total_pallets": 28,
-      "distance_km": 1111.8,
-      "empty_km": 463.9,
-      "co2_emissions_kg": 973.09,
-      "estimated_cost_eur": 1667.7
+      "total_pallets": 29,
+      "distance_km": 1236.24,
+      "empty_km": 493.12,
+      "co2_emissions_kg": 1079.82,
+      "estimated_cost_eur": 1854.36
     },
     {
       "route_id": 20,
@@ -245,215 +246,227 @@
         "Burgos (Muelle 3)"
       ],
       "num_customers": 1,
-      "total_pallets": 2,
-      "distance_km": 1117.79,
-      "empty_km": 547.66,
-      "co2_emissions_kg": 970.79,
-      "estimated_cost_eur": 1676.69
+      "total_pallets": 29,
+      "distance_km": 1236.73,
+      "empty_km": 498.28,
+      "co2_emissions_kg": 1079.8,
+      "estimated_cost_eur": 1855.09
     },
     {
       "route_id": 21,
       "plants": [
-        "Navarra"
+        "Burgos (Muelle 4)"
       ],
       "num_customers": 1,
-      "total_pallets": 30,
-      "distance_km": 1375.88,
-      "empty_km": 511.2,
-      "co2_emissions_kg": 1207.18,
-      "estimated_cost_eur": 2063.82
+      "total_pallets": 29,
+      "distance_km": 1240.18,
+      "empty_km": 496.41,
+      "co2_emissions_kg": 1082.43,
+      "estimated_cost_eur": 1860.27
     },
     {
       "route_id": 22,
       "plants": [
-        "Navarra (Muelle 2)"
+        "Navarra"
       ],
       "num_customers": 1,
-      "total_pallets": 30,
-      "distance_km": 1376.16,
-      "empty_km": 511.34,
-      "co2_emissions_kg": 1207.37,
-      "estimated_cost_eur": 2064.24
+      "total_pallets": 23,
+      "distance_km": 1441.92,
+      "empty_km": 581.34,
+      "co2_emissions_kg": 1254.73,
+      "estimated_cost_eur": 2162.88
     },
     {
       "route_id": 23,
       "plants": [
-        "Valencia"
+        "Navarra (Muelle 2)"
       ],
       "num_customers": 1,
-      "total_pallets": 21,
-      "distance_km": 870.17,
-      "empty_km": 393.19,
-      "co2_emissions_kg": 754.28,
-      "estimated_cost_eur": 1305.26
+      "total_pallets": 23,
+      "distance_km": 1440.12,
+      "empty_km": 582.65,
+      "co2_emissions_kg": 1253.38,
+      "estimated_cost_eur": 2160.18
     },
     {
       "route_id": 24,
       "plants": [
-        "Valencia (Muelle 2)"
+        "Valencia"
       ],
-      "num_customers": 2,
-      "total_pallets": 28,
-      "distance_km": 876.96,
-      "empty_km": 390.75,
-      "co2_emissions_kg": 759.46,
-      "estimated_cost_eur": 1315.45
+      "num_customers": 1,
+      "total_pallets": 34,
+      "distance_km": 860.31,
+      "empty_km": 337.55,
+      "co2_emissions_kg": 750.72,
+      "estimated_cost_eur": 1290.46
     },
     {
       "route_id": 25,
       "plants": [
-        "Valencia (Muelle 3)"
+        "Valencia (Muelle 2)"
       ],
       "num_customers": 1,
-      "total_pallets": 26,
-      "distance_km": 890.25,
-      "empty_km": 387.11,
-      "co2_emissions_kg": 769.73,
-      "estimated_cost_eur": 1335.38
+      "total_pallets": 31,
+      "distance_km": 873.42,
+      "empty_km": 366.94,
+      "co2_emissions_kg": 757.21,
+      "estimated_cost_eur": 1310.13
     },
     {
       "route_id": 26,
       "plants": [
-        "Almeria"
+        "Valencia (Muelle 3)"
       ],
       "num_customers": 1,
-      "total_pallets": 28,
-      "distance_km": 516.06,
-      "empty_km": 105.51,
-      "co2_emissions_kg": 458.38,
-      "estimated_cost_eur": 774.09
+      "total_pallets": 25,
+      "distance_km": 881.74,
+      "empty_km": 369.58,
+      "co2_emissions_kg": 761.65,
+      "estimated_cost_eur": 1322.6
     },
     {
       "route_id": 27,
       "plants": [
-        "Almeria (Muelle 2)"
+        "Almeria"
       ],
       "num_customers": 1,
-      "total_pallets": 28,
-      "distance_km": 516.5,
-      "empty_km": 105.53,
-      "co2_emissions_kg": 458.69,
-      "estimated_cost_eur": 774.74
+      "total_pallets": 20,
+      "distance_km": 445.55,
+      "empty_km": 117.5,
+      "co2_emissions_kg": 386.67,
+      "estimated_cost_eur": 668.32
     },
     {
       "route_id": 28,
       "plants": [
-        "Almeria (Muelle 3)"
+        "Almeria (Muelle 2)"
       ],
       "num_customers": 1,
-      "total_pallets": 30,
-      "distance_km": 519.2,
-      "empty_km": 107.36,
-      "co2_emissions_kg": 461.3,
-      "estimated_cost_eur": 778.8
+      "total_pallets": 33,
+      "distance_km": 468.06,
+      "empty_km": 105.55,
+      "co2_emissions_kg": 408.12,
+      "estimated_cost_eur": 702.09
     },
     {
       "route_id": 29,
+      "plants": [
+        "Almeria (Muelle 3)"
+      ],
+      "num_customers": 1,
+      "total_pallets": 33,
+      "distance_km": 468.17,
+      "empty_km": 105.68,
+      "co2_emissions_kg": 408.19,
+      "estimated_cost_eur": 702.26
+    },
+    {
+      "route_id": 30,
       "plants": [
         "Almeria (Muelle 4)"
       ],
       "num_customers": 1,
       "total_pallets": 20,
-      "distance_km": 514.87,
-      "empty_km": 112.79,
-      "co2_emissions_kg": 454.08,
-      "estimated_cost_eur": 772.3
-    },
-    {
-      "route_id": 30,
-      "plants": [
-        "Almeria (Muelle 5)"
-      ],
-      "num_customers": 1,
-      "total_pallets": 21,
-      "distance_km": 533.2,
-      "empty_km": 142.41,
-      "co2_emissions_kg": 465.81,
-      "estimated_cost_eur": 799.8
+      "distance_km": 468.07,
+      "empty_km": 105.83,
+      "co2_emissions_kg": 403.08,
+      "estimated_cost_eur": 702.1
     },
     {
       "route_id": 31,
       "plants": [
-        "Canovelles"
+        "Almeria (Muelle 5)"
       ],
-      "num_customers": 2,
-      "total_pallets": 33,
-      "distance_km": 1614.35,
-      "empty_km": 608.49,
-      "co2_emissions_kg": 1407.17,
-      "estimated_cost_eur": 2421.53
+      "num_customers": 1,
+      "total_pallets": 18,
+      "distance_km": 444.42,
+      "empty_km": 121.74,
+      "co2_emissions_kg": 385.09,
+      "estimated_cost_eur": 666.62
     },
     {
       "route_id": 32,
       "plants": [
-        "Canovelles (Muelle 2)"
+        "Canovelles"
       ],
       "num_customers": 1,
-      "total_pallets": 33,
-      "distance_km": 1599.59,
-      "empty_km": 791.2,
-      "co2_emissions_kg": 1389.76,
-      "estimated_cost_eur": 2399.38
+      "total_pallets": 16,
+      "distance_km": 1622.61,
+      "empty_km": 694.74,
+      "co2_emissions_kg": 1409.18,
+      "estimated_cost_eur": 2433.91
     },
     {
       "route_id": 33,
       "plants": [
-        "Celpack"
+        "Canovelles (Muelle 2)"
       ],
-      "num_customers": 1,
-      "total_pallets": 29,
-      "distance_km": 1699.72,
-      "empty_km": 754.04,
-      "co2_emissions_kg": 1477.03,
-      "estimated_cost_eur": 2549.58
+      "num_customers": 2,
+      "total_pallets": 32,
+      "distance_km": 1646.22,
+      "empty_km": 785.01,
+      "co2_emissions_kg": 1422.42,
+      "estimated_cost_eur": 2469.32
     },
     {
       "route_id": 34,
       "plants": [
-        "Celpack (Muelle 2)"
+        "Celpack"
       ],
       "num_customers": 1,
-      "total_pallets": 29,
-      "distance_km": 1701.03,
-      "empty_km": 754.69,
-      "co2_emissions_kg": 1477.93,
-      "estimated_cost_eur": 2551.55
+      "total_pallets": 32,
+      "distance_km": 1421.22,
+      "empty_km": 567.68,
+      "co2_emissions_kg": 1256.48,
+      "estimated_cost_eur": 2131.83
     },
     {
       "route_id": 35,
       "plants": [
-        "Celpack (Muelle 3)"
+        "Celpack (Muelle 2)"
       ],
-      "num_customers": 1,
-      "total_pallets": 28,
-      "distance_km": 1701.03,
-      "empty_km": 754.69,
-      "co2_emissions_kg": 1477.64,
-      "estimated_cost_eur": 2551.55
+      "num_customers": 2,
+      "total_pallets": 34,
+      "distance_km": 1463.51,
+      "empty_km": 543.82,
+      "co2_emissions_kg": 1285.21,
+      "estimated_cost_eur": 2195.27
     },
     {
       "route_id": 36,
       "plants": [
-        "Vigo"
+        "Celpack (Muelle 3)"
       ],
-      "num_customers": 4,
+      "num_customers": 2,
       "total_pallets": 34,
-      "distance_km": 1888.55,
-      "empty_km": 751.65,
-      "co2_emissions_kg": 1627.52,
-      "estimated_cost_eur": 2832.83
+      "distance_km": 1466.98,
+      "empty_km": 578.27,
+      "co2_emissions_kg": 1284.83,
+      "estimated_cost_eur": 2200.46
     },
     {
       "route_id": 37,
       "plants": [
+        "Vigo"
+      ],
+      "num_customers": 1,
+      "total_pallets": 32,
+      "distance_km": 1703.05,
+      "empty_km": 650.84,
+      "co2_emissions_kg": 1507.28,
+      "estimated_cost_eur": 2554.58
+    },
+    {
+      "route_id": 38,
+      "plants": [
         "Vigo (Muelle 2)"
       ],
       "num_customers": 1,
-      "total_pallets": 29,
-      "distance_km": 1805.7,
-      "empty_km": 754.04,
-      "co2_emissions_kg": 1572.92,
-      "estimated_cost_eur": 2708.55
+      "total_pallets": 20,
+      "distance_km": 1718.59,
+      "empty_km": 641.43,
+      "co2_emissions_kg": 1513.65,
+      "estimated_cost_eur": 2577.88
     }
   ]
 }

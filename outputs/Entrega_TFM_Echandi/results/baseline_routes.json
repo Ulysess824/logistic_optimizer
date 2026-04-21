@@ -1,0 +1,563 @@
+[
+  [
+    {
+      "name": "Mengíbar",
+      "address": "Polígono Industrial de Mengíbar, 23440 Mengíbar, Jaén, Spain",
+      "lat": 37.98148,
+      "lng": -3.80058,
+      "id": "DEPOT",
+      "type": "depot",
+      "matrix_idx": 0,
+      "original_matrix_idx": 0
+    },
+    {
+      "id": "CP_ALCALA",
+      "name": "Alcalá",
+      "address": "Avda. de Camarmilla s/n, Alcalá de Henares, Madrid",
+      "lat": 40.48205,
+      "lng": -3.35996,
+      "type": "carton_plant",
+      "matrix_idx": 1,
+      "original_matrix_idx": 1
+    },
+    {
+      "id": "C_13670_VIL",
+      "name": "Villarrubia De Los Ojos",
+      "lat": 39.2208,
+      "lng": -3.608,
+      "demanda_pallets": 22,
+      "n_pallets_original": 22,
+      "remontar": 0,
+      "hav_dist": 141.83381374735526,
+      "detour": 0.024756682615247882,
+      "real_dist_km": 141.83381374735526,
+      "real_dist_CM": 138.8184194666245,
+      "obligatorio": false,
+      "parent_cp": "CP_ALCALA",
+      "type": "customer",
+      "matrix_idx": 2,
+      "dist_to_plant": 180.99079999999998,
+      "original_matrix_idx": 2
+    },
+    {
+      "name": "Mengíbar",
+      "address": "Polígono Industrial de Mengíbar, 23440 Mengíbar, Jaén, Spain",
+      "lat": 37.98148,
+      "lng": -3.80058,
+      "id": "DEPOT",
+      "type": "depot",
+      "matrix_idx": 0,
+      "original_matrix_idx": 0
+    }
+  ],
+  [
+    {
+      "name": "Mengíbar",
+      "address": "Polígono Industrial de Mengíbar, 23440 Mengíbar, Jaén, Spain",
+      "lat": 37.98148,
+      "lng": -3.80058,
+      "id": "DEPOT",
+      "type": "depot",
+      "matrix_idx": 0,
+      "original_matrix_idx": 0
+    },
+    {
+      "id": "CP_ALICANTE",
+      "name": "Alicante",
+      "address": "Pol. Ind. El Canastell, San Vicente del Raspeig, Alicante",
+      "lat": 38.40289,
+      "lng": -0.54019,
+      "type": "carton_plant",
+      "matrix_idx": 3,
+      "original_matrix_idx": 3
+    },
+    {
+      "id": "C_30440_MOR",
+      "name": "Moratalla",
+      "lat": 38.1886,
+      "lng": -1.8921,
+      "demanda_pallets": 17,
+      "n_pallets_original": 17,
+      "remontar": 0,
+      "hav_dist": 120.35981482282224,
+      "detour": 0.2239386899958049,
+      "real_dist_km": 120.35981482282222,
+      "real_dist_CM": 168.60937009490257,
+      "obligatorio": false,
+      "parent_cp": "CP_ALICANTE",
+      "type": "customer",
+      "matrix_idx": 4,
+      "dist_to_plant": 160.2211,
+      "original_matrix_idx": 4
+    },
+    {
+      "name": "Mengíbar",
+      "address": "Polígono Industrial de Mengíbar, 23440 Mengíbar, Jaén, Spain",
+      "lat": 37.98148,
+      "lng": -3.80058,
+      "id": "DEPOT",
+      "type": "depot",
+      "matrix_idx": 0,
+      "original_matrix_idx": 0
+    }
+  ],
+  [
+    {
+      "name": "Mengíbar",
+      "address": "Polígono Industrial de Mengíbar, 23440 Mengíbar, Jaén, Spain",
+      "lat": 37.98148,
+      "lng": -3.80058,
+      "id": "DEPOT",
+      "type": "depot",
+      "matrix_idx": 0,
+      "original_matrix_idx": 0
+    },
+    {
+      "id": "CP_CORDOBA",
+      "name": "Córdoba",
+      "address": "Pol. Ind. Alcolea, Córdoba",
+      "lat": 37.93214,
+      "lng": -4.67292,
+      "type": "carton_plant",
+      "matrix_idx": 5,
+      "original_matrix_idx": 5
+    },
+    {
+      "id": "C_23712_JAB",
+      "name": "Jabalquinto",
+      "lat": 38.0194,
+      "lng": -3.7276,
+      "demanda_pallets": 30,
+      "n_pallets_original": 30,
+      "remontar": 0,
+      "hav_dist": 83.42474137616685,
+      "detour": 14.406320790806646,
+      "real_dist_km": 83.42474137616686,
+      "real_dist_CM": 7.6596874698814466,
+      "obligatorio": false,
+      "parent_cp": "CP_CORDOBA",
+      "type": "customer",
+      "matrix_idx": 6,
+      "dist_to_plant": 106.24,
+      "original_matrix_idx": 6
+    },
+    {
+      "name": "Mengíbar",
+      "address": "Polígono Industrial de Mengíbar, 23440 Mengíbar, Jaén, Spain",
+      "lat": 37.98148,
+      "lng": -3.80058,
+      "id": "DEPOT",
+      "type": "depot",
+      "matrix_idx": 0,
+      "original_matrix_idx": 0
+    }
+  ],
+  [
+    {
+      "name": "Mengíbar",
+      "address": "Polígono Industrial de Mengíbar, 23440 Mengíbar, Jaén, Spain",
+      "lat": 37.98148,
+      "lng": -3.80058,
+      "id": "DEPOT",
+      "type": "depot",
+      "matrix_idx": 0,
+      "original_matrix_idx": 0
+    },
+    {
+      "id": "CP_HUELVA",
+      "name": "Huelva",
+      "address": "Pol. Ind. Dehesa Boyal, La Palma del Condado, Huelva",
+      "lat": 37.3635,
+      "lng": -6.543,
+      "type": "carton_plant",
+      "matrix_idx": 7,
+      "original_matrix_idx": 7
+    },
+    {
+      "id": "C_14011_COR",
+      "name": "Cordoba",
+      "lat": 37.9333,
+      "lng": -4.8833,
+      "demanda_pallets": 22,
+      "n_pallets_original": 22,
+      "remontar": 0,
+      "hav_dist": 159.26378844997583,
+      "detour": 3.392998121885711,
+      "real_dist_km": 159.2637884499758,
+      "real_dist_CM": 95.07656869414693,
+      "obligatorio": false,
+      "parent_cp": "CP_HUELVA",
+      "type": "customer",
+      "matrix_idx": 8,
+      "dist_to_plant": 206.9845,
+      "original_matrix_idx": 8
+    },
+    {
+      "name": "Mengíbar",
+      "address": "Polígono Industrial de Mengíbar, 23440 Mengíbar, Jaén, Spain",
+      "lat": 37.98148,
+      "lng": -3.80058,
+      "id": "DEPOT",
+      "type": "depot",
+      "matrix_idx": 0,
+      "original_matrix_idx": 0
+    }
+  ],
+  [
+    {
+      "name": "Mengíbar",
+      "address": "Polígono Industrial de Mengíbar, 23440 Mengíbar, Jaén, Spain",
+      "lat": 37.98148,
+      "lng": -3.80058,
+      "id": "DEPOT",
+      "type": "depot",
+      "matrix_idx": 0,
+      "original_matrix_idx": 0
+    },
+    {
+      "id": "CP_BURGOS",
+      "name": "Burgos",
+      "address": "Pol. Ind. Villalonquéjar, Burgos",
+      "lat": 42.36921,
+      "lng": -3.73705,
+      "type": "carton_plant",
+      "matrix_idx": 9,
+      "original_matrix_idx": 9
+    },
+    {
+      "id": "C_42328_CAS",
+      "name": "Castillejo De Robledo",
+      "lat": 41.5157,
+      "lng": -3.397,
+      "demanda_pallets": 28,
+      "n_pallets_original": 28,
+      "remontar": 0,
+      "hav_dist": 98.98542137255517,
+      "detour": 5.559898360598709,
+      "real_dist_km": 98.98542137255549,
+      "real_dist_CM": 394.4976025508542,
+      "obligatorio": false,
+      "parent_cp": "CP_BURGOS",
+      "type": "customer",
+      "matrix_idx": 10,
+      "dist_to_plant": 133.2156,
+      "original_matrix_idx": 10
+    },
+    {
+      "name": "Mengíbar",
+      "address": "Polígono Industrial de Mengíbar, 23440 Mengíbar, Jaén, Spain",
+      "lat": 37.98148,
+      "lng": -3.80058,
+      "id": "DEPOT",
+      "type": "depot",
+      "matrix_idx": 0,
+      "original_matrix_idx": 0
+    }
+  ],
+  [
+    {
+      "name": "Mengíbar",
+      "address": "Polígono Industrial de Mengíbar, 23440 Mengíbar, Jaén, Spain",
+      "lat": 37.98148,
+      "lng": -3.80058,
+      "id": "DEPOT",
+      "type": "depot",
+      "matrix_idx": 0,
+      "original_matrix_idx": 0
+    },
+    {
+      "id": "CP_NAVARRA",
+      "name": "Navarra",
+      "address": "Cordovilla, Navarra",
+      "lat": 42.78831,
+      "lng": -1.64541,
+      "type": "carton_plant",
+      "matrix_idx": 11,
+      "original_matrix_idx": 11
+    },
+    {
+      "id": "C_31320_MIL",
+      "name": "Milagro",
+      "lat": 42.2419,
+      "lng": -1.7648,
+      "demanda_pallets": 19,
+      "n_pallets_original": 19,
+      "remontar": 0,
+      "hav_dist": 61.54095047259228,
+      "detour": 1.1270810412604533,
+      "real_dist_km": 61.54095047259218,
+      "real_dist_CM": 504.33551568072926,
+      "obligatorio": false,
+      "parent_cp": "CP_NAVARRA",
+      "type": "customer",
+      "matrix_idx": 12,
+      "dist_to_plant": 77.22030000000001,
+      "original_matrix_idx": 12
+    },
+    {
+      "name": "Mengíbar",
+      "address": "Polígono Industrial de Mengíbar, 23440 Mengíbar, Jaén, Spain",
+      "lat": 37.98148,
+      "lng": -3.80058,
+      "id": "DEPOT",
+      "type": "depot",
+      "matrix_idx": 0,
+      "original_matrix_idx": 0
+    }
+  ],
+  [
+    {
+      "name": "Mengíbar",
+      "address": "Polígono Industrial de Mengíbar, 23440 Mengíbar, Jaén, Spain",
+      "lat": 37.98148,
+      "lng": -3.80058,
+      "id": "DEPOT",
+      "type": "depot",
+      "matrix_idx": 0,
+      "original_matrix_idx": 0
+    },
+    {
+      "id": "CP_VALENCIA",
+      "name": "Valencia",
+      "address": "Quart de Poblet, Valencia",
+      "lat": 39.4796,
+      "lng": -0.46162,
+      "type": "carton_plant",
+      "matrix_idx": 13,
+      "original_matrix_idx": 13
+    },
+    {
+      "id": "C_02400_HEL",
+      "name": "Hellin",
+      "lat": 38.5106,
+      "lng": -1.701,
+      "demanda_pallets": 13,
+      "n_pallets_original": 13,
+      "remontar": 0,
+      "hav_dist": 151.92351091519785,
+      "detour": 10.393765108659977,
+      "real_dist_km": 151.92351091519768,
+      "real_dist_CM": 192.55518313597102,
+      "obligatorio": false,
+      "parent_cp": "CP_VALENCIA",
+      "type": "customer",
+      "matrix_idx": 14,
+      "dist_to_plant": 199.29829999999998,
+      "original_matrix_idx": 14
+    },
+    {
+      "name": "Mengíbar",
+      "address": "Polígono Industrial de Mengíbar, 23440 Mengíbar, Jaén, Spain",
+      "lat": 37.98148,
+      "lng": -3.80058,
+      "id": "DEPOT",
+      "type": "depot",
+      "matrix_idx": 0,
+      "original_matrix_idx": 0
+    }
+  ],
+  [
+    {
+      "name": "Mengíbar",
+      "address": "Polígono Industrial de Mengíbar, 23440 Mengíbar, Jaén, Spain",
+      "lat": 37.98148,
+      "lng": -3.80058,
+      "id": "DEPOT",
+      "type": "depot",
+      "matrix_idx": 0,
+      "original_matrix_idx": 0
+    },
+    {
+      "id": "CP_ALMERIA",
+      "name": "Almeria",
+      "address": "Lugar Finca el Vizconde, Carretera Iryda Sector IV, La Canal - Paraje El Vizconde, 04738 Vícar, Almería",
+      "lat": 36.785126,
+      "lng": -2.6657936,
+      "type": "carton_plant",
+      "matrix_idx": 15,
+      "original_matrix_idx": 15
+    },
+    {
+      "id": "C_23730_VIL",
+      "name": "Villanueva De La Reina",
+      "lat": 38.0043,
+      "lng": -3.916,
+      "demanda_pallets": 28,
+      "n_pallets_original": 28,
+      "remontar": 0,
+      "hav_dist": 174.8562220557631,
+      "detour": 18.70605561193625,
+      "real_dist_km": 174.85622205576325,
+      "real_dist_CM": 10.427842146519309,
+      "obligatorio": false,
+      "parent_cp": "CP_ALMERIA",
+      "type": "customer",
+      "matrix_idx": 16,
+      "dist_to_plant": 267.6798,
+      "original_matrix_idx": 16
+    },
+    {
+      "name": "Mengíbar",
+      "address": "Polígono Industrial de Mengíbar, 23440 Mengíbar, Jaén, Spain",
+      "lat": 37.98148,
+      "lng": -3.80058,
+      "id": "DEPOT",
+      "type": "depot",
+      "matrix_idx": 0,
+      "original_matrix_idx": 0
+    }
+  ],
+  [
+    {
+      "name": "Mengíbar",
+      "address": "Polígono Industrial de Mengíbar, 23440 Mengíbar, Jaén, Spain",
+      "lat": 37.98148,
+      "lng": -3.80058,
+      "id": "DEPOT",
+      "type": "depot",
+      "matrix_idx": 0,
+      "original_matrix_idx": 0
+    },
+    {
+      "id": "CP_CANOVELLES",
+      "name": "Canovelles",
+      "address": "Polígono Industrial Can Castells 112-114, 08420 Canovelles, Barcelona",
+      "lat": 41.624792,
+      "lng": 2.2745367,
+      "type": "carton_plant",
+      "matrix_idx": 17,
+      "original_matrix_idx": 17
+    },
+    {
+      "id": "C_50700_CAS",
+      "name": "Caspe",
+      "lat": 41.235,
+      "lng": -0.0406,
+      "demanda_pallets": 18,
+      "n_pallets_original": 18,
+      "remontar": 0,
+      "hav_dist": 197.81317542998227,
+      "detour": 24.022004057107438,
+      "real_dist_km": 197.81317542998224,
+      "real_dist_CM": 484.28619444086854,
+      "obligatorio": false,
+      "parent_cp": "CP_CANOVELLES",
+      "type": "customer",
+      "matrix_idx": 18,
+      "dist_to_plant": 258.45889999999997,
+      "original_matrix_idx": 18
+    },
+    {
+      "name": "Mengíbar",
+      "address": "Polígono Industrial de Mengíbar, 23440 Mengíbar, Jaén, Spain",
+      "lat": 37.98148,
+      "lng": -3.80058,
+      "id": "DEPOT",
+      "type": "depot",
+      "matrix_idx": 0,
+      "original_matrix_idx": 0
+    }
+  ],
+  [
+    {
+      "name": "Mengíbar",
+      "address": "Polígono Industrial de Mengíbar, 23440 Mengíbar, Jaén, Spain",
+      "lat": 37.98148,
+      "lng": -3.80058,
+      "id": "DEPOT",
+      "type": "depot",
+      "matrix_idx": 0,
+      "original_matrix_idx": 0
+    },
+    {
+      "id": "CP_CELPACK",
+      "name": "Celpack",
+      "address": "Rua Da Concharinha 256, 4536-907 S.Paio de Oleiros, Portugal",
+      "lat": 40.9757657,
+      "lng": -8.5772394,
+      "type": "carton_plant",
+      "matrix_idx": 19,
+      "original_matrix_idx": 19
+    },
+    {
+      "id": "C_6230-160_CAS",
+      "name": "Castelo Branco",
+      "lat": 40.0775,
+      "lng": -7.4956,
+      "demanda_pallets": 26,
+      "n_pallets_original": 26,
+      "remontar": 0,
+      "hav_dist": 135.40113951049503,
+      "detour": 2.56046112392562,
+      "real_dist_km": 135.401139510495,
+      "real_dist_CM": 395.14859453511986,
+      "obligatorio": false,
+      "parent_cp": "CP_CELPACK",
+      "type": "customer",
+      "matrix_idx": 20,
+      "dist_to_plant": 246.4952,
+      "original_matrix_idx": 20
+    },
+    {
+      "name": "Mengíbar",
+      "address": "Polígono Industrial de Mengíbar, 23440 Mengíbar, Jaén, Spain",
+      "lat": 37.98148,
+      "lng": -3.80058,
+      "id": "DEPOT",
+      "type": "depot",
+      "matrix_idx": 0,
+      "original_matrix_idx": 0
+    }
+  ],
+  [
+    {
+      "name": "Mengíbar",
+      "address": "Polígono Industrial de Mengíbar, 23440 Mengíbar, Jaén, Spain",
+      "lat": 37.98148,
+      "lng": -3.80058,
+      "id": "DEPOT",
+      "type": "depot",
+      "matrix_idx": 0,
+      "original_matrix_idx": 0
+    },
+    {
+      "id": "CP_VIGO",
+      "name": "Vigo",
+      "address": "Ctra. Coruña-Portugal km 160, 36400 Porriño Pontevedra",
+      "lat": 42.13338299999999,
+      "lng": -8.6215009,
+      "type": "carton_plant",
+      "matrix_idx": 21,
+      "original_matrix_idx": 21
+    },
+    {
+      "id": "C_5400-694_CHA",
+      "name": "Chaves",
+      "lat": 41.7546,
+      "lng": -7.4639,
+      "demanda_pallets": 22,
+      "n_pallets_original": 22,
+      "remontar": 0,
+      "hav_dist": 104.59505422889151,
+      "detour": 10.281379453843329,
+      "real_dist_km": 104.5950542288913,
+      "real_dist_CM": 523.1132691808835,
+      "obligatorio": false,
+      "parent_cp": "CP_VIGO",
+      "type": "customer",
+      "matrix_idx": 22,
+      "dist_to_plant": 170.7959,
+      "original_matrix_idx": 22
+    },
+    {
+      "name": "Mengíbar",
+      "address": "Polígono Industrial de Mengíbar, 23440 Mengíbar, Jaén, Spain",
+      "lat": 37.98148,
+      "lng": -3.80058,
+      "id": "DEPOT",
+      "type": "depot",
+      "matrix_idx": 0,
+      "original_matrix_idx": 0
+    }
+  ]
+]

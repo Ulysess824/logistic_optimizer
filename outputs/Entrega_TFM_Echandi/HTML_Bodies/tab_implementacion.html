@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc; }
+        .grid-line { border-left: 2px dashed #cbd5e1; }
+    </style>
+</head>
+<body class="p-8 pb-32">
+    <div class="max-w-7xl mx-auto">
+        <h1 class="text-3xl font-black text-slate-800 mb-2 border-b-2 border-slate-200 pb-4">Gestión del Cambio & Roll-Out Plan</h1>
+
+
+        <!-- Riesgos: Matriz 2x2 simulada -->
+        <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center"><span class="w-8 h-8 rounded bg-yellow-100 text-yellow-600 flex items-center justify-center mr-3 font-black text-lg">⚠</span> Matriz de Riesgos Principales</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
+            <div class="bg-white border-l-4 border-red-500 p-6 rounded-lg shadow-sm">
+                <div class="flex justify-between items-start mb-2">
+                    <h3 class="font-bold text-slate-800">1. Resistencia de los Transportistas (Sindicatos)</h3>
+                    <span class="bg-red-100 text-red-700 text-xs font-bold px-2 py-1 rounded">Alta Prob.</span>
+                </div>
+                <p class="text-[11px] text-orange-600 mb-4 bg-orange-50 inline-block px-2 py-1 rounded">ℹ Análisis del segmento Linehaul (Entrega): Flota Propia (1.34 €/km) vs. Tarifa Externa (2.22 €/km).</p>
+                <div class="bg-slate-50 p-3 rounded text-xs">
+                    <strong class="text-slate-700 block mb-1">Estrategia de Mitigación:</strong>
+                    Implementar modelo "Share-the-saving". Devolver un 30% del margen ahorrado directamente al conductor.
+                </div>
+            </div>
+
+            <div class="bg-white border-l-4 border-orange-500 p-6 rounded-lg shadow-sm">
+                <div class="flex justify-between items-start mb-2">
+                    <h3 class="font-bold text-slate-800">2. Fallo de la API Geográfica</h3>
+                    <span class="bg-orange-100 text-orange-700 text-xs font-bold px-2 py-1 rounded">Prob. Media</span>
+                </div>
+                <p class="text-sm text-slate-600 mb-4">Incapacidad de resolver la matriz OSRM colapsando todo el proceso de optimización del día.</p>
+                <div class="bg-slate-50 p-3 rounded text-xs">
+                    <strong class="text-slate-700 block mb-1">Estrategia de Mitigación:</strong>
+                    Uso de <code>geo_cache.py</code> y fallback automático a la fórmula Haversine integrada como *failsafe*.
+                </div>
+            </div>
+
+            <div class="bg-white border-l-4 border-yellow-400 p-6 rounded-lg shadow-sm">
+                <div class="flex justify-between items-start mb-2">
+                    <h3 class="font-bold text-slate-800">3. Ventanas de Tiempo (Time Windows)</h3>
+                    <span class="bg-yellow-100 text-yellow-700 text-xs font-bold px-2 py-1 rounded">Impacto Alto</span>
+                </div>
+                <p class="text-sm text-slate-600 mb-4">Los clientes no pueden recepcionar la carga fuera del horario pactado 09:00 - 14:00.</p>
+                <div class="bg-slate-50 p-3 rounded text-xs">
+                    <strong class="text-slate-700 block mb-1">Estrategia de Mitigación:</strong>
+                    Evolución planificada a **VRPTW** en Fase 2.
+                </div>
+            </div>
+
+            <div class="bg-white border-l-4 border-blue-500 p-6 rounded-lg shadow-sm">
+                <div class="flex justify-between items-start mb-2">
+                    <h3 class="font-bold text-slate-800">4. Volatilidad Demanda Física</h3>
+                    <span class="bg-blue-100 text-blue-700 text-xs font-bold px-2 py-1 rounded">Prob. Baja</span>
+                </div>
+                <p class="text-sm text-slate-600 mb-4">La ocupación del trailer supera físicamente el límite de pallets en la ruta pre-optimizada.</p>
+                <div class="bg-slate-50 p-3 rounded text-xs">
+                    <strong class="text-slate-700 block mb-1">Estrategia de Mitigación:</strong>
+                    Dimensionamiento condicional `AddDimensionWithVehicleCapacity` integrado orgánicamente en el Core.
+                </div>
+            </div>
+        </div>
+
+
+
+    </div>
+</body>
+</html>
