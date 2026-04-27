@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f8fafc; color: #334155; }
+        .param-card { background: white; border-radius: 12px; padding: 20px; border-top: 4px solid #3b82f6; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        .label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; font-weight: 700; }
+        .value { font-size: 1.25rem; font-weight: 700; color: #1e293b; font-family: 'ui-monospace', monospace; }
+        .unit { font-size: 0.875rem; color: #94a3b8; margin-left: 4px; font-weight: 400; }
+    </style>
+</head>
+<body class="p-8">
+    <h1 class="text-3xl font-bold text-[#1e3a8a] mb-8 border-b-2 border-blue-100 pb-4">Parámetros de Configuración del Sistema</h1>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+        <!-- Grupo 1: Motor de Optimización -->
+        <div class="space-y-6">
+            <h2 class="text-lg font-bold text-slate-700 flex items-center">
+                <span class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mr-3">1</span>
+                Algoritmo y Solver
+            </h2>
+            <div class="param-card">
+                <div class="mb-4">
+                    <p class="label">Tiempo Máx. Búsqueda</p>
+                    <p class="value">90<span class="unit">segundos</span></p>
+                </div>
+                <div class="mb-4">
+                    <p class="label">Límite Distancia Ruta</p>
+                    <p class="value">4,000<span class="unit">km</span></p>
+                </div>
+                <div class="mb-0">
+                    <p class="label">Paradas Máx. por Ruta</p>
+                    <p class="value">4<span class="unit">clientes</span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grupo 2: Pesos y Emisiones -->
+        <div class="space-y-6">
+            <h2 class="text-lg font-bold text-slate-700 flex items-center">
+                <span class="w-8 h-8 bg-green-100 text-green-600 rounded-full flex items-center justify-center mr-3">2</span>
+                Huella de Carbono (GLEC)
+            </h2>
+            <div class="param-card" style="border-top-color: #10b981;">
+                <div class="mb-4">
+                    <p class="label">Factor CO2 Diesel</p>
+                    <p class="value">2.68<span class="unit">kg/L</span></p>
+                </div>
+                <div class="mb-4">
+                    <p class="label">Intensidad Térmica</p>
+                    <p class="value">17.32<span class="unit">g CO2/tkm</span></p>
+                </div>
+                <div class="mb-0">
+                    <p class="label">Emisión Base Vacío</p>
+                    <p class="value">0.652<span class="unit">kg/km</span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grupo 3: Dimensión y Carga -->
+        <div class="space-y-6">
+            <h2 class="text-lg font-bold text-slate-700 flex items-center">
+                <span class="w-8 h-8 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mr-3">3</span>
+                Capacidad Física
+            </h2>
+            <div class="param-card" style="border-top-color: #a855f7;">
+                <div class="mb-4">
+                    <p class="label">Carga Máxima (Masa)</p>
+                    <p class="value">25.0<span class="unit">toneladas</span></p>
+                </div>
+                <div class="mb-4">
+                    <p class="label">Dimensiones Trailer (LxAxH)</p>
+                    <p class="value">13.6x2.4x2.7<span class="unit">metros</span></p>
+                </div>
+                <div class="mb-0">
+                    <p class="label">Dimensiones Pallet</p>
+                    <p class="value">1.2x0.8x1.5<span class="unit">metros</span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grupo 4: Costes Operativos Finales -->
+        <div class="space-y-6 md:col-span-2 lg:col-span-3">
+            <h2 class="text-lg font-bold text-slate-700 flex items-center">
+                <span class="w-8 h-8 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mr-3">4</span>
+                Estructura de Costes (Tarifa Técnica)
+            </h2>
+            <div class="param-card" style="border-top-color: #f59e0b;">
+                <div class="flex flex-col md:flex-row justify-between items-center gap-8">
+                    <div class="text-center md:text-left">
+                        <p class="label">Tarifa Técnica Interna (TCO Diésel Base)</p>
+                        <p class="text-4xl font-black text-amber-700 font-mono">1.50<span class="text-lg unit">€/km</span></p>
+                        <p class="text-[10px] text-slate-400 mt-1 uppercase">Basado en Modelo MITMA 2026 (Ref. Notebook estimación)</p>
+                    </div>
+                    <div class="h-16 w-px bg-slate-100 hidden md:block"></div>
+                    <div class="bg-amber-50 p-4 rounded-lg flex-1">
+                        <p class="text-xs text-amber-800 font-bold mb-2 uppercase">Nota sobre el Desglose:</p>
+                        <p class="text-xs text-amber-700 leading-relaxed italic">
+                            Los costes fijos (Personal, Amortización, Seguros, Indirectos) y variables (Combustible, Mantenimiento) han sido desacoplados de la configuración global. 
+                            El detalle actuarial y la validación de SciPy residen exclusivamente en el activo técnico de control de costes.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grupo 5: Filtros de Datos -->
+        <div class="space-y-6">
+            <h2 class="text-lg font-bold text-slate-700 flex items-center">
+                <span class="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mr-3">5</span>
+                Filtros y Backhauling
+            </h2>
+            <div class="param-card" style="border-top-color: #6366f1;">
+                <div class="mb-4">
+                    <p class="label">Umbral de Desvío Máximo</p>
+                    <p class="value">100<span class="unit">km</span></p>
+                </div>
+                <div class="mb-0">
+                    <p class="label">Multi-Planta en Ruta</p>
+                    <p class="value">Desactivado</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grupo 6: Configuración de Flota Mixta (NUEVO) -->
+        <div class="space-y-6">
+            <h2 class="text-lg font-bold text-slate-700 flex items-center">
+                <span class="w-8 h-8 bg-sky-100 text-sky-600 rounded-full flex items-center justify-center mr-3">6</span>
+                Configuración de Flota
+            </h2>
+            <div class="param-card" style="border-top-color: #0ea5e9;">
+                <div class="mb-4">
+                    <p class="label">Composición de Flota</p>
+                    <p class="value text-sky-700">33D + 18E<span class="unit">(51 u)</span></p>
+                </div>
+                <div class="mb-4">
+                    <p class="label">Utilización Anual</p>
+                    <p class="value">130_000<span class="unit">km/u/año</span></p>
+                </div>
+                <div class="mb-0">
+                    <p class="label">Horizonte Temporal</p>
+                    <p class="value">5<span class="unit">años análisis</span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grupo 7: Macroeconomía y Tasas -->
+        <div class="space-y-6">
+            <h2 class="text-lg font-bold text-slate-700 flex items-center">
+                <span class="w-8 h-8 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mr-3">7</span>
+                Variable Financiera
+            </h2>
+            <div class="param-card" style="border-top-color: #f43f5e;">
+                <div class="mb-4">
+                    <p class="label">Coste Capital (WACC)</p>
+                    <p class="value">7.0<span class="unit">% (Año 1)</span></p>
+                </div>
+                <div class="mb-4">
+                    <p class="label">Inflación Proyectada</p>
+                    <p class="value">2.0<span class="unit">% (Año 1)</span></p>
+                </div>
+                <div class="mb-0">
+                    <p class="label">Impuesto Sociedades</p>
+                    <p class="value">25<span class="unit">% (IS)</span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grupo 8: Desglose TCO Diésel -->
+        <div class="space-y-6">
+            <h2 class="text-lg font-bold text-slate-700 flex items-center">
+                <span class="w-8 h-8 bg-slate-200 text-slate-600 rounded-full flex items-center justify-center mr-3">8</span>
+                TCO Diésel (Euro VI)
+            </h2>
+            <div class="param-card" style="border-top-color: #475569;">
+                <div class="mb-4">
+                    <p class="label">CAPEX Unitario</p>
+                    <p class="value text-slate-700">140_000<span class="unit">€/u</span></p>
+                </div>
+                <div class="mb-4 flex justify-between gap-2">
+                    <div class="flex-1">
+                        <p class="label">Mantenim.</p>
+                        <p class="text-sm font-bold">6_000€</p>
+                    </div>
+                    <div class="flex-1 text-right">
+                        <p class="label">Seguro/Imp</p>
+                        <p class="text-sm font-bold">3_500€</p>
+                    </div>
+                </div>
+                <div class="mt-4 pt-4 border-t border-slate-100 italic text-[10px] text-slate-400">
+                    Renting: 2_800 €/m | Leasing: 2_600 €/m
+                </div>
+            </div>
+        </div>
+
+        <!-- Grupo 9: Desglose TCO Eléctrico -->
+        <div class="space-y-6">
+            <h2 class="text-lg font-bold text-slate-700 flex items-center">
+                <span class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mr-3">9</span>
+                TCO Eléctrico (BEV)
+            </h2>
+            <div class="param-card" style="border-top-color: #2563eb;">
+                <div class="mb-4">
+                    <p class="label">CAPEX Unitario</p>
+                    <p class="value text-blue-700">350_000 <span class="text-xs font-normal text-slate-400">(Ayuda: 90_000€)</span></p>
+                </div>
+                <div class="mb-4 flex justify-between gap-2">
+                    <div class="flex-1">
+                        <p class="label">Consumo kWh</p>
+                        <p class="text-sm font-bold">1.30<span class="text-[9px] ml-1">kWh/km</span></p>
+                    </div>
+                    <div class="flex-1 text-right">
+                        <p class="label">Precio Energía</p>
+                        <p class="text-sm font-bold">0.18<span class="text-[9px] ml-1">€/kWh</span></p>
+                    </div>
+                </div>
+                <div class="mt-4 pt-4 border-t border-slate-100 italic text-[10px] text-slate-400">
+                    Renting: 5_600 €/m | Leasing: 5_200 €/m
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="mt-12 p-6 bg-slate-100 rounded-lg border border-slate-200 text-xs text-slate-500">
+        Estos parametros definen el comportamiento del modelo de optimizacion y la precision de los KPIs financieros y ambientales reportados en el dashboard. Actualizacion automatica sincronizada con config.py.
+    </div>
+</body>
+</html>

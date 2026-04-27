@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f3f4f6; padding: 1.5rem; margin: 0; }
+        .card { background-color: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); padding: 24px; }
+        .formula-box { background-color: #f8fafc; padding: 16px; border-left: 4px solid #3b82f6; margin-bottom: 16px; border-radius: 4px; overflow-x: auto; }
+        .formula-title { font-weight: 600; color: #1e293b; margin-bottom: 8px; font-size: 1.1rem; }
+        .variable-list { font-size: 0.85rem; color: #475569; margin-top: 12px; }
+        /* Add styling to adjust MathJax displays so they don't look completely huge */
+        mjx-container[display="true"] {
+            margin: 0.5em 0 !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-slate-800 border-b-2 border-slate-300 pb-2">Metodología y Base Matemática</h1>
+        <p class="text-slate-600 mt-2">Fundamentación científica de los modelos de optimización logística e impacto financiero, estructurada para evaluación académica.</p>
+    </div>
+
+    <!-- Módulo Interactivos (Iframes originales) -->
+    <div class="grid grid-cols-1 gap-6 mb-6">
+        <div class="card border-t-4 border-indigo-700">
+            <h2 class="text-xl font-bold text-gray-800 mb-2">Explicación Visual Interactiva</h2>
+            <div class="h-[750px] w-full bg-white rounded overflow-hidden shadow-inner">
+                <iframe src="../maps/explicacion_metodologia.html" class="w-full h-full border-0"></iframe>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="card border-t-4 border-blue-500">
+                <h2 class="text-xl font-bold text-gray-800 mb-2">Radios y Elipses (DataManager)</h2>
+                <div class="h-[500px] w-full border rounded overflow-hidden shadow-inner bg-gray-50">
+                    <iframe src="../maps/visualizacion_logica_datamanager.html" class="w-full h-full border-0"></iframe>
+                </div>
+            </div>
+            
+            <div class="card border-t-4 border-orange-500">
+                <h2 class="text-xl font-bold text-gray-800 mb-2">Estrategia de Selección</h2>
+                <div class="h-[500px] w-full border rounded overflow-hidden shadow-inner bg-gray-50">
+                    <iframe src="../maps/visualizacion_sorting_strategy.html" class="w-full h-full border-0"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BLOQUE 1: MODELO LOGÍSTICO Y DE ARQUITECTURA -->
+    <div class="mb-10">
+        <h2 class="text-2xl font-bold text-white bg-indigo-800 p-4 rounded-t-lg flex items-center shadow">
+            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            Bloque A: Arquitectura Logística y Algorítmica (GLS y VRPB)
+        </h2>
+        <div class="card rounded-t-none border-x border-b border-gray-200">
+            
+            <!-- Fórmula 1 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h3 class="formula-title">1. Función Objetivo Aumentada (GLS)</h3>
+                    <div class="formula-box">
+                        $$h(s) = g(s) + \lambda \cdot \sum_{i \in F} (p_i \cdot I_i(s))$$
+                    </div>
+                    <p class="text-sm text-gray-600 text-justify">El <i>Guided Local Search</i> escapa de óptimos locales penalizando aristas sub-óptimas que se repiten con frecuencia.</p>
+                    <ul class="variable-list list-disc pl-5">
+                        <li>$g(s)$: Función de coste objetivo original de la solución $s$.</li>
+                        <li>$\lambda$: Parámetro de escalado de penalización.</li>
+                        <li>$p_i$: Penalidad acumulada en la conexión $i$.</li>
+                        <li>$I_i(s)$: Función indicadora de uso del arco $i$.</li>
+                    </ul>
+                </div>
+
+                <!-- Fórmula 2 -->
+                <div>
+                    <h3 class="formula-title">2. Lógica de Backhauling y Desvío</h3>
+                    <div class="formula-box">
+                        $$\Delta d = d(P, C) + d(C, M) - d(P, M) \le \tau$$
+                    </div>
+                    <p class="text-sm text-gray-600 text-justify">Condición de elipse para filtrar clientes $C$. El desvío generado (Distancia Planta-Cliente-Muelle respecto a Planta-Muelle) debe ser inferior a un umbral $\tau$.</p>
+                    <ul class="variable-list list-disc pl-5">
+                        <li>$P$: Planta de destino (Cartón).</li>
+                        <li>$C$: Cliente local (Retorno).</li>
+                        <li>$M$: Fábrica o Depot (Muelle Mengíbar).</li>
+                        <li>$\tau$: Límite máximo de kilómetros extra tolerables.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-b border-gray-200 my-6"></div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Fórmula 3 -->
+                <div>
+                    <h3 class="formula-title">3. Dimensionamiento de Flota (Ley de Little)</h3>
+                    <div class="formula-box bg-green-50 border-green-500">
+                        $$L = [\lambda_{día} \times W] \cdot (1 + \rho)$$
+                    </div>
+                    <p class="text-sm text-gray-600 text-justify">Estimación del tamaño del activo físico requiriendo una tasa de despachos y tiempos de ciclo. Utilizado para modelar el CAPEX en simulaciones de estado estacionario.</p>
+                    <ul class="variable-list list-disc pl-5">
+                        <li>$L$: Flota necesaria instalada.</li>
+                        <li>$\lambda$: Tasa constante de expediciones diarias.</li>
+                        <li>$W$: Tiempo de ciclo logístico promedio por vehículo (días).</li>
+                        <li>$\rho$: Coeficiente de buffer de seguridad (mantenimiento/averías).</li>
+                    </ul>
+                </div>
+
+                <!-- Fórmula 4 -->
+                <div>
+                    <h3 class="formula-title">4. Modelo de Emisiones GLEC v3.0</h3>
+                    <div class="formula-box bg-green-50 border-green-500">
+                        $$E_{CO_2} = \sum_{j} d_j \cdot \left[ E_{vacío_{kg/km}} + \left(I_{tkm} \cdot \frac{m_{j}}{1000} \right) \right]$$
+                    </div>
+                    <p class="text-sm text-gray-600 text-justify">Integración de intensidad térmica para calcular huella de carbono escalonada por la carga viva contenida en cada segmento de red $j$.</p>
+                    <ul class="variable-list list-disc pl-5">
+                        <li>$d_j$: Distancia del segmento $j$ (km).</li>
+                        <li>$E_{vacío}$: Factor de emisión base sin carga (kg CO₂ / km).</li>
+                        <li>$I_{tkm}$: Intensidad de carbono por tonelada-km transportada.</li>
+                        <li>$m_j$: Masa efectiva de la mercancía en el segmento (kg).</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-b border-gray-200 my-6"></div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Fórmula 5 -->
+                <div>
+                    <h3 class="formula-title">5. Restricción de Cubicaje 3D y Nivelado</h3>
+                    <div class="formula-box bg-blue-50 border-blue-500">
+                        $$N_{\max} = \left\lfloor \frac{L_{cam}}{\ell_{pal}} \right\rfloor \times \left\lfloor \frac{W_{cam}}{w_{pal}} \right\rfloor \times C_{R}$$
+                    </div>
+                    <p class="text-sm text-gray-600 text-justify">Garantiza que ninguna ruta supere la capacidad física del vehículo.</p>
+                </div>
+
+                <!-- Fórmula 6 (NUEVA) -->
+                <div>
+                    <h3 class="formula-title">6. Función de Coste de Arco (Priorización)</h3>
+                    <div class="formula-box border-indigo-500">
+                        $$C_{ij} = d_{ij} \times TCO_{Int} \times (1 - \beta \cdot U_{ij})$$
+                    </div>
+                    <p class="text-sm text-gray-600 text-justify">Define cómo el solver valora cada trayecto. El factor de utilización $\beta$ reduce el coste efectivo si el arco $ij$ contribuye al retorno de carga.</p>
+                </div>
+            </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- BLOQUE 2: MODELO FINANCIERO Y VIABILIDAD -->
+    <div class="mb-10">
+        <h2 class="text-2xl font-bold text-white bg-slate-800 p-4 rounded-t-lg flex items-center shadow">
+            <svg class="w-6 h-6 mr-2 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            Bloque B: Análisis Financiero, Riesgo y Viabilidad Comercial
+        </h2>
+        <div class="card rounded-t-none border-x border-b border-gray-200">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Fórmula 1 -->
+                <div>
+                    <h3 class="formula-title">1. TCO (Costo Total de Propiedad)</h3>
+                    <div class="formula-box border-emerald-500">
+                        $$TCO = \text{CAPEX} + \sum_{t=1}^{N} \frac{\text{OPEX}_t}{(1+r)^t}$$
+                    </div>
+                    <p class="text-sm text-gray-600 text-justify">Estructura del costo neto actualizado de mantener y operar activos en modalidad propia, fundamental para fijar la <i>Tarifa Técnica Interna</i>.</p>
+                    <ul class="variable-list list-disc pl-5">
+                        <li>$CAPEX$: Inversión de capital inicial (Adquisición de activos).</li>
+                        <li>$OPEX_t$: Gasto operativo en el periodo $t$ (Variable y Fijo).</li>
+                        <li>$r$: Tasa de descuento requerida (WACC).</li>
+                    </ul>
+                </div>
+
+                <!-- Fórmula 2 -->
+                <div>
+                    <h3 class="formula-title">2. Ahorro Sistémico (Make-or-Buy)</h3>
+                    <div class="formula-box border-emerald-500">
+                        $$S_T = \sum_{r \in \mathcal{R}} \left( Tarif_{Ext} - TCO_{Int} \right) \cdot d_{Linehaul_r}$$
+                    </div>
+                    <p class="text-sm text-gray-600 text-justify">Diferencial económico extraído de realizar el segmento primario de distribución con flota propia en lugar de subcontratarlo al spot market.</p>
+                    <ul class="variable-list list-disc pl-5">
+                        <li>$S_T$: Ahorro total acumulado sobre externalización.</li>
+                        <li>$Tarif_{Ext}$: Tarifa del mercado transportista para viaje directo (Spot).</li>
+                        <li>$TCO_{Int}$: Tarifa técnica amortizada de la flota cautiva ($ \approx $ 1.50 €/km).</li>
+                        <li>$d_{Linehaul_r}$: Distancia útil entregada al último nodo.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-b border-gray-200 my-6"></div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Fórmula 3 -->
+                <div>
+                    <h3 class="formula-title">3. Monetización de Retornos (Coste Hundido)</h3>
+                    <div class="formula-box bg-slate-50 border-slate-400">
+                        $$\pi_{BH} = \left( \sum d_{vacío}^{old} - \sum d_{vacío}^{new} \right) \times TCO_{Int}$$
+                    </div>
+                    <p class="text-sm text-gray-600 text-justify">Cálculo de eficiencia de software: Conversión de los kilómetros ociosos devueltos al sistema (backhauling) en ahorros estructurales puros o beneficios cruzados.</p>
+                </div>
+
+                <!-- Fórmula 4 -->
+                <div>
+                    <h3 class="formula-title">4. Retorno de Inversión (Software TMS)</h3>
+                    <div class="formula-box bg-slate-50 border-slate-400">
+                        $$ROI = \frac{\pi_{anual} - \text{Inv}_{TMS}}{\text{Inv}_{TMS}}$$
+                        $$P_{period} = \frac{\text{Inv}_{TMS}}{\pi_{diaria}}$$
+                    </div>
+                    <p class="text-sm text-gray-600 text-justify">Validación del impacto financiero directo y periodo de recuperación.</p>
+                </div>
+
+                <!-- Fórmula 5 (NUEVA: Impacto Relativo) -->
+                <div>
+                    <h3 class="formula-title">5. Métricas de Impacto Relativo (Captura Dashboard)</h3>
+                    <div class="formula-box bg-green-50 border-green-600">
+                        $$\eta_{BH} = \frac{\sum d_{v}^{base} - \sum d_{v}^{opt}}{\sum d_{v}^{base}} \times 100$$
+                        $$\Delta CO_2 = CO_{2}^{base} - CO_{2}^{opt}$$
+                    </div>
+                    <p class="text-sm text-gray-600 text-justify">Cálculo del ahorro relativo en kilómetros de vacío ($\eta$) y mitigación neta de emisiones de carbono ($\Delta$).</p>
+                </div>
+            </div>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>

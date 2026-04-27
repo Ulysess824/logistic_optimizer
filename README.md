@@ -48,6 +48,28 @@ Actualmente, el proyecto cuenta con un sistema maduro, empaquetado y altamente v
 
 ---
 
+## 🚀 Actualizaciones Recientes (Abril 2026)
+
+Se ha realizado una actualización mayor del sistema para alcanzar estándares de auditoría financiera profesional:
+
+### 1. Evolución al Motor Dinámico DCF
+El sistema ha migrado de cálculos estáticos a un modelo de **Flujos de Caja Descontados (DCF)** a 5 años.
+*   **Inflación Variable**: Los costes operativos y salarios se ajustan anualmente según el IPC proyectado.
+*   **WACC (Tasa de Descuento)**: Se aplica una curva de tipos para calcular el Valor Actual Neto (VAN) real de la inversión.
+*   **Ingresos Indexados**: Las tarifas de transporte ahora evolucionan con la inflación, protegiendo los márgenes operativos.
+
+### 2. Integración del Factor Humano
+*   **Coste del Conductor**: Se ha integrado el coste total empresa (42.000 €/año) como un flujo de caja operativo crítico en el TCO.
+*   **Escudo Fiscal**: Aplicación automática de deducciones fiscales (25%) sobre OPEX, salarios y amortizaciones técnicas.
+
+### 3. Documentación y Metodología
+*   **Anexo Técnico**: Creación de `docs/Metodologia_TCO_5_Anos.md` con la formalización matemática de los cálculos.
+*   **ROI Estándar**: Implementación de la fórmula internacional `(Ganancia - Coste) / Coste` para todas las comparativas de flota.
+
+---
+
+## 🛠️ Instalación y Uso
+
 ## 🔄 Simulación Anual de 250 Días
 
 Para evaluar el impacto estratégico a largo plazo, el sistema permite correr una simulación batch:

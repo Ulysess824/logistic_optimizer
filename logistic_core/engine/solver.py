@@ -439,8 +439,25 @@ class LogisticsSolver:
             route.append(node_data)
 
             # Filtrar: solo conservar rutas que lleven al menos un cliente
+            # y que cumplan la métrica de rentabilidad mínima (Bin Packing constraint bypass)
             if any(n['type'] == 'customer' for n in route):
-                all_routes.append(route)
+                carga_pallets = sum(n.get('demanda_pallets', 0) for n in route if n['type'] == 'customer')
+                
+                # Obtener la capacidad parametrizada en Solve, o asumir 34
+                max_pallets = self._last_solve_args.get("max_pallets_ruta", 34)
+                if max_pallets is None or max_pallets <= 0:
+                    max_pallets = 34
+                
+                from logistic_core.config import MIN_FILL_RATE_PCT
+                fill_rate = (carga_pallets / max_pallets) * 100.0
+                
+                if fill_rate >= MIN_FILL_RATE_PCT:
+                    all_routes.append(route)
+                else:
+                    logger.warning(
+                        "[bold red]Ruta descartada (Outsourcing):[/bold red] Llenado volumétrico %.1f%% (%d/%d pals) < Umbral %.1f%%",
+                        fill_rate, carga_pallets, max_pallets, MIN_FILL_RATE_PCT
+                    )
 
         logger.info("[bold green]Rutas Activas Construidas:[/bold green] %d", len(all_routes))
         return all_routes

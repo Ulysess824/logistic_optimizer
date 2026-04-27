@@ -21,7 +21,7 @@ from logistic_core.config import (
     RESULTS_DIR, DATA_DIR, MAPS_DIR,
     GLEC_CO2_PER_LITER, GLEC_INTENSITY_GTKM, GLEC_EMPTY_FLOOR_KGKM,
     PAPER_LOAD_KG, PALLET_WEIGHT_KG, VEHICLE_MAX_LOAD_KG,
-    INTERNAL_OPERATIONAL_TCO_RATE,
+    TARIFA_INTERNA_DIESEL,
     CAPEX_TRUCK_UNIT_COST, DEFAULT_CYCLE_TIME_DAYS, DAILY_TRUCK_OUTBOUND, DEFAULT_FLEET_BUFFER
 )
 
@@ -229,7 +229,7 @@ MAX_SEARCH_TIME = 30            # Tiempo máximo de búsqueda del solver (s)
 SORTING_STRATEGY = "far_plant_close_depot"
 
 # Motor Geografico: "haversine", "osrm", "google_maps" o "routes_api"
-API_TYPE = "osrm"
+API_TYPE = "haversine"
 
 # Especificaciones de Camion
 TRUCK_SPECS = {
@@ -340,7 +340,7 @@ def _build_summary(routes, solver, max_pallets=35, threshold_km=50, n_candidatos
     total_empty_km = 0
     
     cost_estimator = CostEstimator(
-        price_per_km=INTERNAL_OPERATIONAL_TCO_RATE
+        price_per_km=TARIFA_INTERNA_DIESEL
     )
 
     co2_estimator = FCREmissionEstimator(

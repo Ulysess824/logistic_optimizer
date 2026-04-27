@@ -74,8 +74,8 @@ def generate_database():
     ]).filter(
         pl.col("tipo_envio").str.strip_chars() == "TM Third-party_FTL/CTL",
         pl.col("SPEC402   [#]   Drops") == 1,
-        pl.col("SPEC801   [#]   Base Pallets Units") > 15,
-        pl.col("SPEC801   [#]   Base Pallets Units") < 50
+        pl.col("SPEC801   [#]   Base Pallets Units") > 20,
+        pl.col("SPEC801   [#]   Base Pallets Units") < 35
     ).rename(new_name_columns)
 
     print("Procesando histórico completo...")

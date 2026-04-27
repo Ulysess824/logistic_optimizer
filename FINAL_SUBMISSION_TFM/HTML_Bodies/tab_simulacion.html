@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f3f4f6; margin: 0; padding: 1.5rem; }
+        .card { background-color: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); padding: 20px; }
+    </style>
+</head>
+<body>
+    <div class="card mb-6 border-t-4 border-purple-600">
+        <h2 class="text-2xl font-bold text-purple-900 mb-4">Simulación de Flota Diaria</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Left Col: Animation & Parameters -->
+            <div class="md:col-span-2 flex flex-col space-y-4">
+                <div class="border rounded-lg shadow-sm bg-white overflow-hidden p-2">
+                    <img src="../simulacion_rutas_optimizadas.gif" alt="Animación Simulación Flotas" class="w-full h-auto rounded">
+                </div>
+
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="bg-gray-50 p-3 rounded border text-center">
+                        <p class="text-[10px] font-bold text-gray-500 uppercase">Muelles de Carga</p>
+                        <p class="text-xl font-bold text-purple-700">2</p>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded border text-center">
+                        <p class="text-[10px] font-bold text-gray-500 uppercase">Tiempo Carga Base</p>
+                        <p class="text-xl font-bold text-purple-700">40 min</p>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded border text-center">
+                        <p class="text-[10px] font-bold text-gray-500 uppercase">Velocidad Promedio</p>
+                        <p class="text-xl font-bold text-purple-700">80 km/h</p>
+                    </div>
+                </div>
+
+                <div class="bg-yellow-50 border border-yellow-200 p-3 rounded text-sm text-yellow-800 flex items-start">
+                    <div>
+                        <strong>Mejora Futura:</strong> En próximas versiones se integrará un <em>parámetro de tráfico dinámico</em> usando datos en tiempo real de API.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Col: Table Data -->
+            <div class="card border border-gray-100 shadow-sm bg-white relative">
+                <h3 class="font-bold text-gray-800 mb-2 border-b pb-2">Distribución Diaria (Ejemplo)</h3>
+                <div class="overflow-x-auto text-sm">
+                    <table class="w-full text-left text-gray-700 divide-y divide-gray-200">
+                        <thead>
+                            <tr class="bg-gray-50">
+                                <th class="py-2 px-3 font-bold">Planta</th>
+                                <th class="py-2 px-3 font-bold text-center">Camiones/Día</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sim-tbody" class="divide-y divide-gray-100">
+                            <tr><td class="py-2 px-3">Celpack</td><td class="py-2 px-3 text-center">3</td></tr>
+                            <tr class="bg-gray-50"><td class="py-2 px-3">Alcalá</td><td class="py-2 px-3 text-center">4</td></tr>
+                            <tr><td class="py-2 px-3">Alicante</td><td class="py-2 px-3 text-center">5</td></tr>
+                            <tr class="bg-gray-50"><td class="py-2 px-3">Almeria</td><td class="py-2 px-3 text-center">5</td></tr>
+                            <tr><td class="py-2 px-3">Burgos</td><td class="py-2 px-3 text-center">4</td></tr>
+                            <tr class="bg-gray-50"><td class="py-2 px-3">Canovelles</td><td class="py-2 px-3 text-center">2</td></tr>
+                            <tr><td class="py-2 px-3">Córdoba</td><td class="py-2 px-3 text-center">3</td></tr>
+                            <tr class="bg-gray-50"><td class="py-2 px-3">Navarra</td><td class="py-2 px-3 text-center">2</td></tr>
+                            <tr><td class="py-2 px-3">Huelva</td><td class="py-2 px-3 text-center">5</td></tr>
+                            <tr class="bg-gray-50"><td class="py-2 px-3">Valencia</td><td class="py-2 px-3 text-center">3</td></tr>
+                            <tr><td class="py-2 px-3">Vigo</td><td class="py-2 px-3 text-center">2</td></tr>
+                            <tr class="bg-blue-50 text-blue-900">
+                                <td class="py-2 px-3 font-bold border-t border-blue-200">Total Flota</td>
+                                <td class="py-2 px-3 font-bold text-center border-t border-blue-200">38</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

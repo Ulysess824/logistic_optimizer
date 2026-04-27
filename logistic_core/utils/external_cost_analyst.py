@@ -1,21 +1,24 @@
 import logging
 from typing import Dict, Any
-from logistic_core.config import INTERNAL_OPERATIONAL_TCO_RATE, EXTERNAL_PROVIDER_RATE_PER_KM
+import math
+from logistic_core.config import TARIFA_INTERNA_DIESEL, EXTERNAL_PROVIDER_RATE_PER_KM
 from logistic_core.utils.fcr_estimator import FCREmissionEstimator
 
 class ExternalCostAnalyst:
     """
-    Analista de comparación de costes: Flota Propia vs Empresa Externa (Outsourcing).
-    Compara el tramo de entrega (Linehaul) bajo mimas condiciones de distancia.
+    Analiza la viabilidad financiera de las rutas generadas por OSRM VRPB 
+    frente a un proveedor externo que cobra por Point-to-Point (Matriz orígenes-destinos).
     """
-    
-    def __init__(self, internal_rate: float = None, external_rate: float = None):
+
+    def __init__(self, internal_rate: float = TARIFA_INTERNA_DIESEL, external_rate: float = EXTERNAL_PROVIDER_RATE_PER_KM):
         """
+        Inicializa el analista financiero comparativo.
+        
         Args:
-            internal_rate (float): Coste interno por km (€). Default de config.
-            external_rate (float): Tarifa externa por km (€). Default de config.
+            internal_rate: Coste interno en €/km (TCO unitario propio).
+            external_rate: Estructura de costes de compra de transporte (€/km mercado).
         """
-        self.internal_rate = internal_rate or INTERNAL_OPERATIONAL_TCO_RATE
+        self.internal_rate = internal_rate
         self.external_rate = external_rate or EXTERNAL_PROVIDER_RATE_PER_KM
         self.co2_est = FCREmissionEstimator() # GLEC v3 Motor
         logging.info(f"ExternalCostAnalyst inicializado. Interno: {self.internal_rate} €/km, Externo: {self.external_rate} €/km")

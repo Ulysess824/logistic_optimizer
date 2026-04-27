@@ -24,17 +24,19 @@ from logistic_core.config import (
      TRAILER_LENGTH_M, TRAILER_WIDTH_M, TRAILER_HEIGHT_M,
      PALLET_LENGTH_M, PALLET_WIDTH_M, PALLET_HEIGHT_M,
      DEFAULT_MAX_CUSTOMERS, DEFAULT_THRESHOLD_KM,
-     INTERNAL_OPERATIONAL_TCO_RATE, EXTERNAL_PROVIDER_RATE_PER_KM,
+     TARIFA_INTERNA_DIESEL, TARIFA_INTERNA_EV, EXTERNAL_PROVIDER_RATE_PER_KM,
      CAPEX_TRUCK_UNIT_COST, DEFAULT_CYCLE_TIME_DAYS, 
      DAILY_TRUCK_OUTBOUND, DEFAULT_FLEET_BUFFER,
      SOFTWARE_TMS_CAPEX, ELECTRIC_PLANTS_LIST, EV_CONS_EMPTY, EV_CONS_FULL,
      DIESEL_CAPEX, EV_CAPEX, EV_MOVES_AYUDA,
-     FLEET_MIX_DIESEL, FLEET_MIX_EV, KMS_ANUALES_POR_CAMION, TCO_HORIZON_YEARS,
+     FLEET_MIX_DIESEL, FLEET_MIX_EV, ANNUAL_DRIVER_COST_PER_TRUCK, KMS_ANUALES_POR_CAMION, TCO_HORIZON_YEARS,
      TCO_WACC, TCO_INFLACION_ANUAL, TCO_TAX_RATE,
      DIESEL_SEGURO_ANUAL, DIESEL_MANT_ANUAL, DIESEL_NEUMATICOS_ANUAL,
      DIESEL_RENTING_MENSUAL, DIESEL_LEASING_MENSUAL,
      EV_CONSUMO_KWH_KM, EV_COSTE_KWH, EV_MANT_ANUAL,
-     EV_RENTING_MENSUAL, EV_LEASING_MENSUAL
+     EV_RENTING_MENSUAL, EV_LEASING_MENSUAL,
+     DIESEL_CONSUMO_L_100KM, DIESEL_COSTE_COMBUSTIBLE_L,
+     BASE_TCO_DIESEL, BASE_TCO_EV
 )
 from logistic_core.utils.geo import GeoUtils
 from logistic_core.utils.cost_estimator import CostEstimator
@@ -45,10 +47,18 @@ from logistic_core.utils.strategic_analyzer import StrategicAnalyzer
 
 logger = logging.getLogger(__name__)
 
-def fmt_std(val, decimals=2):
-    """Formatea un número al estilo estándar (punto para decimales)."""
+import numpy as np
+
+def fmt_std(val, decimals=1):
+    """Formatea un número con separador de miles (_) y 1 decimal por defecto."""
     if val is None: return "0"
-    return f"{val:,.{decimals}f}"
+    try:
+        # Si es una lista o array, intentamos sumar (caso de flujos)
+        if isinstance(val, (list, np.ndarray)):
+            val = float(np.sum(val))
+        return f"{float(val):_.{decimals}f}"
+    except:
+        return str(val)
 
 def _replace_kpi(html_text, kpi_id, new_value):
     """Reemplaza el valor de un KPI buscando su ID único."""
@@ -77,7 +87,7 @@ def generate_dashboard(summary_path, routes_path, output_path, hedonic_path=None
 
     geo = GeoUtils()
     cost_est = CostEstimator(
-        price_per_km=INTERNAL_OPERATIONAL_TCO_RATE
+        price_per_km=TARIFA_INTERNA_DIESEL
     )
     price_km = cost_est.price_per_km
     
@@ -129,7 +139,7 @@ def generate_dashboard(summary_path, routes_path, output_path, hedonic_path=None
         last_customer = customers_in_route[-1] if customers_in_route else last_plant
 
         # Identificadores estéticos (Usado en múltiples tablas)
-        plants_short = ", ".join([p.replace("Smurfit Westrock ", "").replace("CP_", "") for p in r["plants"]])
+        plants_short = ", ".join([p.replace("Smurfit Westrock ", "").replace("CP_", "").replace("Muelle", "Ruta") for p in r["plants"]])
         p_full_name = r["plants"][0] if r["plants"] else "Desconocida"
         
         # Agrupamiento por nombre base (v2): Alcalá (Muelle 2) -> Alcalá
@@ -152,10 +162,18 @@ def generate_dashboard(summary_path, routes_path, output_path, hedonic_path=None
         dist_p_c_p = dist_p_c_only_out # Cambiamos la referencia para el resto del script
         
         dist_trad_systemic = dist_m_p_m + dist_p_c_p
+        
+        is_ev = p_short in ELECTRIC_PLANTS_LIST
+        # 🎯 Tarifa dinámica según tecnología de la planta (Diésel vs. Eléctrico)
+        price_km = TARIFA_INTERNA_EV if is_ev else TARIFA_INTERNA_DIESEL
+        tco_km = BASE_TCO_EV if is_ev else BASE_TCO_DIESEL
+        
+        ext_analyst.internal_rate = price_km
+        cost_est.price_per_km = price_km
+
         cost_trad_systemic = dist_trad_systemic * price_km
         co2_trad_systemic = co2_est.co2_total_trip(dist_loaded=dist_trad_systemic/2, dist_empty=dist_trad_systemic/2, weight_tons=25.0)
         
-        is_ev = p_short in ELECTRIC_PLANTS_LIST
         if is_ev:
             co2_trad_systemic = 0.0
 
@@ -331,9 +349,13 @@ def generate_dashboard(summary_path, routes_path, output_path, hedonic_path=None
             if lh_dist > 0:
                 ext_metrics = ext_analyst.analyze_leg(lh_dist)
                 if ext_metrics:
+                    border_col = "fuchsia-500" if is_ev else "yellow-500"
+                    txt_col = "fuchsia-800 font-black" if is_ev else "gray-800 font-semibold"
+                    lbl_ev = "(EV) " if is_ev else ""
+                    
                     row = (
                         f'<tr class="hover:bg-gray-50 border-b text-[12px]">'
-                        f'<td class="px-3 py-2 font-semibold text-gray-800 border-l-4 border-yellow-500 bg-gray-50/30">{plants_short}</td>'
+                        f'<td class="px-3 py-2 {txt_col} border-l-4 border-{border_col} bg-gray-50/30">{lbl_ev}{plants_short}</td>'
                         f'<td class="px-3 py-1 text-center font-mono">{fmt_std(lh_dist)} km</td>'
                         f'<td class="px-3 py-1 text-center font-mono text-blue-700">{fmt_std(ext_metrics["internal_cost"])} €</td>'
                         f'<td class="px-3 py-1 text-center font-mono text-red-600">{fmt_std(ext_metrics["external_cost"])} €</td>'
@@ -347,16 +369,17 @@ def generate_dashboard(summary_path, routes_path, output_path, hedonic_path=None
         else:
             logger.debug(f"Ruta {r['route_id']}: No customers or plants for outsourcing comparison.")
 
-        # --- 3. FILA DETALLE (Tab Resultados) ---
         route_rows_html.append(
             f'<tr class="border-b hover:bg-gray-50 text-[12px]">'
             f'<td class="py-2 px-3 font-bold text-center">{r["route_id"]}</td>'
             f'<td class="py-2 px-3">{plants_short}</td>'
             f'<td class="py-2 px-3 text-center">{r["num_customers"]}</td>'
+            f'<td class="py-2 px-3 font-mono text-center font-bold text-orange-600">{int(total_pallets)}</td>'
+            f'<td class="py-2 px-3 font-mono text-center font-bold text-amber-600 bg-amber-50/30">{fmt_std((total_pallets / 34) * 100, 1)}%</td>'
             f'<td class="py-2 px-3 font-mono text-center">{fmt_std(r["distance_km"])} km</td>'
-            f'<td class="py-2 px-3 font-mono text-center text-purple-600 font-bold">{fmt_std(r.get("co2_emissions_kg", 0))} kg</td>'
-            f'<td class="py-2 px-3 font-mono text-center font-bold text-teal-600">+{fmt_std(systemic_co2_saving_route)} kg</td>'
-            f'<td class="py-2 px-3 font-mono text-center font-bold text-blue-700">{fmt_std(route_cost_vrpb)} €</td>'
+            f'<td class="py-2 px-3 font-mono text-center text-gray-600">{fmt_std(r["distance_km"] * tco_km)} €</td>'
+            f'<td class="py-2 px-3 font-mono text-center font-bold text-blue-700">{fmt_std(r["distance_km"] * price_km)} €</td>'
+            f'<td class="py-2 px-3 font-mono text-center font-bold text-emerald-600">+{fmt_std((r["distance_km"] * price_km) - (r["distance_km"] * tco_km))} €</td>'
             f'<td class="py-2 px-3 font-mono text-center font-bold text-green-600">+{fmt_std(systemic_saving_route)} €</td>'
             f'</tr>'
         )
@@ -383,7 +406,7 @@ def generate_dashboard(summary_path, routes_path, output_path, hedonic_path=None
         
         km_rows_html.append(
             f'<tr class="bg-gray-100 font-bold text-gray-700 text-[11px] uppercase tracking-wider">'
-            f'<td colspan="15" class="px-3 py-1">'
+            f'<td colspan="13" class="px-3 py-1">'
             f'<span>PLANTA: {pg["name_display"]}</span>'
             f'<div class="{motor_class} text-[9px] font-medium tracking-normal mt-0.5">{motor_label}</div>'
             f'</td>'
@@ -411,16 +434,14 @@ def generate_dashboard(summary_path, routes_path, output_path, hedonic_path=None
             f'<td class="px-6 py-1 border-l-4 border-gray-300" title="Ruta de un camión que sale del depot, va a la planta y regresa vacío">Escenario Base Inbound (Sin clientes)</td>'
             f'<td class="px-2 py-1 text-center font-bold text-slate-400">Referencia</td>'
             f'<td class="px-2 py-1 text-center font-bold text-slate-400">Total Op.</td>'
-            f'<td class="px-3 py-1 text-center font-mono font-bold text-indigo-400 bg-indigo-50/20">~88%</td>'
+            f'<td class="px-3 py-1 text-center font-mono text-orange-400">-</td>'
+            f'<td class="px-3 py-1 text-center font-mono text-amber-400">-</td>'
             f'<td class="px-3 py-1 text-center font-mono">{fmt_std(base_km)}</td>'
-            f'<td class="px-3 py-1 text-center font-mono">{fmt_std(base_km / 2, 1)}</td>'
             f'<td class="px-3 py-1 text-center font-mono font-bold text-red-400 bg-red-50/20">50.0%</td>'
-            f'<td class="px-3 py-1 text-center font-mono">{fmt_std(base_cost, 2)} €</td>'
-            f'{b_co2_km_td}'
+            f'<td class="px-3 py-1 text-center font-mono">-</td>'
+            f'<td class="px-3 py-1 text-center font-mono text-blue-700">{fmt_std(base_cost, 2)} €</td>'
+            f'<td class="px-3 py-1 text-center font-mono">-</td>'
             f'{b_co2_td}'
-            f'<td class="px-3 py-1 text-center font-mono">-</td>'
-            f'<td class="px-3 py-1 text-center font-mono">-</td>'
-            f'<td class="px-3 py-1 text-center font-mono">-</td>'
             f'<td class="px-3 py-1 text-center font-mono">-</td>'
             f'<td class="px-3 py-1 text-center">Referencia</td>'
             f'</tr>'
@@ -445,16 +466,14 @@ def generate_dashboard(summary_path, routes_path, output_path, hedonic_path=None
             f'</td>'
             f'<td class="px-2 py-1 text-center">-</td>'
             f'<td class="px-2 py-1 text-center font-bold text-slate-400">Escala</td>'
-            f'<td class="px-3 py-1 text-center font-mono font-bold text-indigo-400 bg-indigo-50/10">~88%</td>'
+            f'<td class="px-3 py-1 text-center font-mono text-orange-400">-</td>'
+            f'<td class="px-3 py-1 text-center font-mono text-amber-400">-</td>'
             f'<td class="px-3 py-1 text-center font-mono">{fmt_std(agg_base_km)}</td>'
-            f'<td class="px-3 py-1 text-center font-mono italic text-slate-500">{fmt_std(agg_base_empty, 1)}</td>'
             f'<td class="px-3 py-1 text-center font-mono font-bold text-red-400 bg-red-50/10">50.0%</td>'
-            f'<td class="px-3 py-1 text-center font-mono bg-slate-200/40">{fmt_std(agg_base_cost, 2)} €</td>'
-            f'{b_co2_km_td}'
+            f'<td class="px-3 py-1 text-center font-mono">-</td>'
+            f'<td class="px-3 py-1 text-center font-mono bg-slate-200/40 text-blue-700">{fmt_std(agg_base_cost, 2)} €</td>'
+            f'<td class="px-3 py-1 text-center font-mono">-</td>'
             f'{agg_b_co2_td}'
-            f'<td class="px-3 py-1 text-center font-mono">-</td>'
-            f'<td class="px-3 py-1 text-center font-mono">-</td>'
-            f'<td class="px-3 py-1 text-center font-mono">-</td>'
             f'<td class="px-3 py-1 text-center font-mono">-</td>'
             f'<td class="px-3 py-1 text-center">Referencia</td>'
             f'</tr>'
@@ -491,22 +510,26 @@ def generate_dashboard(summary_path, routes_path, output_path, hedonic_path=None
                 o_co2_km_td = f'<td class="px-3 py-1 text-center font-mono">{fmt_std(r_co2_km, 3)} kg/km</td>'
                 o_co2_td = f'<td class="px-3 py-1 text-center font-mono">{fmt_std(r_co2, 1)} kg</td>'
             
+            r_price = TARIFA_INTERNA_EV if orout['is_ev'] else TARIFA_INTERNA_DIESEL
+            r_tco = BASE_TCO_EV if orout['is_ev'] else BASE_TCO_DIESEL
+            r_tco_cost = r_dist * r_tco
+            r_revenue = r_dist * r_price
+            r_net = r_revenue - r_tco_cost
+            
             km_rows_html.append(
                 f'<tr class="hover:bg-blue-50/20 border-b text-[12px] text-blue-800">'
                 f'<td class="px-6 py-2 font-semibold pl-12">{orout["desc"]}</td>'
                 f'<td class="px-2 py-1 text-[10px] text-blue-600 uppercase font-bold text-center">Optimizado</td>'
                 f'<td class="px-3 py-1 text-center font-bold text-indigo-600">{r_cust}</td>'
-                f'<td class="px-3 py-1 text-center font-bold text-indigo-500 bg-indigo-50/30">{fmt_std(r_fill_rate, 1)}%</td>'
+                f'<td class="px-3 py-1 text-center font-bold text-orange-500">{int(orout.get("total_pallets",0))}</td>'
+                f'<td class="px-3 py-1 text-center font-bold text-amber-600 bg-amber-50/20">{fmt_std((orout.get("total_pallets",0) / 34) * 100, 1)}%</td>'
                 f'<td class="px-3 py-1 text-center font-mono font-bold">{fmt_std(r_dist)}</td>'
-                f'<td class="px-3 py-1 text-center font-mono text-gray-400 italic">{fmt_std(r_empty, 1)}</td>'
                 f'<td class="px-3 py-1 text-center font-bold text-red-500 bg-red-50/30">{fmt_std(r_milla_vacia, 1)}%</td>'
-                f'<td class="px-3 py-1 text-center font-mono font-bold">{fmt_std(r_cost, 2)} €</td>'
-                f"{o_co2_km_td}"
+                f'<td class="px-3 py-1 text-center font-mono text-gray-500">{fmt_std(r_tco_cost, 2)} €</td>'
+                f'<td class="px-3 py-1 text-center font-mono font-bold text-blue-700">{fmt_std(r_revenue, 2)} €</td>'
+                f'<td class="px-3 py-1 text-center font-mono font-bold text-emerald-600">+{fmt_std(r_net, 2)} €</td>'
                 f"{o_co2_td}"
                 f'<td class="px-3 py-1 text-center font-bold text-teal-600">+{fmt_std(orout["systemic_co2_saving"], 1)} kg</td>'
-                f'<td class="px-3 py-1 text-center font-bold text-green-600">-</td>'
-                f'<td class="px-3 py-1 text-center font-bold text-green-600 border-l border-green-100 italic">+{fmt_std(orout["imp"], 1)}%</td>'
-                f'<td class="px-3 py-1 text-center font-bold text-green-600 bg-green-50/30">+{fmt_std(orout["empty_ret_saving"], 0)} €</td>'
                 f'<td class="px-3 py-1 text-center font-bold text-emerald-600 bg-emerald-50/50">+{fmt_std(orout["systemic_saving"], 0)} €</td>'
                 f'</tr>'
             )
@@ -529,6 +552,10 @@ def generate_dashboard(summary_path, routes_path, output_path, hedonic_path=None
         p_avg_fill_rate = (p_total_pallets / (len(pg["opt_routes"]) * 34)) * 100 if pg["opt_routes"] else 0
         p_avg_milla_vacia = (p_total_empty_after / total_p_dist * 100) if total_p_dist > 0 else 0
 
+        p_total_tco = total_p_dist * (BASE_TCO_EV if is_plant_ev else BASE_TCO_DIESEL)
+        p_total_rev = total_p_dist * (TARIFA_INTERNA_EV if is_plant_ev else TARIFA_INTERNA_DIESEL)
+        p_total_net = p_total_rev - p_total_tco
+
         km_rows_html.append(
             f'<tr class="bg-blue-100 text-blue-900 font-bold text-[11px] border-b border-blue-200">'
             f'<td class="px-6 py-2 border-l-4 border-blue-400 uppercase tracking-tighter pl-10">'
@@ -536,23 +563,22 @@ def generate_dashboard(summary_path, routes_path, output_path, hedonic_path=None
             f'</td>'
             f'<td class="px-2 py-1 text-center font-bold text-blue-600 underline">Realizado</td>'
             f'<td class="px-3 py-1 text-center font-bold text-indigo-700">{total_p_cust}</td>'
-            f'<td class="px-3 py-1 text-center font-bold text-indigo-800 bg-blue-200/50">{fmt_std(p_avg_fill_rate, 1)}%</td>'
+            f'<td class="px-3 py-1 text-center font-bold text-orange-600">{int(p_total_pallets)}</td>'
+            f'<td class="px-3 py-1 text-center font-bold text-amber-700 bg-amber-100/50">{fmt_std(p_avg_fill_rate, 1)}%</td>'
             f'<td class="px-3 py-1 text-center font-mono">{fmt_std(total_p_dist)}</td>'
-            f'<td class="px-3 py-1 text-center font-mono">-</td>'
             f'<td class="px-3 py-1 text-center font-bold text-red-800 bg-red-200/50">{fmt_std(p_avg_milla_vacia, 1)}%</td>'
-            f'<td class="px-3 py-1 text-center font-mono bg-blue-200/40">{fmt_std(total_p_cost, 2)} €</td>'
-            f"{p_co2_km_td}"
+            f'<td class="px-3 py-1 text-center font-mono text-gray-700">{fmt_std(p_total_tco, 2)} €</td>'
+            f'<td class="px-3 py-1 text-center font-mono bg-blue-200/40 text-blue-900">{fmt_std(p_total_rev, 2)} €</td>'
+            f'<td class="px-3 py-1 text-center font-mono font-bold text-emerald-700">+{fmt_std(p_total_net, 2)} €</td>'
             f"{p_co2_td}"
             f'<td class="px-3 py-1 text-center font-bold text-teal-700">+{fmt_std(total_p_sys_co2_saving, 1)} kg</td>'
-            f'<td class="px-3 py-1 text-center">-</td>'
-            f'<td class="px-3 py-1 text-center font-bold text-green-700 italic">+{fmt_std(p_total_pct_empty, 1)}%</td>'
-            f'<td class="px-3 py-1 text-center font-bold text-green-700 bg-green-50/50">+{fmt_std(total_p_ret_saving, 0)} €</td>'
             f'<td class="px-3 py-1 text-center font-bold text-emerald-700 bg-emerald-100/50">+{fmt_std(total_p_sys_saving, 0)} €</td>'
             f'</tr>'
         )
 
     total_savings = total_empty_before - total_empty_after
-    total_pct = (total_savings / total_empty_before * 100) if total_empty_before > 0 else 0
+    # Milla Vacía Absoluta (Total Sistema Optimizado)
+    total_pct = (total_empty_after / t_dist_vrpb * 100) if t_dist_vrpb > 0 else 0
 
     if is_baseline:
         # MODO BASELINE: Solo actualizamos la pestaña de Condiciones Normales (tabla externa)
@@ -683,6 +709,23 @@ def generate_dashboard(summary_path, routes_path, output_path, hedonic_path=None
             html_res = _replace_kpi(html_res, "kpi-software-payback", f"{fmt_std(payback_days, 1)} días")
             html_res = _replace_kpi(html_res, "kpi-backhauling-profit", f"{fmt_std(backhauling_profit, 2)} €")
 
+            # Inyectar Botón de Descarga Operacional al FINAL (NUEVO)
+            if 'id="btn-download-operational"' not in html_res:
+                btn_html = """
+        <div class="flex justify-end mt-10 mb-10 mr-4">
+            <a href="../../results_analysis/reporte_operativo_rutas.xlsx" download 
+               class="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white px-6 py-3 rounded-2xl text-sm font-bold shadow-2xl transition-all hover:-translate-y-1 border border-slate-600"
+               id="btn-download-operational">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                Descargar Reporte Operativo Detallado (Excel - 2 Hojas)
+            </a>
+        </div>
+                """
+                if '</body>' in html_res:
+                    html_res = html_res.replace('</body>', btn_html + '</body>')
+
             # Inyectar Tabla Comparativa
             marker = 'id="comparison-tbody"'
             if marker in html_res:
@@ -735,7 +778,16 @@ def generate_dashboard(summary_path, routes_path, output_path, hedonic_path=None
         _generate_finanzas_tab(bodies_dir, t_dist_trad, t_dist_vrpb, ext_analyst.external_rate, price_km, summary["num_routes"])
         _generate_implementacion_tab(bodies_dir)
         
+        # 5. Inyectar métricas dinámicas de inversión y TCO
+        _inject_investment_metrics(bodies_dir)
+        _inject_strategic_tco(bodies_dir)
+        _inject_segregated_unitary_tco(bodies_dir)
+        
         logger.info(f"Dashboard (Producción) actualizado exitosamente.")
+        
+        # 5. Inyectar métricas de inversión (Break-Even) y TCO Estratégico si existen
+        _inject_investment_metrics(bodies_dir)
+        _inject_strategic_tco(bodies_dir)
 
 def _generate_bibliografia_tab(bodies_dir):
     """Genera la pestaña de bibliografía a partir de docs/Bibliografia.md"""
@@ -871,15 +923,15 @@ def _generate_parametros_tab(bodies_dir):
             <div class="param-card" style="border-top-color: #10b981;">
                 <div class="mb-4">
                     <p class="label">Factor CO2 Diesel</p>
-                    <p class="value">{GLEC_CO2_PER_LITER:.2f}<span class="unit">kg/L</span></p>
+                    <p class="value">{GLEC_CO2_PER_LITER:.1f}<span class="unit">kg/L</span></p>
                 </div>
                 <div class="mb-4">
                     <p class="label">Intensidad Térmica</p>
-                    <p class="value">{GLEC_INTENSITY_GTKM:.2f}<span class="unit">g CO2/tkm</span></p>
+                    <p class="value">{GLEC_INTENSITY_GTKM:.1f}<span class="unit">g CO2/tkm</span></p>
                 </div>
                 <div class="mb-0">
                     <p class="label">Emisión Base Vacío</p>
-                    <p class="value">{GLEC_EMPTY_FLOOR_KGKM:.3f}<span class="unit">kg/km</span></p>
+                    <p class="value">{GLEC_EMPTY_FLOOR_KGKM:.1f}<span class="unit">kg/km</span></p>
                 </div>
             </div>
         </div>
@@ -915,8 +967,8 @@ def _generate_parametros_tab(bodies_dir):
             <div class="param-card" style="border-top-color: #f59e0b;">
                 <div class="flex flex-col md:flex-row justify-between items-center gap-8">
                     <div class="text-center md:text-left">
-                        <p class="label">Tarifa Técnica Interna (TCO)</p>
-                        <p class="text-4xl font-black text-amber-700 font-mono">{INTERNAL_OPERATIONAL_TCO_RATE:,.2f}<span class="text-lg unit">€/km</span></p>
+                        <p class="label">Tarifa Técnica Interna (TCO Diésel Base)</p>
+                        <p class="text-4xl font-black text-amber-700 font-mono">{TARIFA_INTERNA_DIESEL:,.1f}<span class="text-lg unit">€/km</span></p>
                         <p class="text-[10px] text-slate-400 mt-1 uppercase">Basado en Modelo MITMA 2026 (Ref. Notebook estimación)</p>
                     </div>
                     <div class="h-16 w-px bg-slate-100 hidden md:block"></div>
@@ -980,11 +1032,11 @@ def _generate_parametros_tab(bodies_dir):
             <div class="param-card" style="border-top-color: #f43f5e;">
                 <div class="mb-4">
                     <p class="label">Coste Capital (WACC)</p>
-                    <p class="value">{TCO_WACC*100:.1f}<span class="unit">%</span></p>
+                    <p class="value">{TCO_WACC[0]*100:.1f}<span class="unit">% (Año 1)</span></p>
                 </div>
                 <div class="mb-4">
                     <p class="label">Inflación Proyectada</p>
-                    <p class="value">{TCO_INFLACION_ANUAL*100:.1f}<span class="unit">% anual</span></p>
+                    <p class="value">{TCO_INFLACION_ANUAL[0]*100:.1f}<span class="unit">% (Año 1)</span></p>
                 </div>
                 <div class="mb-0">
                     <p class="label">Impuesto Sociedades</p>
@@ -1034,11 +1086,11 @@ def _generate_parametros_tab(bodies_dir):
                 <div class="mb-4 flex justify-between gap-2">
                     <div class="flex-1">
                         <p class="label">Consumo kWh</p>
-                        <p class="text-sm font-bold">{EV_CONSUMO_KWH_KM:.2f}<span class="text-[9px] ml-1">kWh/km</span></p>
+                        <p class="text-sm font-bold">{EV_CONSUMO_KWH_KM:.1f}<span class="text-[9px] ml-1">kWh/km</span></p>
                     </div>
                     <div class="flex-1 text-right">
                         <p class="label">Precio Energía</p>
-                        <p class="text-sm font-bold">{EV_COSTE_KWH:.2f}<span class="text-[9px] ml-1">€/kWh</span></p>
+                        <p class="text-sm font-bold">{EV_COSTE_KWH:.1f}<span class="text-[9px] ml-1">€/kWh</span></p>
                     </div>
                 </div>
                 <div class="mt-4 pt-4 border-t border-slate-100 italic text-[10px] text-slate-400">
@@ -1054,7 +1106,6 @@ def _generate_parametros_tab(bodies_dir):
     </div>
 </body>
 </html>"""
-    
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(html_content)
     logger.info("Pestana de Parametros generada.")
@@ -1069,23 +1120,33 @@ def _generate_finanzas_tab(bodies_dir, km_baseline, km_opt, ext_rate, int_rate, 
         daily_dispatch=DAILY_TRUCK_OUTBOUND,
         fleet_buffer=DEFAULT_FLEET_BUFFER
     )
-    bc = analyzer.generate_business_case(km_baseline, km_opt, int_rate, ext_rate, num_routes)
+    # Generar tabla financiera resumida (TCO)
+    # bc = analyzer.generate_business_case(km_baseline, km_opt, int_rate, ext_rate, num_routes)
+    bc = {
+        "roi_pct": 0, 
+        "payback_years": 0, 
+        "annual_net_saving": 0,
+        "asset_light": {"capex_eur": 0, "opex_anual": 0},
+        "operational": {"daily_dispatch": 0, "fleet_size_required": 0},
+        "asset_heavy": {"capex_eur": 0, "fleet_capex": 0, "opex_anual": 0}
+    } # Mock para evitar crash posterior
+
     
     # --- Seccion 1B: TCO Flota Mixta vs Diesel ---
     try:
-        mixed_tco = analyzer.evaluate_mixed_fleet_transition(FLEET_MIX_DIESEL, FLEET_MIX_EV, KMS_ANUALES_POR_CAMION)
-        m_tco = mixed_tco['mixed_fleet']
-        c_tco = mixed_tco['comparative']
-        color_tco = "text-emerald-300" if c_tco['ahorro_tco_5y'] >= 0 else "text-red-400"
+        tabla = analyzer.generar_tabla_comparativa(n_diesel=FLEET_MIX_DIESEL, n_ev=FLEET_MIX_EV)
+        rec = tabla["recomendacion"]
+        m_tco = tabla['flota_mixta'][rec['modalidad']] 
+        c_tco = rec
+        color_tco = "text-emerald-300" if c_tco['ahorro_pct'] >= 0 else "text-red-400"
     except Exception as e:
         logger.error(f"Error generando TCO misto: {e}")
-        m_tco = {'capex_neto': 0, 'opex_anual': 0}
-        c_tco = {'payback_years': 0, 'ahorro_tco_5y': 0}
+        m_tco = {'capex_neto': 0, 'opex_anual': 0, 'tco_total': 0}
+        c_tco = {'payback_years': 0, 'ahorro_pct': 0, 'modalidad': 'compra'}
         color_tco = "text-red-400"
+        tabla = analyzer.generar_tabla_comparativa(n_diesel=FLEET_MIX_DIESEL, n_ev=FLEET_MIX_EV)
+        rec = tabla["recomendacion"]
 
-    # --- Seccion 2: Tabla de Inversion Mixta (Compra/Leasing/Renting) ---
-    tabla = analyzer.generar_tabla_comparativa()
-    rec = tabla["recomendacion"]
     n_d = tabla["flota_mixta"]["compra"]["n_diesel"]
     n_e = tabla["flota_mixta"]["compra"]["n_ev"]
     n_t = tabla["flota_mixta"]["compra"]["n_total"]
@@ -1097,7 +1158,7 @@ def _generate_finanzas_tab(bodies_dir, km_baseline, km_opt, ext_rate, int_rate, 
         return (
             f'<td class="px-4 py-4 text-center {bg} {border} rounded-lg">'
             f'<p class="text-lg font-mono font-bold text-slate-800">{fmt_std(abs(tco_van), 0)} EUR</p>'
-            f'<p class="text-[11px] text-slate-500 mt-1">{fmt_std(coste_km, 3)} EUR/km</p>'
+            f'<p class="text-[11px] text-slate-500 mt-1">{fmt_std(coste_km, 1)} EUR/km</p>'
             f'</td>'
         )
 
@@ -1108,7 +1169,7 @@ def _generate_finanzas_tab(bodies_dir, km_baseline, km_opt, ext_rate, int_rate, 
         return (
             f'<td class="px-4 py-5 text-center {bg} {border}">'
             f'<p class="text-xl font-mono font-bold text-white">{fmt_std(abs(data["tco_total"]), 0)} EUR{badge}</p>'
-            f'<p class="text-[11px] text-slate-400 mt-1">{fmt_std(data["coste_km_medio"], 3)} EUR/km medio</p>'
+            f'<p class="text-[11px] text-slate-400 mt-1">{fmt_std(data["coste_km_medio"], 1)} EUR/km medio</p>'
             f'</td>'
         )
 
@@ -1139,97 +1200,43 @@ def _generate_finanzas_tab(bodies_dir, km_baseline, km_opt, ext_rate, int_rate, 
 </head>
 <body class="p-8 pb-32">
     <div class="max-w-7xl mx-auto">
-        <h1 class="text-3xl font-black text-slate-800 mb-2 border-b-2 border-slate-200 pb-4">Business Case & Modelos de Flota</h1>
-        <p class="text-slate-500 text-sm mb-8">Evaluacion estrategica: modalidades de adquisicion y TCO a {TCO_HORIZON_YEARS} anos para una flota de {n_t} camiones.</p>
+        <h1 class="text-3xl font-black text-slate-800 mb-2 border-b-2 border-slate-200 pb-4">Análisis de Inversión y TCO</h1>
+        <p class="text-slate-500 text-sm mb-8">Evaluación estratégica de modalidades de adquisición y Coste Total de Propiedad (TCO).</p>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
-            <!-- Asset-Light Mode -->
-            <div class="bg-white rounded-2xl p-8 border-t-8 border-blue-500 shadow-xl relative overflow-hidden">
-                <div class="absolute -right-10 -top-10 bg-blue-50 w-32 h-32 rounded-full z-0 opacity-50"></div>
-                <div class="relative z-10">
-                    <span class="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Estrategia A (Asset-Light)</span>
-                    <h2 class="text-2xl font-bold mt-4 mb-1">Subcontratar Flota</h2>
-                    <p class="text-slate-500 text-sm mb-6">Inversion unica en Software (TMS) manteniendo flota de 3ros.</p>
-                    <div class="grid grid-cols-1 gap-4 mb-6">
-                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                            <p class="text-xs uppercase tracking-wider font-bold text-slate-400">CAPEX Inicial</p>
-                            <p class="text-2xl font-mono font-bold text-slate-700">{fmt_std(bc['asset_light']['capex_eur'], 0)} EUR</p>
-                        </div>
-                    </div>
-                </div>
+        <!-- Bloque de Parámetros de Simulación -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-10">
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Macroeconomía</p>
+                <p class="text-xs text-slate-700 mt-2">WACC: <b>{float(TCO_WACC[0])*100:.1f}% a {float(TCO_WACC[-1])*100:.1f}%</b></p>
+                <p class="text-xs text-slate-700">Inflación: <b>{float(TCO_INFLACION_ANUAL[0])*100:.1f}%</b></p>
+                <p class="text-xs text-slate-700">Tax Rate: <b>{float(TCO_TAX_RATE)*100:.1f}%</b></p>
             </div>
-
-            <!-- Asset-Heavy Mode -->
-            <div class="bg-dark rounded-2xl p-8 border-t-8 border-indigo-500 shadow-2xl relative overflow-hidden" style="background-color: #0f172a;">
-                <div class="absolute -right-10 -top-10 bg-slate-800 w-32 h-32 rounded-full z-0"></div>
-                <div class="relative z-10">
-                    <span class="bg-indigo-900/50 border border-indigo-500/30 text-indigo-300 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Estrategia B (Asset-Heavy)</span>
-                    <h2 class="text-2xl font-bold mt-4 mb-1 text-white">Adquisicion Propia</h2>
-                    <p class="text-slate-400 text-sm mb-6">Inversion en flota calculada para soportar {fmt_std(bc['operational']['daily_dispatch'], 0)} despachos/dia.</p>
-                    <div class="grid grid-cols-2 gap-4 mb-4">
-                        <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
-                            <p class="text-xs uppercase tracking-wider font-bold text-slate-500">CAPEX Flota</p>
-                            <p class="text-xl font-mono font-bold text-slate-300">{fmt_std(bc['asset_heavy'].get('fleet_capex', 0), 0)} EUR</p>
-                        </div>
-                        <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
-                            <p class="text-xs uppercase tracking-wider font-bold text-slate-500">CAPEX Total</p>
-                            <p class="text-xl font-mono font-bold text-slate-100">{fmt_std(bc['asset_heavy']['capex_eur'], 0)} EUR</p>
-                        </div>
-                    </div>
-                    <div class="bg-indigo-900/20 p-4 rounded-xl border border-indigo-500/20 mb-6">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <p class="text-[10px] uppercase tracking-wider font-bold text-indigo-400">Flota 100% Diésel</p>
-                                <p class="text-lg font-bold text-indigo-200">{bc['operational']['fleet_size_required']} <span class="text-xs opacity-60">camiones</span></p>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-[10px] uppercase tracking-wider font-bold text-indigo-400">Precio Diésel u.</p>
-                                <p class="text-lg font-bold text-indigo-200">{fmt_std(DIESEL_CAPEX, 0)} EUR</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Operación</p>
+                <p class="text-xs text-slate-700 mt-2">Uso: <b>{fmt_std(KMS_ANUALES_POR_CAMION, 0)} km/año</b></p>
+                <p class="text-xs text-slate-700">Horizonte: <b>{TCO_HORIZON_YEARS} años</b></p>
+                <p class="text-xs text-slate-700">Flota Total: <b>{n_t} camiones</b></p>
             </div>
-
-            <!-- Estrategia C: Transición Mixta -->
-            <div class="bg-gradient-to-br from-emerald-900 to-slate-900 rounded-2xl p-8 border-t-8 border-emerald-500 shadow-2xl relative overflow-hidden">
-                <div class="absolute -right-10 -top-10 bg-emerald-800 w-32 h-32 rounded-full z-0 opacity-40"></div>
-                <div class="relative z-10">
-                    <span class="bg-emerald-900/50 border border-emerald-500/30 text-emerald-300 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Estrategia C (Transicion)</span>
-                    <h2 class="text-2xl font-bold mt-4 mb-1 text-white">Flota Mixta (ESG)</h2>
-                    <p class="text-slate-400 text-sm mb-6">Inversion parcial en electrificacion ({FLEET_MIX_DIESEL} Diesel / {FLEET_MIX_EV} EV) apoyada en metodo TCO.</p>
-                    <div class="grid grid-cols-2 gap-4 mb-4">
-                        <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50">
-                            <p class="text-[10px] uppercase tracking-wider font-bold text-slate-500">CAPEX Inversión</p>
-                            <p class="text-xl font-mono font-bold text-slate-300">{fmt_std(m_tco['capex_neto'], 0)} EUR</p>
-                        </div>
-                        <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50">
-                            <p class="text-[10px] uppercase tracking-wider font-bold text-slate-500">OPEX Anual</p>
-                            <p class="text-xl font-mono font-bold text-emerald-300">{fmt_std(m_tco['opex_anual'], 0)} EUR</p>
-                        </div>
-                    </div>
-                    <div class="bg-emerald-900/30 p-4 rounded-xl border border-emerald-500/30 mb-6">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <p class="text-[10px] uppercase tracking-wider font-bold text-emerald-400">Payback vs Diésel</p>
-                                <p class="text-lg font-bold text-emerald-100">{fmt_std(c_tco['payback_years'], 1)} <span class="text-xs opacity-60">años</span></p>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-[10px] uppercase tracking-wider font-bold text-emerald-400">Ahorro TCO 5Y</p>
-                                <p class="text-lg font-bold {color_tco}">{fmt_std(c_tco['ahorro_tco_5y'], 0)} €</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Diesel (Euro VI)</p>
+                <p class="text-xs text-slate-700 mt-2">Capex: <b>{fmt_std(DIESEL_CAPEX, 0)} €</b></p>
+                <p class="text-xs text-slate-700">Gasoil: <b>{DIESEL_COSTE_COMBUSTIBLE_L} €/L</b></p>
+                <p class="text-xs text-slate-700">Consumo: <b>{DIESEL_CONSUMO_L_100KM} L/100</b></p>
+            </div>
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm border-l-4 border-emerald-500">
+                <p class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">Vehículo Eléctrico</p>
+                <p class="text-xs text-slate-700 mt-2">Capex: <b>{fmt_std(EV_CAPEX, 0)} €</b></p>
+                <p class="text-xs text-slate-700">Moves III: <b>-{fmt_std(EV_MOVES_AYUDA, 0)} €</b></p>
+                <p class="text-xs text-slate-700">Energía: <b>{EV_COSTE_KWH} €/kWh</b></p>
             </div>
         </div>
 
         <!-- ================================================================ -->
-        <!-- SECCION 2: TABLA DE INVERSION POR MODALIDAD (NUEVO)              -->
+        <!-- SECCION 2: TABLA DE INVERSION POR MODALIDAD                      -->
         <!-- ================================================================ -->
-        <div class="mb-8">
-            <h2 class="text-2xl font-black text-slate-800 mb-2">Analisis de Inversion por Modalidad</h2>
-            <p class="text-slate-500 text-sm mb-6">TCO (Valor Actual Neto) a {TCO_HORIZON_YEARS} anos para {n_t} camiones. WACC: {analyzer.wacc*100:.0f}% | Inflación: {analyzer.inflación*100:.0f}% | {fmt_std(KMS_ANUALES_POR_CAMION, 0)} km/año por unidad.</p>
+        <div class="mb-4">
+            <h2 class="text-2xl font-black text-slate-800 mb-1">Cálculo de TCO por Modalidad</h2>
+            <p class="text-slate-500 text-xs">Comparativa de flujos de caja descontados (VAN) para flota mixta ({FLEET_MIX_DIESEL} Diésel / {FLEET_MIX_EV} BEV).</p>
         </div>
 
         <div class="overflow-x-auto rounded-2xl shadow-xl border border-slate-200 mb-8">
@@ -1278,6 +1285,26 @@ def _generate_finanzas_tab(bodies_dir, km_baseline, km_opt, ext_rate, int_rate, 
                 <p class="text-4xl font-black font-mono">{fmt_std(abs(tabla['flota_mixta'][rec['modalidad']]['tco_total']), 0)}</p>
                 <p class="text-xs text-green-200 mt-1">EUR TCO Total ({TCO_HORIZON_YEARS} anos)</p>
             </div>
+        </div>
+
+        <!-- Dashboard Interactivo de Gráficos (Extracción Estratégica) -->
+        <h2 class="text-2xl font-black text-slate-800 mt-12 mb-6 border-b pb-2">Visualización de Sensibilidad y VAN</h2>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                <h4 class="text-center font-bold text-slate-700 mb-2">Evolución del VAN Acumulado</h4>
+                <iframe src="../../results_analysis/grafico_evolucion_van.html" style="width: 100%; height: 500px; border: none; border-radius: 8px;"></iframe>
+            </div>
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                <h4 class="text-center font-bold text-slate-700 mb-2">Comparativa TCO: Diésel vs Eléctrico</h4>
+                <iframe src="../../results_analysis/grafico_tco_comparativo.html" style="width: 100%; height: 500px; border: none; border-radius: 8px;"></iframe>
+            </div>
+        </div>
+
+        <div class="mt-8 flex justify-center pb-12">
+            <a href="../../results_analysis/resumen_comparativo_modalidades.xlsx" target="_blank" class="bg-slate-800 text-white px-8 py-4 rounded-xl font-bold hover:bg-slate-700 transition-all shadow-lg flex items-center transform hover:-translate-y-1">
+                <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                Descargar Informe Estratégico Detallado (Excel)
+            </a>
         </div>
 
     </div>
@@ -1379,3 +1406,4 @@ if __name__ == "__main__":
     
     if Path(bas_sum).exists():
         generate_dashboard(bas_sum, bas_rout, shell, is_baseline=True)
+# Fin de report_generator.py

@@ -67,10 +67,17 @@ if not GOOGLE_MAPS_API_KEY:
 # Datos actualizados 2026 (Ref: [Observatorio MITMA / FENADISMER])
 # Vehículo Articulado de Carga General (44 Toneladas Euro VI)
 EXTERNAL_PROVIDER_RATE_PER_KM = 1.70    # Tarifa de mercado del proveedor externo por km (Punto a Punto)
-INTERNAL_OPERATIONAL_TCO_RATE = 1.50    # Tarifa técnica propia (Valor final TCO)
+# Costes de Explotación Base (Punto de equilibrio TCO)
+BASE_TCO_DIESEL = 1.35
+BASE_TCO_EV = 1.36
+
+# Tarifas de Transferencia Interna (Ingreso de la división logística)
+TARIFA_INTERNA_DIESEL = 1.50
+TARIFA_INTERNA_EV = 1.60
 
 # --- Estimación de Flota y CAPEX (Ley de Little) ---
 CAPEX_TRUCK_UNIT_COST = 145_000.0  # Euros por cabeza tractora heavy duty
+MIN_FILL_RATE_PCT = 10.0           # Llenado mínimo (%) para que una ruta sea rentable
 DEFAULT_CYCLE_TIME_DAYS = 1.2     # Tiempo de ciclo logístico promedio en días (W)
 DAILY_TRUCK_OUTBOUND = 38.0       # Viajes o despachos diarios constantes (lambda)
 DEFAULT_FLEET_BUFFER = 1.10       # 10% margen operativo de seguridad (averías, descansos)
@@ -95,8 +102,8 @@ EV_CONS_FULL = 1.70                           # Consumo kWh/km a plena carga (25
 # =============================================================================
 
 TCO_HORIZON_YEARS = 5
-TCO_WACC = 0.07                               # Tasa de descuento (WACC)
-TCO_INFLACION_ANUAL = 0.02                    # Inflación interanual proyectada
+TCO_WACC = [0.07, 0.075, 0.08, 0.085, 0.09]             # Curva de tipos / Tasa de descuento (WACC)
+TCO_INFLACION_ANUAL = [0.02, 0.03, 0.05, 0.03, 0.02]  # Pico de inflación (Inflación interanual proyectada)
 TCO_TAX_RATE = 0.25                           # Impuesto de Sociedades (España)
 KMS_ANUALES_POR_CAMION = 130_000              # Distancia anual por unidad (intensivo)
 
@@ -128,3 +135,13 @@ EV_LEASING_MENSUAL = 5_200                    # Leasing financiero BEV
 # --- Composición de Flota Mixta (Distribución 51 camiones Excel) ---
 FLEET_MIX_DIESEL = 33                          # Camiones diésel requeridos
 FLEET_MIX_EV = 18                              # Camiones eléctricos requeridos
+ANNUAL_DRIVER_COST_PER_TRUCK = 42_000          # Coste total empresa por conductor (Salario + SS + Dietas)
+
+# =============================================================================
+# PARÁMETROS DE BREAK-EVEN (PUNTO DE EQUILIBRIO)
+# =============================================================================
+BE_TARIFA_MERCADO_KM = 1.70        # Tarifa de mercado por km (€/km)
+BE_INGRESO_MEDIO_VIAJE = 850.0     # Ingreso promedio por trayecto completo (€)
+BE_VIAJES_ANUALES_CAMION = 250.0   # Productividad anual esperada (Viajes)
+BE_PALLETS_POR_VIAJE = 33          # Capacidad de carga estándar (Euro-pallets)
+BE_COBERTURA_KM2_MEDIA = 4500.0    # Área media de influencia logística (km2)

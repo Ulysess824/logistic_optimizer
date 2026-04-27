@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Logístico: MC-VRPB Multi-Planta</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f3f4f6; overflow-x: hidden; }
+        .tab-content { display: none; width: 100%; height: calc(100vh - 180px); min-height: 700px; }
+        .tab-content.active { display: block; }
+        .tab-btn { padding: 12px 24px; font-weight: 600; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s; color: #6b7280; }
+        .tab-btn.active { border-bottom: 3px solid #3b82f6; color: #1e3a8a; background-color: rgba(59, 130, 246, 0.05); }
+        iframe { width: 100%; height: 100%; border: none; }
+    </style>
+</head>
+
+<body class="bg-gray-100">
+
+    <header class="flex justify-between items-center shadow-md px-8 bg-[#1e3a8a] text-white">
+        <div class="flex items-center py-4">
+            <img src="https://corrugandodigital.acccsa.org/hubfs/SW_LOGO_2COL.png" alt="Smurfit Logo" class="h-12 mr-6 bg-white p-1 rounded">
+            <div>
+                <h1 class="text-3xl font-bold">Logistics Optimizer</h1>
+                <p class="text-sm mt-1 opacity-80">MC-VRPB con Backhauling Multi-Planta</p>
+            </div>
+        </div>
+        <div>
+            <p class="text-lg font-mono bg-blue-800 px-4 py-2 rounded">v5.3 (Modular)</p>
+        </div>
+    </header>
+
+    <div class="max-w-[1600px] mx-auto px-4 mt-6">
+        <!-- Dashboard Tabs -->
+        <div class="flex space-x-2 mb-4 border-b border-gray-300 bg-white rounded-t-lg px-4">
+            <button class="tab-btn active" onclick="openTab('resumen')">Resumen Ejecutivo</button>
+            <button class="tab-btn" onclick="openTab('analisis_tco')">Análisis TCO</button>
+            <button class="tab-btn" onclick="openTab('baseline')">Condiciones Normales</button>
+            <button class="tab-btn" onclick="openTab('metodologia')">Metodología</button>
+            <button class="tab-btn" onclick="openTab('mapa')">Mapa Interactivo</button>
+            <button class="tab-btn" onclick="openTab('grafo')">Grafos de Red</button>
+            <button class="tab-btn" onclick="openTab('simulacion')">Simulación</button>
+            <button class="tab-btn" onclick="openTab('parametros')">Parámetros</button>
+            <button class="tab-btn" onclick="openTab('pseudocodigo')">Lógica (Pseudocódigo)</button>
+            <button class="tab-btn" onclick="openTab('bibliografia')">Bibliografía</button>
+        </div>
+
+        <!-- Tab Contents (Iframes con Altura Explícita) -->
+        <div id="resumen" class="tab-content active shadow-lg rounded-b-lg bg-white" style="display: block; height: 850px;">
+            <iframe src="HTML_Bodies/tab_resumen.html?v=99" style="width: 100%; height: 850px;" loading="eager"></iframe>
+        </div>
+
+        <div id="analisis_tco" class="tab-content shadow-lg rounded-b-lg bg-white" style="height: 850px;">
+            <iframe src="HTML_Bodies/tab_finanzas.html" style="width: 100%; height: 850px;" loading="lazy"></iframe>
+        </div>
+
+        <div id="baseline" class="tab-content shadow-lg rounded-b-lg bg-white" style="height: 850px;">
+            <iframe src="HTML_Bodies/tab_baseline.html" style="width: 100%; height: 850px;"></iframe>
+        </div>
+
+        <div id="metodologia" class="tab-content shadow-lg rounded-b-lg bg-white" style="height: 850px;">
+            <iframe src="HTML_Bodies/tab_metodologia.html" style="width: 100%; height: 850px;"></iframe>
+        </div>
+
+        <div id="mapa" class="tab-content shadow-lg rounded-b-lg bg-white" style="height: 850px;">
+            <iframe src="HTML_Bodies/tab_mapa.html" style="width: 100%; height: 850px;"></iframe>
+        </div>
+
+
+        <div id="grafo" class="tab-content shadow-lg rounded-b-lg bg-white" style="height: 850px;">
+            <iframe src="HTML_Bodies/tab_grafo.html" style="width: 100%; height: 850px;"></iframe>
+        </div>
+
+        <div id="simulacion" class="tab-content shadow-lg rounded-b-lg bg-white" style="height: 850px;">
+            <iframe src="HTML_Bodies/tab_simulacion.html" style="width: 100%; height: 850px;"></iframe>
+        </div>
+
+        <div id="parametros" class="tab-content shadow-lg rounded-b-lg bg-white" style="height: 850px;">
+            <iframe src="HTML_Bodies/tab_parametros.html" style="width: 100%; height: 850px;"></iframe>
+        </div>
+
+        <div id="pseudocodigo" class="tab-content shadow-lg rounded-b-lg bg-white" style="height: 850px;">
+            <iframe src="HTML_Bodies/tab_pseudocodigo.html" style="width: 100%; height: 850px;"></iframe>
+        </div>
+
+        <div id="bibliografia" class="tab-content shadow-lg rounded-b-lg bg-white" style="height: 850px;">
+            <iframe src="HTML_Bodies/tab_bibliografia.html" style="width: 100%; height: 850px;"></iframe>
+        </div>
+    </div>
+
+    <script>
+        function openTab(tabName) {
+            const contents = document.getElementsByClassName("tab-content");
+            const buttons = document.getElementsByClassName("tab-btn");
+            
+            for (let content of contents) {
+                content.classList.remove("active");
+                content.style.display = "none";
+            }
+            for (let btn of buttons) {
+                btn.classList.remove("active");
+            }
+            
+            const target = document.getElementById(tabName);
+            target.classList.add("active");
+            target.style.display = "block";
+            
+            // Find relative button
+            for (let btn of buttons) {
+                if (btn.getAttribute('onclick').includes(tabName)) {
+                    btn.classList.add("active");
+                }
+            }
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(event) {
+            const tabOrder = ['resumen', 'analisis_tco', 'baseline', 'metodologia', 'mapa', 'grafo', 'simulacion', 'parametros', 'pseudocodigo', 'bibliografia'];
+            const activeElem = document.querySelector('.tab-content.active');
+            if (!activeElem) return;
+            
+            let currentIndex = tabOrder.indexOf(activeElem.id);
+            if (event.key === 'ArrowRight') {
+                openTab(tabOrder[(currentIndex + 1) % tabOrder.length]);
+            } else if (event.key === 'ArrowLeft') {
+                openTab(tabOrder[(currentIndex - 1 + tabOrder.length) % tabOrder.length]);
+            }
+        });
+    </script>
+</body>
+</html>

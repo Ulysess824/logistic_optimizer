@@ -1,0 +1,92 @@
+/* Custom CSS for TFM Presentation - IE University Style */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Outfit:wght@300;400;700&display=swap');
+
+:root {
+  --ie-blue: #0098E0;
+  --ie-navy: #002D56;
+  --ie-black: #0a0a0a;
+  --glass-bg: rgba(10, 10, 10, 0.7);
+  --glass-border: rgba(0, 152, 224, 0.3);
+  --text-main: #ffffff;
+}
+
+.reveal {
+  font-family: 'Inter', sans-serif;
+  color: var(--text-main);
+  background-color: var(--ie-black);
+}
+
+.reveal h1, .reveal h2, .reveal h3 {
+  font-family: 'Outfit', sans-serif;
+  text-transform: none;
+  color: var(--ie-blue);
+}
+
+.reveal .slides section {
+  text-align: left;
+}
+
+/* Glassmorphism Panel */
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  margin-top: 20px;
+}
+
+/* KPI Highlight */
+.kpi-box {
+  border-left: 5px solid var(--ie-blue);
+  padding-left: 20px;
+  margin: 15px 0;
+}
+
+.kpi-value {
+  font-size: 2.2em;
+  font-weight: 800;
+  color: var(--ie-blue);
+  display: block;
+}
+
+.kpi-label {
+  font-size: 0.9em;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #cccccc;
+}
+
+/* Footer / Logo area */
+.presentation-footer {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  font-size: 0.6em;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Custom Table Styling */
+.reveal table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.reveal table th {
+  border-bottom: 2px solid var(--ie-blue);
+  color: var(--ie-blue);
+  padding: 10px;
+}
+
+.reveal table td {
+  padding: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Slide backgrounds */
+.reveal .slide-background-content {
+  filter: brightness(0.4);
+}
