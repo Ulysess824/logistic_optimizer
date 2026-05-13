@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 class Visualizer:
-    def __init__(self, routes, distance_matrix, geo_utils=None):
+    def __init__(self, routes, distance_matrix=None, geo_utils=None):
         self.routes = routes
         self.distance_matrix = distance_matrix
         self.geo = geo_utils or GeoUtils()
@@ -243,7 +243,16 @@ class Visualizer:
         for route in self.routes:
             for j in range(len(route) - 1):
                 start, end = route[j], route[j+1]
-                dist_km = self.distance_matrix[start['matrix_idx']][end['matrix_idx']] / 1000
+                
+                # Fallback si no hay matriz de distancias
+                if self.distance_matrix is not None:
+                    dist_km = self.distance_matrix[start['matrix_idx']][end['matrix_idx']] / 1000
+                else:
+                    dist_km = self.geo.get_route_distance(
+                        (start['lat'], start['lng']), 
+                        (end['lat'], end['lng'])
+                    ) / 1000.0
+                
                 G.add_edge(start['id'], end['id'], weight=dist_km)
 
         pos = {n: (unique_nodes[n]['lng'], unique_nodes[n]['lat']) for n in G.nodes()}

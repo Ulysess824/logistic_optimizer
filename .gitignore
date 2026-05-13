@@ -13,6 +13,8 @@ data/raw/
 data/osrm/
 *.db
 *.osrm*
+osrm_iberia/
+*.pbf
 
 # Temporary and log files
 temp_*

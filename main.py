@@ -59,6 +59,7 @@ def generate_logistics_dashboard(routes, solver, output_path="logistics_dashboar
         d_ruta_km = d_ruta_m / 1000.0
 
         carga = sum(n.get('demanda_pallets', 0) for n in clientes_ruta)
+        pallets_reales = sum(n.get('n_pallets_original', n.get('demanda_pallets', 0)) for n in clientes_ruta)
         pct_uso = (carga / max_pallets) * 100
 
         # Construir secuencia "PP -> Planta -> C1 -> C2 -> PP"
@@ -76,6 +77,7 @@ def generate_logistics_dashboard(routes, solver, output_path="logistics_dashboar
             "plant_id": plant_id_clean,
             "clientes": len(clientes_ruta),
             "carga": carga,
+            "pallets_reales": pallets_reales,
             "pct_uso": min(pct_uso, 100.0),
             "secuencia": " &rarr; ".join(seq),
             "dist_km": round(d_ruta_km, 2),
@@ -109,10 +111,14 @@ def generate_logistics_dashboard(routes, solver, output_path="logistics_dashboar
                 bg_color = "danger"
                 estado = "Baja Carga"
 
+            # Si hay pallets remontados, la carga real supera los huecos ocupados
+            tiene_remontar = r['pallets_reales'] > r['carga']
+            label_carga = f"{r['carga']}/{max_pallets} huecos ({r['pallets_reales']}P)" if tiene_remontar else f"{r['carga']}/{max_pallets} P"
+
             progreso_html = f'''
-                <div class="progress" style="height: 24px;" title="{r['pct_uso']:.1f}%">
+                <div class="progress" style="height: 24px;" title="{r['pct_uso']:.1f}% | {r['pallets_reales']} pallets fisicos">
                     <div class="progress-bar bg-{bg_color} text-dark fw-bold" style="width: {r['pct_uso']}%">
-                        {r['carga']}/{max_pallets} P
+                        {label_carga}
                     </div>
                 </div>
             '''
@@ -229,7 +235,7 @@ MAX_SEARCH_TIME = 30            # Tiempo máximo de búsqueda del solver (s)
 SORTING_STRATEGY = "far_plant_close_depot"
 
 # Motor Geografico: "haversine", "osrm", "google_maps" o "routes_api"
-API_TYPE = "haversine"
+API_TYPE = "osrm"
 
 # Especificaciones de Camion
 TRUCK_SPECS = {

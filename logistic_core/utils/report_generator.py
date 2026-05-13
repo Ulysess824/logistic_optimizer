@@ -18,11 +18,14 @@ if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
 from logistic_core.config import (
+     DATA_DIR,
      GLEC_INTENSITY_GTKM, GLEC_EMPTY_FLOOR_KGKM,
      MAX_SEARCH_TIME, DIST_LIMIT, DEFAULT_N_CLIENTES, DEFAULT_MAX_PLANTS_PER_ROUTE,
+     ALLOW_ROUTE_SPLITTING,
      GLEC_CO2_PER_LITER, PAPER_LOAD_KG, PALLET_WEIGHT_KG, VEHICLE_MAX_LOAD_KG,
      TRAILER_LENGTH_M, TRAILER_WIDTH_M, TRAILER_HEIGHT_M,
      PALLET_LENGTH_M, PALLET_WIDTH_M, PALLET_HEIGHT_M,
+     LOAD_STACKABLE,
      DEFAULT_MAX_CUSTOMERS, DEFAULT_THRESHOLD_KM,
      TARIFA_INTERNA_DIESEL, TARIFA_INTERNA_EV, EXTERNAL_PROVIDER_RATE_PER_KM,
      CAPEX_TRUCK_UNIT_COST, DEFAULT_CYCLE_TIME_DAYS, 
@@ -44,6 +47,7 @@ from logistic_core.utils.fcr_estimator import FCREmissionEstimator
 from logistic_core.utils.external_cost_analyst import ExternalCostAnalyst
 from logistic_core.utils.operational_analyzer import OperationalAnalyzer
 from logistic_core.utils.strategic_analyzer import StrategicAnalyzer
+from logistic_core.utils.visualizer import Visualizer
 
 logger = logging.getLogger(__name__)
 
@@ -85,7 +89,7 @@ def generate_dashboard(summary_path, routes_path, output_path, hedonic_path=None
     with open(routes_path, "r", encoding="utf-8") as f:
         routes = json.load(f)
 
-    geo = GeoUtils()
+    geo = GeoUtils(api_type="osrm")
     cost_est = CostEstimator(
         price_per_km=TARIFA_INTERNA_DIESEL
     )
@@ -777,17 +781,47 @@ def generate_dashboard(summary_path, routes_path, output_path, hedonic_path=None
         # 4. Generar pestañas Ejecutivas (Negocio/Riesgos)
         _generate_finanzas_tab(bodies_dir, t_dist_trad, t_dist_vrpb, ext_analyst.external_rate, price_km, summary["num_routes"])
         _generate_implementacion_tab(bodies_dir)
-        
-        # 5. Inyectar métricas dinámicas de inversión y TCO
-        _inject_investment_metrics(bodies_dir)
-        _inject_strategic_tco(bodies_dir)
-        _inject_segregated_unitary_tco(bodies_dir)
-        
+
+        # 5. GENERACIÓN DE GRAFOS DE RED (Centralizado para no sobrecargar main.py)
+        try:
+            # 1. Cargar datos maestros para el grafo de complejidad
+            plants_file = DATA_DIR / "locations_smurfit.json"
+            clients_file = DATA_DIR / "cliente_ubi.json"
+            
+            if plants_file.exists() and clients_file.exists():
+                with open(plants_file, 'r', encoding='utf-8') as f:
+                    plants_data = json.load(f)
+                with open(clients_file, 'r', encoding='utf-8') as f:
+                    raw_clients = json.load(f)
+                    
+                all_clients_list = []
+                for z, dests in raw_clients.items():
+                    for d in dests:
+                        if "latitude" in d and "longitude" in d:
+                            all_clients_list.append({
+                                "name": d.get("municipio_destino", z), 
+                                "lat": d["latitude"], 
+                                "lng": d["longitude"]
+                            })
+
+                # 2. Instanciar Visualizer (sin matriz, usará geo fallback)
+                viz = Visualizer(routes, distance_matrix=None, geo_utils=geo)
+                
+                # 3. Generar HTMLs en la carpeta de resultados
+                viz.create_plotly_graph("Logistics_Graph.html")
+                viz.create_global_complexity_graph(
+                    plants_data['paper_plant'], 
+                    plants_data['carton_plants'], 
+                    all_clients_list, 
+                    "Logistics_Global_Complexity.html"
+                )
+                logger.info("Grafos de red actualizados correctamente.")
+            else:
+                logger.warning("No se encontraron archivos de datos para generar grafos.")
+        except Exception as e:
+            logger.warning(f"No se pudieron actualizar los grafos de red: {e}")
+
         logger.info(f"Dashboard (Producción) actualizado exitosamente.")
-        
-        # 5. Inyectar métricas de inversión (Break-Even) y TCO Estratégico si existen
-        _inject_investment_metrics(bodies_dir)
-        _inject_strategic_tco(bodies_dir)
 
 def _generate_bibliografia_tab(bodies_dir):
     """Genera la pestaña de bibliografía a partir de docs/Bibliografia.md"""
@@ -907,53 +941,62 @@ def _generate_parametros_tab(bodies_dir):
                     <p class="label">Límite Distancia Ruta</p>
                     <p class="value">{DIST_LIMIT/1000:,.0f}<span class="unit">km</span></p>
                 </div>
-                <div class="mb-0">
+                <div class="mb-4">
                     <p class="label">Paradas Máx. por Ruta</p>
                     <p class="value">{DEFAULT_N_CLIENTES}<span class="unit">clientes</span></p>
                 </div>
+                <div class="mb-0">
+                    <p class="label">Route Splitting (Fragmentación)</p>
+                    <p class="value">{'Activado' if ALLOW_ROUTE_SPLITTING else 'Desactivado'}</p>
+                </div>
             </div>
         </div>
 
-        <!-- Grupo 2: Pesos y Emisiones -->
+        <!-- Grupo 2: Huella de Carbono y Pesos -->
         <div class="space-y-6">
             <h2 class="text-lg font-bold text-slate-700 flex items-center">
                 <span class="w-8 h-8 bg-green-100 text-green-600 rounded-full flex items-center justify-center mr-3">2</span>
-                Huella de Carbono (GLEC)
+                Factores KPI (GLEC v3)
             </h2>
             <div class="param-card" style="border-top-color: #10b981;">
                 <div class="mb-4">
-                    <p class="label">Factor CO2 Diesel</p>
-                    <p class="value">{GLEC_CO2_PER_LITER:.1f}<span class="unit">kg/L</span></p>
+                    <p class="label">Emisión Base Vacío</p>
+                    <p class="value">{GLEC_EMPTY_FLOOR_KGKM:.3f}<span class="unit">kg/km</span></p>
                 </div>
                 <div class="mb-4">
-                    <p class="label">Intensidad Térmica</p>
-                    <p class="value">{GLEC_INTENSITY_GTKM:.1f}<span class="unit">g CO2/tkm</span></p>
+                    <p class="label">Intensidad por Carga</p>
+                    <p class="value">{GLEC_INTENSITY_GTKM:.2f}<span class="unit">g CO2/tkm</span></p>
+                </div>
+                <div class="mb-4">
+                    <p class="label">Peso Bobina Papel</p>
+                    <p class="value">{PAPER_LOAD_KG:,.0f}<span class="unit">kg</span></p>
                 </div>
                 <div class="mb-0">
-                    <p class="label">Emisión Base Vacío</p>
-                    <p class="value">{GLEC_EMPTY_FLOOR_KGKM:.1f}<span class="unit">kg/km</span></p>
+                    <p class="label">Peso Pallet Cartón</p>
+                    <p class="value">{PALLET_WEIGHT_KG:,.0f}<span class="unit">kg</span></p>
                 </div>
             </div>
         </div>
 
-        <!-- Grupo 3: Dimensión y Carga -->
+        <!-- Grupo 3: Dimensión y Estiba -->
         <div class="space-y-6">
             <h2 class="text-lg font-bold text-slate-700 flex items-center">
                 <span class="w-8 h-8 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mr-3">3</span>
-                Capacidad Física
+                Capacidad y Estiba
             </h2>
             <div class="param-card" style="border-top-color: #a855f7;">
                 <div class="mb-4">
-                    <p class="label">Carga Máxima (Masa)</p>
-                    <p class="value">{VEHICLE_MAX_LOAD_KG/1000:,.1f}<span class="unit">toneladas</span></p>
+                    <p class="label">Remontabilidad (1+1)</p>
+                    <p class="value">{'Global (ON)' if LOAD_STACKABLE else 'Dinamica (Per-Client)'}</p>
+                    <p class="text-[9px] text-purple-600 mt-1 uppercase italic font-bold">Lógica: math.ceil(n/2) para huecos suelo</p>
                 </div>
                 <div class="mb-4">
                     <p class="label">Dimensiones Trailer (LxAxH)</p>
-                    <p class="value">{TRAILER_LENGTH_M}x{TRAILER_WIDTH_M}x{TRAILER_HEIGHT_M}<span class="unit">metros</span></p>
+                    <p class="value">{TRAILER_LENGTH_M}x{TRAILER_WIDTH_M}x{TRAILER_HEIGHT_M}<span class="unit">m</span></p>
                 </div>
                 <div class="mb-0">
-                    <p class="label">Dimensiones Pallet</p>
-                    <p class="value">{PALLET_LENGTH_M}x{PALLET_WIDTH_M}x{PALLET_HEIGHT_M}<span class="unit">metros</span></p>
+                    <p class="label">Capacidad Máx. Suelo</p>
+                    <p class="value">33-34<span class="unit">slots</span></p>
                 </div>
             </div>
         </div>

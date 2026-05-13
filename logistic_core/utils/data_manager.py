@@ -1,4 +1,5 @@
 import json
+import math
 import logging
 import numpy as np
 import unicodedata
@@ -61,8 +62,9 @@ class DataManager:
         n_pallets = int(dest.get('n_pallets', dest.get('demanda_pallets', 0)))
         remontar = int(dest.get('remontar', 0))
         if remontar == 1:
-            # Si se puede remontar, el número de huecos que ocupa en el camión es la mitad.
-            eff_pallets = n_pallets // 2
+            # Si se puede remontar, cada 2 pallets ocupan 1 hueco de suelo.
+            # math.ceil asegura que un número impar (ej. 3) redondee a 2 huecos, no 1.
+            eff_pallets = math.ceil(n_pallets / 2)
         else:
             eff_pallets = n_pallets
             
@@ -124,7 +126,8 @@ class DataManager:
             return {"paper_plant": self.paper_plant, "carton_plants": []}
 
         # --- VALIDACIÓN PRE-SOLVER: Partición de envíos sobredimensionados ---
-        if max_pallets and max_pallets > 0:
+        from logistic_core.config import ALLOW_ROUTE_SPLITTING
+        if max_pallets and max_pallets > 0 and ALLOW_ROUTE_SPLITTING:
             partitioned = []
             for client in flattened_clients:
                 dem = client['demanda_pallets']
@@ -143,12 +146,15 @@ class DataManager:
                         remaining -= chunk
                         part_num += 1
                     logger.info(
-                        "Envio '%s' (%d pallets) excede capacidad de %d. Particionado en %d envios.",
-                        client['name'], dem, max_pallets, part_num - 1
+                        "ALLOW_ROUTE_SPLITTING=True: Envio '%s' (%d pallets) particionado en %d envios.",
+                        client['name'], dem, part_num - 1
                     )
                 else:
                     partitioned.append(client)
             flattened_clients = partitioned
+        else:
+            if max_pallets and not ALLOW_ROUTE_SPLITTING:
+                logger.info("ALLOW_ROUTE_SPLITTING=False: Los envíos se tratarán como unidades atómicas.")
 
         df_clients = pl.DataFrame(flattened_clients).unique(subset=["lat", "lng"])
         logger.info("Clientes únicos en base de datos: %d", len(df_clients))

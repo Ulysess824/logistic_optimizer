@@ -27,6 +27,7 @@ ROAD_CORRECTION_FACTOR = 1.25 # Factor de "asfalto" para Haversine (GABM Std)
 DIST_LIMIT = 4_000_000        # Límite de distancia por vehículo (metros)
 DEFAULT_N_CLIENTES = 4        # Máximo de clientes por ruta (dimensión del solver)
 DEFAULT_MAX_PLANTS_PER_ROUTE = 1  # Plantas por ruta (1=VRPB clásico, >1=MC-VRPB)
+ALLOW_ROUTE_SPLITTING = True      # Permite fragmentar pedidos entre varios camiones
 
 # Data Manager config
 DEFAULT_MAX_CUSTOMERS = 4     # Valor de respaldo si no se define N_CLIENTES o un dict
@@ -57,10 +58,9 @@ for folder in [OUTPUT_DIR, RESULTS_DIR, MAPS_DIR, LOGS_DIR]:
 # --- Logging Configuration ---
 LogManager.setup_logging(LOGS_DIR)
 
-# Warn if API key is missing
 if not GOOGLE_MAPS_API_KEY:
     logging.getLogger("config").warning(
-        "[bold yellow]GOOGLE_MAPS_API_KEY no está configurada. Se usará estimación Haversine.[/bold yellow]"
+        "[bold yellow]GOOGLE_MAPS_API_KEY no detectada. Se utilizará OSRM o Haversine para cálculos geográficos.[/bold yellow]"
     )
 
 # --- Tarifas de Mercado y Costes Operativos (€/km) ---

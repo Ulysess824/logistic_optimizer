@@ -31,53 +31,62 @@
                     <p class="label">Límite Distancia Ruta</p>
                     <p class="value">4,000<span class="unit">km</span></p>
                 </div>
-                <div class="mb-0">
+                <div class="mb-4">
                     <p class="label">Paradas Máx. por Ruta</p>
                     <p class="value">4<span class="unit">clientes</span></p>
                 </div>
+                <div class="mb-0">
+                    <p class="label">Route Splitting (Fragmentación)</p>
+                    <p class="value">Activado</p>
+                </div>
             </div>
         </div>
 
-        <!-- Grupo 2: Pesos y Emisiones -->
+        <!-- Grupo 2: Huella de Carbono y Pesos -->
         <div class="space-y-6">
             <h2 class="text-lg font-bold text-slate-700 flex items-center">
                 <span class="w-8 h-8 bg-green-100 text-green-600 rounded-full flex items-center justify-center mr-3">2</span>
-                Huella de Carbono (GLEC)
+                Factores KPI (GLEC v3)
             </h2>
             <div class="param-card" style="border-top-color: #10b981;">
                 <div class="mb-4">
-                    <p class="label">Factor CO2 Diesel</p>
-                    <p class="value">2.7<span class="unit">kg/L</span></p>
+                    <p class="label">Emisión Base Vacío</p>
+                    <p class="value">0.652<span class="unit">kg/km</span></p>
                 </div>
                 <div class="mb-4">
-                    <p class="label">Intensidad Térmica</p>
-                    <p class="value">17.3<span class="unit">g CO2/tkm</span></p>
+                    <p class="label">Intensidad por Carga</p>
+                    <p class="value">17.32<span class="unit">g CO2/tkm</span></p>
+                </div>
+                <div class="mb-4">
+                    <p class="label">Peso Bobina Papel</p>
+                    <p class="value">25,000<span class="unit">kg</span></p>
                 </div>
                 <div class="mb-0">
-                    <p class="label">Emisión Base Vacío</p>
-                    <p class="value">0.7<span class="unit">kg/km</span></p>
+                    <p class="label">Peso Pallet Cartón</p>
+                    <p class="value">145<span class="unit">kg</span></p>
                 </div>
             </div>
         </div>
 
-        <!-- Grupo 3: Dimensión y Carga -->
+        <!-- Grupo 3: Dimensión y Estiba -->
         <div class="space-y-6">
             <h2 class="text-lg font-bold text-slate-700 flex items-center">
                 <span class="w-8 h-8 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mr-3">3</span>
-                Capacidad Física
+                Capacidad y Estiba
             </h2>
             <div class="param-card" style="border-top-color: #a855f7;">
                 <div class="mb-4">
-                    <p class="label">Carga Máxima (Masa)</p>
-                    <p class="value">25.0<span class="unit">toneladas</span></p>
+                    <p class="label">Remontabilidad (1+1)</p>
+                    <p class="value">Dinamica (Per-Client)</p>
+                    <p class="text-[9px] text-purple-600 mt-1 uppercase italic font-bold">Lógica: math.ceil(n/2) para huecos suelo</p>
                 </div>
                 <div class="mb-4">
                     <p class="label">Dimensiones Trailer (LxAxH)</p>
-                    <p class="value">13.6x2.4x2.7<span class="unit">metros</span></p>
+                    <p class="value">13.6x2.4x2.7<span class="unit">m</span></p>
                 </div>
                 <div class="mb-0">
-                    <p class="label">Dimensiones Pallet</p>
-                    <p class="value">1.2x0.8x1.5<span class="unit">metros</span></p>
+                    <p class="label">Capacidad Máx. Suelo</p>
+                    <p class="value">33-34<span class="unit">slots</span></p>
                 </div>
             </div>
         </div>
