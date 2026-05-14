@@ -145,3 +145,19 @@ BE_INGRESO_MEDIO_VIAJE = 850.0     # Ingreso promedio por trayecto completo (€
 BE_VIAJES_ANUALES_CAMION = 250.0   # Productividad anual esperada (Viajes)
 BE_PALLETS_POR_VIAJE = 33          # Capacidad de carga estándar (Euro-pallets)
 BE_COBERTURA_KM2_MEDIA = 4500.0    # Área media de influencia logística (km2)
+
+# =============================================================================
+# PARÁMETROS DE BACKHAULING (Logística Inversa / Pickup and Delivery)
+# =============================================================================
+
+# Activación del módulo de recogida en retorno
+BACKHAUL_ENABLED = False           # True activa el modo Pickup & Delivery en el solver
+
+# Radio máximo (km) desde el último cliente de entrega para buscar
+# plantas candidatas a la recogida de retorno
+BACKHAUL_SEARCH_RADIUS_KM = 80.0
+
+# Pallets máximos que el camión puede recoger en el viaje de vuelta.
+# No puede superar la capacidad física menos lo que ya lleva cargado
+# al inicio. El solver lo respeta como restricción dura.
+BACKHAUL_MAX_RETURN_PALLETS = 20

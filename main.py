@@ -22,8 +22,10 @@ from logistic_core.config import (
     GLEC_CO2_PER_LITER, GLEC_INTENSITY_GTKM, GLEC_EMPTY_FLOOR_KGKM,
     PAPER_LOAD_KG, PALLET_WEIGHT_KG, VEHICLE_MAX_LOAD_KG,
     TARIFA_INTERNA_DIESEL,
-    CAPEX_TRUCK_UNIT_COST, DEFAULT_CYCLE_TIME_DAYS, DAILY_TRUCK_OUTBOUND, DEFAULT_FLEET_BUFFER
+    CAPEX_TRUCK_UNIT_COST, DEFAULT_CYCLE_TIME_DAYS, DAILY_TRUCK_OUTBOUND, DEFAULT_FLEET_BUFFER,
+    BACKHAUL_ENABLED, BACKHAUL_SEARCH_RADIUS_KM, BACKHAUL_MAX_RETURN_PALLETS,
 )
+from logistic_core.utils.backhaul_detector import BackhaulDetector
 
 logger = logging.getLogger(__name__)
 
@@ -332,9 +334,57 @@ def run_optimization(
     if not routes:
         return None, None, None
 
-    summary = _build_summary(routes, solver, max_pallets=max_pallets, threshold_km=threshold_km, 
+    # --- FASE BACKHAULING (opcional, post-solve) ---
+    # Detecta plantas de retorno candidatas para cada ruta y re-optimiza
+    # con los nodos de recogida inyectados si BACKHAUL_ENABLED=True.
+    if BACKHAUL_ENABLED:
+        detector = BackhaulDetector(
+            all_carton_plants=enriched_data["carton_plants"],
+            geo_engine=geo_engine,
+        )
+        backhaul_map = detector.analyze_all_routes(
+            routes=routes,
+            distance_matrix=solver.distance_matrix,
+            search_radius_km=BACKHAUL_SEARCH_RADIUS_KM,
+            max_return_pallets=BACKHAUL_MAX_RETURN_PALLETS,
+        )
+        if backhaul_map:
+            # Aplanar los candidatos: un nodo por ruta (el mas cercano al ultimo cliente)
+            bh_flat = []
+            for route_idx, candidates in backhaul_map.items():
+                best = candidates[0]
+                best["parent_route_idx"] = route_idx
+                for node in solver.nodes:
+                    if node.get("id") == best["id"]:
+                        best["matrix_idx"] = node.get("matrix_idx", 0)
+                        break
+                bh_flat.append(best)
+
+            if not silent:
+                print(f">>> Backhauling: {len(bh_flat)} candidatos de retorno detectados. Re-optimizando...")
+
+            # Segunda pasada con los nodos de backhauling
+            solver_bh = LogisticsSolver(
+                enriched_data, geo_engine=geo_engine,
+                precomputed_matrix=solver.distance_matrix
+            )
+            routes_bh = solver_bh.solve(
+                n_clientes=n_candidatos,
+                varias_plantas=False,
+                max_pallets_ruta=max_pallets,
+                max_search_time=max_search_time,
+                flota_por_planta=flota_final,
+                backhaul_nodes=bh_flat,
+            )
+            if routes_bh:
+                routes = routes_bh
+                solver = solver_bh
+                if not silent:
+                    print(">>> Backhauling: Re-optimizacion completada con exito.")
+
+    summary = _build_summary(routes, solver, max_pallets=max_pallets, threshold_km=threshold_km,
                              n_candidatos=n_candidatos)
-    
+
     return routes, summary, solver
 
 def _build_summary(routes, solver, max_pallets=35, threshold_km=50, n_candidatos=30):

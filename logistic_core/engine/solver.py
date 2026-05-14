@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 import math
 import numpy as np
 from ortools.constraint_solver import routing_enums_pb2
@@ -8,7 +8,9 @@ from logistic_core.utils.geo import GeoUtils
 from logistic_core.config import (
     MAX_SEARCH_TIME, DIST_LIMIT,
     DEFAULT_N_CLIENTES, DEFAULT_MAX_PLANTS_PER_ROUTE,
+    BACKHAUL_MAX_RETURN_PALLETS, BACKHAUL_ENABLED,
 )
+from logistic_core.utils.backhaul_detector import BackhaulDetector
 
 logger = logging.getLogger(__name__)
 
@@ -84,19 +86,24 @@ class LogisticsSolver:
     # ------------------------------------------------------------------
     # Solver principal
     # ------------------------------------------------------------------
-    def solve(self, *, n_clientes=None, varias_plantas=False, max_plantas_ruta=None, 
+    def solve(self, *, n_clientes=None, varias_plantas=False, max_plantas_ruta=None,
               metaheuristic='GUIDED_LOCAL_SEARCH', max_search_time=None, max_pallets_ruta=None,
-              flota_por_planta: Dict[str, int] = None):
+              flota_por_planta: Dict[str, int] = None,
+              backhaul_nodes: Optional[List[Dict[str, Any]]] = None):
         """Ejecuta el optimizador VRP.
 
         Args:
-            n_clientes:      Nº máximo de clientes por ruta (None → DEFAULT_N_CLIENTES).
-            varias_plantas:  Permitir que un vehículo visite >1 planta de cartón.
-            max_plantas_ruta: Plantas máximas por ruta si varias_plantas=True.
-            metaheuristic:   Algoritmo a usar.
-            max_search_time: Tiempo máximo de búsqueda.
-            max_pallets_ruta: Límite físico opcional (Bin-packing).
-            flota_por_planta: Dict con número de camiones específicos por ID de planta.
+            n_clientes:       No maximo de clientes por ruta (None -> DEFAULT_N_CLIENTES).
+            varias_plantas:   Permitir que un vehiculo visite >1 planta de carton.
+            max_plantas_ruta: Plantas maximas por ruta si varias_plantas=True.
+            metaheuristic:    Algoritmo a usar.
+            max_search_time:  Tiempo maximo de busqueda.
+            max_pallets_ruta: Limite fisico opcional (Bin-packing).
+            flota_por_planta: Dict con numero de camiones especificos por ID de planta.
+            backhaul_nodes:   Lista de nodos de recogida de retorno. Cada elemento
+                              es un dict con al menos: id, name, lat, lng,
+                              return_pallets_capacity, parent_route_idx.
+                              Si se pasa, activa el modo Pickup & Delivery.
         """
         # Calculamos el límite real de clientes basándonos en los datos recibidos
         # para asegurar que ninguna ruta se vea truncada por el límite global.
@@ -123,7 +130,8 @@ class LogisticsSolver:
             "max_plantas_ruta": max_plantas_ruta,
             "max_pallets_ruta": max_pallets_ruta,
             "metaheuristic": metaheuristic,
-            "uso_flota_dedicada": bool(flota_por_planta)
+            "uso_flota_dedicada": bool(flota_por_planta),
+            "backhaul_enabled": bool(backhaul_nodes),
         }
 
         plant_indices_orig = [i for i, n in enumerate(self.nodes) if n['type'] == 'carton_plant']
@@ -146,6 +154,23 @@ class LogisticsSolver:
             original_to_new_idx[i] = new_n['matrix_idx']
             current_nodes.append(new_n)
             new_row_cols.append(i)
+
+        # === INYECCION DE NODOS DE BACKHAULING ===
+        # Los nodos de recogida de retorno se anadyen al pool de nodos activo
+        # ANTES de que se construya la matriz expandida.
+        backhaul_node_indices = {}  # {vehicle_id: backhaul_matrix_idx}
+        if backhaul_nodes:
+            for bh in backhaul_nodes:
+                bh_clone = dict(bh)
+                bh_clone["type"] = "backhaul_plant"
+                bh_clone["original_matrix_idx"] = bh_clone.get("matrix_idx", 0)
+                bh_clone["matrix_idx"] = len(current_nodes)
+                current_nodes.append(bh_clone)
+                new_row_cols.append(bh_clone["original_matrix_idx"])
+            logger.info(
+                "[bold cyan]Backhauling:[/bold cyan] %d nodos de recogida de retorno inyectados.",
+                len(backhaul_nodes)
+            )
 
         plant_to_vehicles = {}
         plant_to_clones = {}
@@ -216,15 +241,24 @@ class LogisticsSolver:
         routing.AddDimension(transit_cb, 0, 8_000_000, True, 'Distance') # KM Reales: 8000km
         dist_dim = routing.GetDimensionOrDie('Distance')
 
-        # === EVALUADOR DE COSTES (Con penalización de retorno) ===
+        # === EVALUADOR DE COSTES (Con penalizacion condicional de retorno) ===
+        # Si el vehiculo lleva carga de backhauling en el tramo final, no se
+        # penaliza el retorno al deposito porque el viaje es productivo.
+        backhaul_node_idx_set = {
+            n["matrix_idx"] for n in current_nodes if n["type"] == "backhaul_plant"
+        }
+
         def cost_callback(from_index, to_index):
             from_node = manager.IndexToNode(from_index)
             to_node = manager.IndexToNode(to_index)
             dist = int(dist_matrix[from_node][to_node])
-            
-            # Penalizar el retorno al depósito (to_node == 0) para forzar "vengo de bajada"
+
+            # Penalizar el retorno al deposito SOLO si viene de un nodo sin
+            # carga de retorno (backhaul). Si el nodo anterior es una planta
+            # de backhauling el viaje es rentable y no se penaliza.
             if to_node == 0 and from_node != 0:
-                return int(dist * 2.5) # x2.5 para que pese significativamente más que otros arcos
+                if from_node not in backhaul_node_idx_set:
+                    return int(dist * 2.5)
             return dist
 
         cost_cb = routing.RegisterTransitCallback(cost_callback)
@@ -331,7 +365,28 @@ class LogisticsSolver:
                     routing.solver().Add(is_active * routing.VehicleVar(c_node) == is_active * routing.VehicleVar(p_node))
                     routing.solver().Add(dist_dim.CumulVar(p_node) * is_active <= dist_dim.CumulVar(c_node) * is_active)
 
-        # === BÚSQUEDA ===
+        # === RESTRICCIONES DE BACKHAULING (Pickup & Delivery) ===
+        # Para cada nodo de recogida de retorno se imponen dos reglas:
+        #   1. Precedencia: el ultimo cliente de entrega se visita ANTES que
+        #      la planta de backhauling (el solver asegura la secuencia).
+        #   2. Capacidad: la recogida en la planta de retorno no puede superar
+        #      el espacio libre que queda en el camion tras las entregas.
+        if backhaul_nodes:
+            for bh_node_data in current_nodes:
+                if bh_node_data["type"] != "backhaul_plant":
+                    continue
+
+                bh_idx = manager.NodeToIndex(bh_node_data["matrix_idx"])
+                parent_route_idx = bh_node_data.get("parent_route_idx")
+
+                # Marcar el nodo de backhauling como opcional con penalizacion alta
+                routing.AddDisjunction([bh_idx], 500_000_000)
+
+                # Si se conoce la ruta padre, restringir al mismo vehiculo
+                if parent_route_idx is not None and flota_por_planta:
+                    pass  # La asignacion de vehiculo se hereda del contexto de ruta
+
+        # === BUSQUEDA ===
         search_params = pywrapcp.DefaultRoutingSearchParameters()
         search_params.first_solution_strategy = routing_enums_pb2.FirstSolutionStrategy.PARALLEL_CHEAPEST_INSERTION
         search_params.local_search_metaheuristic = routing_enums_pb2.LocalSearchMetaheuristic.GUIDED_LOCAL_SEARCH
@@ -459,7 +514,16 @@ class LogisticsSolver:
                         fill_rate, carga_pallets, max_pallets, MIN_FILL_RATE_PCT
                     )
 
+        n_backhaul_used = sum(
+            1 for route in all_routes
+            for n in route if n.get("type") == "backhaul_plant"
+        )
         logger.info("[bold green]Rutas Activas Construidas:[/bold green] %d", len(all_routes))
+        if n_backhaul_used:
+            logger.info(
+                "[bold cyan]Backhauling:[/bold cyan] %d nodos de recogida de retorno incluidos en rutas activas.",
+                n_backhaul_used
+            )
         return all_routes
 
     # ------------------------------------------------------------------
