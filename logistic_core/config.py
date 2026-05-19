@@ -161,3 +161,16 @@ BACKHAUL_SEARCH_RADIUS_KM = 80.0
 # No puede superar la capacidad física menos lo que ya lleva cargado
 # al inicio. El solver lo respeta como restricción dura.
 BACKHAUL_MAX_RETURN_PALLETS = 20
+
+# =============================================================================
+# RUTAS MULTI-PLANTA ENCADENADAS (Chained Plant VRP)
+# =============================================================================
+
+# Activacion del encadenamiento dirigido entre plantas
+CHAINED_PLANT_ENABLED = False
+
+# Diccionario de encadenamiento: {planta_origen: [planta_destino, ...]}
+# El camion que va a planta_origen, tras entregar a sus clientes,
+# continua a planta_destino y entrega a los clientes de esta.
+# Ejemplo: {"CP_ALCALA": ["CP_VALENCIA"]}
+PLANT_CHAIN_MAP = {"CP_VIGO": ["CP_ALCALA"]}

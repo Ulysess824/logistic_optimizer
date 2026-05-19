@@ -9,6 +9,7 @@ from logistic_core.config import (
     MAX_SEARCH_TIME, DIST_LIMIT,
     DEFAULT_N_CLIENTES, DEFAULT_MAX_PLANTS_PER_ROUTE,
     BACKHAUL_MAX_RETURN_PALLETS, BACKHAUL_ENABLED,
+    CHAINED_PLANT_ENABLED, PLANT_CHAIN_MAP,
 )
 from logistic_core.utils.backhaul_detector import BackhaulDetector
 
@@ -89,7 +90,8 @@ class LogisticsSolver:
     def solve(self, *, n_clientes=None, varias_plantas=False, max_plantas_ruta=None,
               metaheuristic='GUIDED_LOCAL_SEARCH', max_search_time=None, max_pallets_ruta=None,
               flota_por_planta: Dict[str, int] = None,
-              backhaul_nodes: Optional[List[Dict[str, Any]]] = None):
+              backhaul_nodes: Optional[List[Dict[str, Any]]] = None,
+              plant_chain_map: Optional[Dict[str, List[str]]] = None):
         """Ejecuta el optimizador VRP.
 
         Args:
@@ -132,6 +134,7 @@ class LogisticsSolver:
             "metaheuristic": metaheuristic,
             "uso_flota_dedicada": bool(flota_por_planta),
             "backhaul_enabled": bool(backhaul_nodes),
+            "chained_plants": bool(plant_chain_map),
         }
 
         plant_indices_orig = [i for i, n in enumerate(self.nodes) if n['type'] == 'carton_plant']
@@ -180,46 +183,90 @@ class LogisticsSolver:
             for p_idx_orig in plant_indices_orig:
                 p_id = self.nodes[p_idx_orig]['id']
                 count = flota_por_planta.get(p_id, 1)
-                
                 plant_to_vehicles[p_id] = list(range(num_vehicles, num_vehicles + count))
                 num_vehicles += count
                 
-                clones_for_plant = []
-                # El Muelle 1 es el nodo original
-                orig_new_idx = original_to_new_idx[p_idx_orig]
-                clones_for_plant.append(orig_new_idx)
-                
-                # Muelle 2, 3... (Clones perfectos)
+                clones_for_plant = [original_to_new_idx[p_idx_orig]]
                 for v in range(1, count):
                     clone = dict(self.nodes[p_idx_orig])
-                    clone['original_matrix_idx'] = clone.get('matrix_idx', p_idx_orig)
+                    clone['original_matrix_idx'] = p_idx_orig
                     clone['matrix_idx'] = len(current_nodes)
                     clone['id'] = f"{p_id}_clone_{v}"
-                    clone['name'] = f"{clone['name']} (Muelle {v+1})"
-                    clones_for_plant.append(clone['matrix_idx'])
                     current_nodes.append(clone)
-                    new_row_cols.append(p_idx_orig)
-                
+                    clones_for_plant.append(clone['matrix_idx'])
                 plant_to_clones[p_id] = clones_for_plant
-                
-            varias_plantas = False
-            idxs = np.array(new_row_cols)
-            current_matrix = self.distance_matrix[idxs][:, idxs]
-            
         else:
-            if varias_plantas:
-                num_vehicles = num_plants_orig
-            else:
-                num_vehicles = num_plants_orig + 2
-                
-            current_matrix = self.distance_matrix
+            # Flota estándar: un vehiculo por planta + reserva
+            num_vehicles = num_plants_orig + 2
             for p_idx_orig in plant_indices_orig:
                 p_id = self.nodes[p_idx_orig]['id']
                 plant_to_clones[p_id] = [original_to_new_idx[p_idx_orig]]
 
-        dist_matrix = current_matrix.astype(int).tolist()
+        # === INYECCION DE NODOS DE ENCADENAMIENTO (Chained Plant VRP) ===
+        # Para cada cadena A -> B, se crea un clon de la planta B asignado
+        # al primer vehiculo de la planta A. Esto permite que un camion
+        # haga: Depot -> A -> Clientes(A) -> B -> Clientes(B) -> Depot.
+        chain_vehicle_map = {}  # {plant_a_id: [{vehicle_id, plant_b_id, chain_clone_idx}]}
+        chain_extra_vehicles = {}  # {plant_b_id: [chain_vehicle_id, ...]}
+        chain_clone_indices = {}  # {(plant_a_id, plant_b_id): chain_clone_matrix_idx}
+
+        if plant_chain_map and flota_por_planta:
+            for plant_a_id, chain_targets in plant_chain_map.items():
+                if plant_a_id not in plant_to_vehicles:
+                    logger.warning("Chain: Planta origen '%s' no encontrada. Ignorando.", plant_a_id)
+                    continue
+
+                chain_veh_id = plant_to_vehicles[plant_a_id][0]
+
+                for plant_b_id in chain_targets:
+                    # Buscar el indice original de la planta B
+                    p_b_orig_idx = None
+                    for i, n in enumerate(self.nodes):
+                        if n.get('id') == plant_b_id and n.get('type') == 'carton_plant':
+                            p_b_orig_idx = i
+                            break
+
+                    if p_b_orig_idx is None:
+                        logger.warning("Chain: Planta destino '%s' no encontrada. Ignorando.", plant_b_id)
+                        continue
+
+                    # Crear clon de planta B para el vehiculo encadenado
+                    chain_clone = dict(self.nodes[p_b_orig_idx])
+                    chain_clone['original_matrix_idx'] = p_b_orig_idx
+                    chain_clone['matrix_idx'] = len(current_nodes)
+                    chain_clone['id'] = f"{plant_b_id}_chain_{plant_a_id}"
+                    chain_clone['type'] = 'carton_plant'
+                    chain_clone['is_chain_clone'] = True
+                    chain_clone['chain_parent'] = plant_a_id
+                    current_nodes.append(chain_clone)
+
+                    chain_clone_idx = chain_clone['matrix_idx']
+                    chain_clone_indices[(plant_a_id, plant_b_id)] = chain_clone_idx
+
+                    chain_vehicle_map.setdefault(plant_a_id, []).append({
+                        'vehicle_id': chain_veh_id,
+                        'plant_b_id': plant_b_id,
+                        'chain_clone_idx': chain_clone_idx,
+                    })
+
+                    chain_extra_vehicles.setdefault(plant_b_id, []).append(chain_veh_id)
+
+                    logger.info(
+                        "[bold cyan]Chain:[/bold cyan] %s -> %s (vehiculo %d, clon idx %d)",
+                        plant_a_id, plant_b_id, chain_veh_id, chain_clone_idx
+                    )
+
+        # === CONSTRUCCION DE LA MATRIZ EXPANDIDA FINAL ===
+        size = len(current_nodes)
+        full_dist_matrix = np.zeros((size, size), dtype=np.int64)
+        for i in range(size):
+            orig_i = current_nodes[i].get("original_matrix_idx", current_nodes[i].get("matrix_idx", 0))
+            for j in range(size):
+                orig_j = current_nodes[j].get("original_matrix_idx", current_nodes[j].get("matrix_idx", 0))
+                full_dist_matrix[i][j] = int(self.distance_matrix[orig_i][orig_j])
+
         depot_idx = 0
-        manager = pywrapcp.RoutingIndexManager(len(dist_matrix), num_vehicles, depot_idx)
+        manager = pywrapcp.RoutingIndexManager(size, num_vehicles, depot_idx)
 
         logger.info("[bold cyan]Muelles Virtuales:[/bold cyan] Nodos totales a optimizar: %d", len(current_nodes))
 
@@ -231,34 +278,52 @@ class LogisticsSolver:
 
         routing = pywrapcp.RoutingModel(manager)
 
-        # === DIMENSIÓN 1: Distancia ===
-        def distance_callback(from_index, to_index):
+        # === CONSTRUCCION DE LA MATRIZ EXPANDIDA ===
+        # Creamos una matriz que incluya todos los clones y nodos de backhauling
+        size = len(current_nodes)
+        full_dist_matrix = np.zeros((size, size), dtype=np.int64)
+        
+        orig_matrix = self.distance_matrix
+        for i in range(size):
+            orig_i = current_nodes[i].get("original_matrix_idx", current_nodes[i].get("matrix_idx", 0))
+            for j in range(size):
+                orig_j = current_nodes[j].get("original_matrix_idx", current_nodes[j].get("matrix_idx", 0))
+                full_dist_matrix[i][j] = int(orig_matrix[orig_i][orig_j])
+
+        # === CALLBACKS ===
+        def transit_callback(from_index, to_index):
             from_node = manager.IndexToNode(from_index)
             to_node = manager.IndexToNode(to_index)
-            return int(dist_matrix[from_node][to_node])
+            return full_dist_matrix[from_node][to_node]
 
-        transit_cb = routing.RegisterTransitCallback(distance_callback)
+        transit_cb = routing.RegisterTransitCallback(transit_callback)
+        routing.SetArcCostEvaluatorOfAllVehicles(transit_cb)
+        
+        # Dimension de distancia
         routing.AddDimension(transit_cb, 0, 8_000_000, True, 'Distance') # KM Reales: 8000km
         dist_dim = routing.GetDimensionOrDie('Distance')
 
         # === EVALUADOR DE COSTES (Con penalizacion condicional de retorno) ===
         # Si el vehiculo lleva carga de backhauling en el tramo final, no se
         # penaliza el retorno al deposito porque el viaje es productivo.
-        backhaul_node_idx_set = {
-            n["matrix_idx"] for n in current_nodes if n["type"] == "backhaul_plant"
-        }
+        backhaul_node_idx_set = set()
+        if backhaul_nodes:
+            backhaul_node_idx_set = {
+                n["matrix_idx"] for n in current_nodes if n["type"] == "backhaul_plant"
+            }
 
         def cost_callback(from_index, to_index):
             from_node = manager.IndexToNode(from_index)
             to_node = manager.IndexToNode(to_index)
-            dist = int(dist_matrix[from_node][to_node])
+            dist = int(full_dist_matrix[from_node][to_node])
 
             # Penalizar el retorno al deposito SOLO si viene de un nodo sin
             # carga de retorno (backhaul). Si el nodo anterior es una planta
-            # de backhauling el viaje es rentable y no se penaliza.
+            # de backhauling el viaje es rentable y no se penaliza (coste 0).
             if to_node == 0 and from_node != 0:
-                if from_node not in backhaul_node_idx_set:
-                    return int(dist * 2.5)
+                if from_node in backhaul_node_idx_set:
+                    return 0  # Premio maximo por volver cargado
+                return int(dist * 2.5)
             return dist
 
         cost_cb = routing.RegisterTransitCallback(cost_callback)
@@ -270,7 +335,16 @@ class LogisticsSolver:
             return 1 if current_nodes[node_idx]['type'] == 'carton_plant' else 0
 
         plant_cb = routing.RegisterUnaryTransitCallback(plant_callback)
-        routing.AddDimension(plant_cb, 0, max_plantas_ruta, True, 'PlantCount')
+
+        # Per-vehicle plant limit: chain vehicles can visit 2+ plants
+        plant_limits = [int(max_plantas_ruta)] * num_vehicles
+        if chain_vehicle_map:
+            for plant_a_id, chain_infos in chain_vehicle_map.items():
+                for ci in chain_infos:
+                    v_id = ci['vehicle_id']
+                    plant_limits[v_id] = max(plant_limits[v_id], 1 + len(chain_infos))
+
+        routing.AddDimensionWithVehicleCapacity(plant_cb, 0, plant_limits, True, 'PlantCount')
         plant_dim = routing.GetDimensionOrDie('PlantCount')
 
         # === DIMENSIÓN 3: Contador de Clientes por vehículo ===
@@ -291,6 +365,13 @@ class LogisticsSolver:
 
             demand_cb = routing.RegisterUnaryTransitCallback(demand_callback)
             capacities = [int(max_pallets_ruta)] * num_vehicles
+            # Chain vehicles: doble capacidad para modelar carga-descarga-recarga
+            if chain_vehicle_map:
+                for plant_a_id, chain_infos in chain_vehicle_map.items():
+                    for ci in chain_infos:
+                        v_id = ci['vehicle_id']
+                        capacities[v_id] = int(max_pallets_ruta) * 2
+
             routing.AddDimensionWithVehicleCapacity(
                 demand_cb,
                 0,  # null capacity slack
@@ -298,6 +379,7 @@ class LogisticsSolver:
                 True,  # start cumul to zero
                 'PalletsCapacity'
             )
+
 
         if varias_plantas:
             # ESTRATEGIA: En lugar de forzar con 'Add(CumulVar >= 1)', que es muy frágil,
@@ -332,7 +414,16 @@ class LogisticsSolver:
                         c_node = manager.NodeToIndex(clon_idx)
                         routing.solver().Add(routing.VehicleVar(c_node) == veh_id)
 
-        # R3: Clientes — vinculación a camiones correctos y precedencias
+        # R2.5: Desactivar los nodos de planta originales (solo se usan los clones)
+        for i, node in enumerate(current_nodes):
+            if node['type'] == 'carton_plant' and 'clone' not in node.get('id', '') and 'chain' not in node.get('id', ''):
+                orig_node_idx = manager.NodeToIndex(i)
+                # Penalización 0 para que el solver lo descarte sin coste
+                routing.AddDisjunction([orig_node_idx], 0)
+                # Forzar explícitamente a que no esté activo
+                # routing.solver().Add(routing.ActiveVar(orig_node_idx) == 0)
+
+        # R3: Clientes -- vinculacion a camiones correctos y precedencias
         for c_idx, node in enumerate(current_nodes):
             if node['type'] != 'customer':
                 continue
@@ -346,18 +437,35 @@ class LogisticsSolver:
             is_active = routing.ActiveVar(c_node)
             
             if flota_por_planta:
-                allowed_vehicles = plant_to_vehicles.get(parent_id, [])
+                allowed_vehicles = list(plant_to_vehicles.get(parent_id, []))
+                # Extender con vehiculos de cadenas que apuntan a esta planta
+                extra = chain_extra_vehicles.get(parent_id, [])
+                if extra:
+                    allowed_vehicles = allowed_vehicles + extra
+
                 if allowed_vehicles:
                     routing.solver().Add(
                         routing.solver().Sum([routing.VehicleVar(c_node) == v for v in allowed_vehicles]) == is_active
                     )
                     
-                    for i, veh_id in enumerate(allowed_vehicles):
-                        if i < len(plant_to_clones[parent_id]):
+                    for i, veh_id in enumerate(plant_to_vehicles.get(parent_id, [])):
+                        if parent_id in plant_to_clones and i < len(plant_to_clones[parent_id]):
                             clon_node = manager.NodeToIndex(plant_to_clones[parent_id][i])
                             is_in_veh = (routing.VehicleVar(c_node) == veh_id)
                             # Precedencia
                             routing.solver().Add(dist_dim.CumulVar(clon_node) * is_in_veh <= dist_dim.CumulVar(c_node) * is_in_veh)
+
+                    # Precedencia para clientes de B en vehiculo encadenado:
+                    # deben ir DESPUES del clon de la cadena (no de la planta original)
+                    for chain_veh_id in extra:
+                        is_on_chain = (routing.VehicleVar(c_node) == chain_veh_id)
+                        # Buscar el chain_clone_idx correspondiente
+                        for pair_key, cc_idx in chain_clone_indices.items():
+                            if pair_key[1] == parent_id:
+                                cc_node = manager.NodeToIndex(cc_idx)
+                                routing.solver().Add(
+                                    dist_dim.CumulVar(cc_node) * is_on_chain <= dist_dim.CumulVar(c_node) * is_on_chain
+                                )
             else:
                 clones = plant_to_clones.get(parent_id, [])
                 if clones:
@@ -365,26 +473,95 @@ class LogisticsSolver:
                     routing.solver().Add(is_active * routing.VehicleVar(c_node) == is_active * routing.VehicleVar(p_node))
                     routing.solver().Add(dist_dim.CumulVar(p_node) * is_active <= dist_dim.CumulVar(c_node) * is_active)
 
+        # === RESTRICCIONES DE ENCADENAMIENTO (Chained Plant VRP) ===
+        # Para cada cadena A -> B:
+        #   1. El clon de B se asigna al vehiculo 0 de A (obligatorio).
+        #   2. Planta A se visita ANTES que clon B (precedencia).
+        #   3. Clientes de A en el vehiculo encadenado van ANTES de clon B.
+        #   4. Clientes de B en el vehiculo encadenado van DESPUES de clon B.
+        if chain_vehicle_map:
+            for plant_a_id, chain_infos in chain_vehicle_map.items():
+                a_clones = plant_to_clones.get(plant_a_id, [])
+                if not a_clones:
+                    continue
+                a_node_idx = a_clones[0]
+                a_node = manager.NodeToIndex(a_node_idx)
+
+                for ci in chain_infos:
+                    chain_veh_id = ci['vehicle_id']
+                    cc_idx = ci['chain_clone_idx']
+                    cc_node = manager.NodeToIndex(cc_idx)
+
+                    plant_b_id = ci['plant_b_id']
+                    
+                    # R-CHAIN-1: Clon B obligatorio, asignado al vehiculo encadenado
+                    routing.AddDisjunction([cc_node], 1_000_000_000_000)
+                    is_active_cc = routing.ActiveVar(cc_node)
+                    routing.solver().Add(is_active_cc * routing.VehicleVar(cc_node) == is_active_cc * chain_veh_id)
+
+                    # R-CHAIN-2: Planta A antes que clon B
+                    routing.solver().Add(dist_dim.CumulVar(a_node) * is_active_cc <= dist_dim.CumulVar(cc_node) * is_active_cc)
+
+                    # R-CHAIN-3: Clientes de A en vehiculo encadenado van ANTES de clon B
+                    for c_idx_inner, n_inner in enumerate(current_nodes):
+                        if n_inner['type'] != 'customer':
+                            continue
+                        if n_inner.get('parent_cp') != plant_a_id:
+                            continue
+                        inner_node = manager.NodeToIndex(c_idx_inner)
+                        is_on_chain = (routing.VehicleVar(inner_node) == chain_veh_id)
+                        routing.solver().Add(
+                            dist_dim.CumulVar(inner_node) * is_on_chain <= dist_dim.CumulVar(cc_node) * is_on_chain
+                        )
+
+                    # R-CHAIN-4: Si se visita un cliente de B en el vehiculo encadenado, el clon B es obligatorio
+                    for c_idx_inner, n_inner in enumerate(current_nodes):
+                        if n_inner['type'] != 'customer' or n_inner.get('parent_cp') != plant_b_id:
+                            continue
+                        inner_node = manager.NodeToIndex(c_idx_inner)
+                        is_on_chain = (routing.VehicleVar(inner_node) == chain_veh_id)
+                        routing.solver().Add(is_active_cc >= is_on_chain)
+
+                    # R-CHAIN-5: Limitar la capacidad física por tramo para no sobrecargar el camión en una sola planta
+                    if max_pallets_ruta is not None:
+                        # Suma de demanda de clientes de Planta A asignados a este vehículo <= max_pallets
+                        demands_a = []
+                        for c_idx_inner, n_inner in enumerate(current_nodes):
+                            if n_inner['type'] == 'customer' and n_inner.get('parent_cp') == plant_a_id:
+                                inner_node = manager.NodeToIndex(c_idx_inner)
+                                is_on_chain = (routing.VehicleVar(inner_node) == chain_veh_id)
+                                is_active = routing.ActiveVar(inner_node)
+                                demands_a.append(is_active * is_on_chain * int(n_inner.get('demanda_pallets', 0)))
+                        if demands_a:
+                            routing.solver().Add(routing.solver().Sum(demands_a) <= int(max_pallets_ruta))
+
+                        # Suma de demanda de clientes de Planta B asignados a este vehículo <= max_pallets
+                        demands_b = []
+                        for c_idx_inner, n_inner in enumerate(current_nodes):
+                            if n_inner['type'] == 'customer' and n_inner.get('parent_cp') == plant_b_id:
+                                inner_node = manager.NodeToIndex(c_idx_inner)
+                                is_on_chain = (routing.VehicleVar(inner_node) == chain_veh_id)
+                                is_active = routing.ActiveVar(inner_node)
+                                demands_b.append(is_active * is_on_chain * int(n_inner.get('demanda_pallets', 0)))
+                        if demands_b:
+                            routing.solver().Add(routing.solver().Sum(demands_b) <= int(max_pallets_ruta))
+
+            logger.info("[bold cyan]Chain:[/bold cyan] %d cadenas de encadenamiento configuradas.", len(chain_clone_indices))
+
         # === RESTRICCIONES DE BACKHAULING (Pickup & Delivery) ===
-        # Para cada nodo de recogida de retorno se imponen dos reglas:
-        #   1. Precedencia: el ultimo cliente de entrega se visita ANTES que
-        #      la planta de backhauling (el solver asegura la secuencia).
-        #   2. Capacidad: la recogida en la planta de retorno no puede superar
-        #      el espacio libre que queda en el camion tras las entregas.
         if backhaul_nodes:
             for bh_node_data in current_nodes:
                 if bh_node_data["type"] != "backhaul_plant":
                     continue
 
-                bh_idx = manager.NodeToIndex(bh_node_data["matrix_idx"])
-                parent_route_idx = bh_node_data.get("parent_route_idx")
+                node_idx = current_nodes.index(bh_node_data)
+                bh_idx = manager.NodeToIndex(node_idx)
 
-                # Marcar el nodo de backhauling como opcional con penalizacion alta
-                routing.AddDisjunction([bh_idx], 500_000_000)
+                routing.AddDisjunction([bh_idx], 500_000)
 
-                # Si se conoce la ruta padre, restringir al mismo vehiculo
-                if parent_route_idx is not None and flota_por_planta:
-                    pass  # La asignacion de vehiculo se hereda del contexto de ruta
+                p_route_idx = bh_node_data.get("parent_route_idx")
+                if p_route_idx is not None and flota_por_planta:
+                    pass
 
         # === BUSQUEDA ===
         search_params = pywrapcp.DefaultRoutingSearchParameters()

@@ -169,10 +169,12 @@ class Visualizer:
         """
         return html
 
-    def create_map(self, filename="Logistics_Dashboard.html"):
+    def create_map(self, filename="Logistics_Dashboard.html", show_sidebar=True):
         m = folium.Map(location=[40.4167, -3.7037], zoom_start=6, tiles="cartodbpositron")
-        sidebar_html = self._generate_sidebar_html()
-        m.get_root().html.add_child(folium.Element(sidebar_html))
+        
+        if show_sidebar:
+            sidebar_html = self._generate_sidebar_html()
+            m.get_root().html.add_child(folium.Element(sidebar_html))
 
         for i, route in enumerate(self.routes):
             color = self.route_colors[i % len(self.route_colors)]

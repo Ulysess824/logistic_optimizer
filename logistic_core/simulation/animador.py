@@ -47,6 +47,8 @@ class AnimadorLogistico:
         self.ax.set_ylim(35.5, 44.5)
         self.ax.set_facecolor('#f0f4f8')
         self.ax.set_title("Simulacion Logistica - Flotas Diarias", fontsize=14, weight='bold')
+        self.ax.set_xlabel("Longitud (º)", fontsize=10, weight='bold')
+        self.ax.set_ylabel("Latitud (º)", fontsize=10, weight='bold')
 
         # 1. Dibujar Origen
         self.ax.plot(origen['lng'], origen['lat'], 'g^', markersize=12,
@@ -94,15 +96,10 @@ class AnimadorLogistico:
             0.02, 0.97, '', transform=self.ax.transAxes,
             fontsize=11, weight='bold', va='top', bbox=props
         )
-        self.texto_stats = self.ax.text(
-            0.20, 0.97, '', transform=self.ax.transAxes,
-            fontsize=9, va='top', bbox=props
-        )
-        # Panel de carga / pallets
-        self.texto_pallets = self.ax.text(
-            0.55, 0.97, '', transform=self.ax.transAxes,
-            fontsize=9, va='top', bbox=props
-        )
+        # Panel de estadisticas (Desactivado a peticion de la interfaz)
+        self.texto_stats = None
+        # Panel de carga / pallets (Desactivado a peticion de la interfaz)
+        self.texto_pallets = None
 
         self.ax.legend(loc='lower right', fontsize=9)
 
@@ -196,19 +193,19 @@ class AnimadorLogistico:
         minutos = int((frame % 1) * 60)
         self.texto_reloj.set_text(f"Hora: {horas:02d}:{minutos:02d} h")
 
-        self.texto_stats.set_text(
-            f"Salidos: {salidos}/{self.total_camiones}\n"
-            f"En ruta: {en_ruta}\n"
-            f"Retornados: {retornados}"
-        )
+        # self.texto_stats.set_text(
+        #     f"Salidos: {salidos}/{self.total_camiones}\n"
+        #     f"En ruta: {en_ruta}\n"
+        #     f"Retornados: {retornados}"
+        # )
 
-        self.texto_pallets.set_text(
-            f"Pallets totales: {self.total_pallets}\n"
-            f"Capacidad flota: {self.capacidad_total} P\n"
-            f"Carga promedio global: {self.pct_uso_global}%"
-        )
+        # self.texto_pallets.set_text(
+        #     f"Pallets totales: {self.total_pallets}\n"
+        #     f"Capacidad flota: {self.capacidad_total} P\n"
+        #     f"Carga promedio global: {self.pct_uso_global}%"
+        # )
 
-        return self.puntos_camiones, self.texto_reloj, self.texto_stats, self.texto_pallets,
+        return self.puntos_camiones, self.texto_reloj,
 
     def generar_gif(self, nombre_archivo='outputs/simulacion_dinamica.gif', fps=40):
         # Encontrar el tiempo en que el primer camion sale y el ultimo regresa

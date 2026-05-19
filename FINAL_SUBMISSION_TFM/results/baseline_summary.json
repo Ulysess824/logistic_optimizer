@@ -1,8 +1,8 @@
 {
   "num_routes": 11,
-  "total_km": 11437.93,
-  "total_empty_km": 3922.11,
-  "total_co2_kg": 12903.4,
+  "total_km": 11300.15,
+  "total_empty_km": 4004.92,
+  "total_co2_kg": 9838.15,
   "distance_source": "GPS Real",
   "parameters": {
     "n_candidatos": 1,
@@ -27,7 +27,7 @@
       "total_pallets": 22,
       "distance_km": 691.37,
       "empty_km": 177.45,
-      "co2_emissions_kg": 785.54,
+      "co2_emissions_kg": 604.93,
       "num_stops": 4
     },
     {
@@ -41,12 +41,12 @@
       "num_plants": 1,
       "num_customers": 1,
       "customers": [
-        "Moratalla"
+        "Hellin"
       ],
-      "total_pallets": 17,
-      "distance_km": 835.02,
-      "empty_km": 260.85,
-      "co2_emissions_kg": 948.57,
+      "total_pallets": 13,
+      "distance_km": 814.08,
+      "empty_km": 245.23,
+      "co2_emissions_kg": 715.08,
       "num_stops": 4
     },
     {
@@ -60,12 +60,12 @@
       "num_plants": 1,
       "num_customers": 1,
       "customers": [
-        "Jabalquinto"
+        "Mengibar"
       ],
       "total_pallets": 30,
-      "distance_km": 223.63,
-      "empty_km": 12.96,
-      "co2_emissions_kg": 259.91,
+      "distance_km": 212.33,
+      "empty_km": 1.78,
+      "co2_emissions_kg": 191.65,
       "num_stops": 4
     },
     {
@@ -79,12 +79,12 @@
       "num_plants": 1,
       "num_customers": 1,
       "customers": [
-        "Cordoba"
+        "Villarrubia"
       ],
-      "total_pallets": 22,
-      "distance_km": 646.17,
-      "empty_km": 131.79,
-      "co2_emissions_kg": 734.98,
+      "total_pallets": 12,
+      "distance_km": 635.46,
+      "empty_km": 128.71,
+      "co2_emissions_kg": 553.43,
       "num_stops": 4
     },
     {
@@ -100,10 +100,10 @@
       "customers": [
         "Castillejo De Robledo"
       ],
-      "total_pallets": 28,
-      "distance_km": 1149.33,
-      "empty_km": 457.38,
-      "co2_emissions_kg": 1297.27,
+      "total_pallets": 10,
+      "distance_km": 1149.54,
+      "empty_km": 456.94,
+      "co2_emissions_kg": 994.79,
       "num_stops": 4
     },
     {
@@ -117,12 +117,12 @@
       "num_plants": 1,
       "num_customers": 1,
       "customers": [
-        "Milagro"
+        "Pradejon"
       ],
       "total_pallets": 19,
-      "distance_km": 1385.92,
-      "empty_km": 623.81,
-      "co2_emissions_kg": 1559.49,
+      "distance_km": 1409.32,
+      "empty_km": 622.72,
+      "co2_emissions_kg": 1220.28,
       "num_stops": 4
     },
     {
@@ -141,7 +141,7 @@
       "total_pallets": 13,
       "distance_km": 869.95,
       "empty_km": 245.23,
-      "co2_emissions_kg": 982.8,
+      "co2_emissions_kg": 757.92,
       "num_stops": 4
     },
     {
@@ -155,12 +155,12 @@
       "num_plants": 1,
       "num_customers": 1,
       "customers": [
-        "Villanueva De La Reina"
+        "Santa Ana (Jaen)"
       ],
-      "total_pallets": 28,
-      "distance_km": 536.96,
-      "empty_km": 12.74,
-      "co2_emissions_kg": 627.72,
+      "total_pallets": 29,
+      "distance_km": 550.31,
+      "empty_km": 100.08,
+      "co2_emissions_kg": 483.99,
       "num_stops": 4
     },
     {
@@ -174,12 +174,12 @@
       "num_plants": 1,
       "num_customers": 1,
       "customers": [
-        "Caspe"
+        "Mora D'Ebre"
       ],
-      "total_pallets": 18,
-      "distance_km": 1694.71,
-      "empty_km": 637.01,
-      "co2_emissions_kg": 1890.7,
+      "total_pallets": 19,
+      "distance_km": 1641.08,
+      "empty_km": 663.79,
+      "co2_emissions_kg": 1424.55,
       "num_stops": 4
     },
     {
@@ -193,12 +193,12 @@
       "num_plants": 1,
       "num_customers": 1,
       "customers": [
-        "Castelo Branco"
+        "Rio Maior"
       ],
-      "total_pallets": 26,
-      "distance_km": 1591.55,
-      "empty_km": 606.06,
-      "co2_emissions_kg": 1775.78,
+      "total_pallets": 21,
+      "distance_km": 1513.4,
+      "empty_km": 606.18,
+      "co2_emissions_kg": 1316.29,
       "num_stops": 4
     },
     {
@@ -217,7 +217,7 @@
       "total_pallets": 22,
       "distance_km": 1813.33,
       "empty_km": 756.82,
-      "co2_emissions_kg": 2040.63,
+      "co2_emissions_kg": 1575.24,
       "num_stops": 4
     }
   ]

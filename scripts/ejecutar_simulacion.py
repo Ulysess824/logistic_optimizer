@@ -72,8 +72,7 @@ def run_simulation(routes_file=None, plants_file=None):
         num_muelles=2,
         num_conductores=38,
         max_pallets=max_pallets_param,
-        geo_utils=geo_engine,
-        num_muelles = 2
+        geo_utils=geo_engine
     )
 
     # 6. Ejecutar simulación

@@ -27,7 +27,7 @@
     {
       "route_id": 2,
       "plants": [
-        "Alcalá (Muelle 2)"
+        "Alcalá"
       ],
       "num_customers": 1,
       "total_pallets": 26,
@@ -39,7 +39,7 @@
     {
       "route_id": 3,
       "plants": [
-        "Alcalá (Muelle 3)"
+        "Alcalá"
       ],
       "num_customers": 2,
       "total_pallets": 33,
@@ -51,7 +51,7 @@
     {
       "route_id": 4,
       "plants": [
-        "Alcalá (Muelle 4)"
+        "Alcalá"
       ],
       "num_customers": 1,
       "total_pallets": 26,
@@ -75,7 +75,7 @@
     {
       "route_id": 6,
       "plants": [
-        "Alicante (Muelle 2)"
+        "Alicante"
       ],
       "num_customers": 2,
       "total_pallets": 28,
@@ -87,7 +87,7 @@
     {
       "route_id": 7,
       "plants": [
-        "Alicante (Muelle 3)"
+        "Alicante"
       ],
       "num_customers": 2,
       "total_pallets": 30,
@@ -99,7 +99,7 @@
     {
       "route_id": 8,
       "plants": [
-        "Alicante (Muelle 4)"
+        "Alicante"
       ],
       "num_customers": 2,
       "total_pallets": 30,
@@ -111,7 +111,7 @@
     {
       "route_id": 9,
       "plants": [
-        "Alicante (Muelle 5)"
+        "Alicante"
       ],
       "num_customers": 2,
       "total_pallets": 34,
@@ -135,7 +135,7 @@
     {
       "route_id": 11,
       "plants": [
-        "Córdoba (Muelle 2)"
+        "Córdoba"
       ],
       "num_customers": 1,
       "total_pallets": 23,
@@ -147,7 +147,7 @@
     {
       "route_id": 12,
       "plants": [
-        "Córdoba (Muelle 3)"
+        "Córdoba"
       ],
       "num_customers": 1,
       "total_pallets": 25,
@@ -171,7 +171,7 @@
     {
       "route_id": 14,
       "plants": [
-        "Huelva (Muelle 2)"
+        "Huelva"
       ],
       "num_customers": 2,
       "total_pallets": 26,
@@ -183,7 +183,7 @@
     {
       "route_id": 15,
       "plants": [
-        "Huelva (Muelle 3)"
+        "Huelva"
       ],
       "num_customers": 2,
       "total_pallets": 33,
@@ -195,7 +195,7 @@
     {
       "route_id": 16,
       "plants": [
-        "Huelva (Muelle 4)"
+        "Huelva"
       ],
       "num_customers": 1,
       "total_pallets": 30,
@@ -207,7 +207,7 @@
     {
       "route_id": 17,
       "plants": [
-        "Huelva (Muelle 5)"
+        "Huelva"
       ],
       "num_customers": 1,
       "total_pallets": 30,
@@ -231,7 +231,7 @@
     {
       "route_id": 19,
       "plants": [
-        "Burgos (Muelle 2)"
+        "Burgos"
       ],
       "num_customers": 1,
       "total_pallets": 29,
@@ -243,7 +243,7 @@
     {
       "route_id": 20,
       "plants": [
-        "Burgos (Muelle 3)"
+        "Burgos"
       ],
       "num_customers": 2,
       "total_pallets": 30,
@@ -255,7 +255,7 @@
     {
       "route_id": 21,
       "plants": [
-        "Burgos (Muelle 4)"
+        "Burgos"
       ],
       "num_customers": 2,
       "total_pallets": 30,
@@ -279,7 +279,7 @@
     {
       "route_id": 23,
       "plants": [
-        "Navarra (Muelle 2)"
+        "Navarra"
       ],
       "num_customers": 1,
       "total_pallets": 23,
@@ -303,7 +303,7 @@
     {
       "route_id": 25,
       "plants": [
-        "Valencia (Muelle 2)"
+        "Valencia"
       ],
       "num_customers": 1,
       "total_pallets": 25,
@@ -315,7 +315,7 @@
     {
       "route_id": 26,
       "plants": [
-        "Valencia (Muelle 3)"
+        "Valencia"
       ],
       "num_customers": 1,
       "total_pallets": 31,
@@ -339,7 +339,7 @@
     {
       "route_id": 28,
       "plants": [
-        "Almeria (Muelle 2)"
+        "Almeria"
       ],
       "num_customers": 1,
       "total_pallets": 17,
@@ -351,7 +351,7 @@
     {
       "route_id": 29,
       "plants": [
-        "Almeria (Muelle 3)"
+        "Almeria"
       ],
       "num_customers": 1,
       "total_pallets": 32,
@@ -363,7 +363,7 @@
     {
       "route_id": 30,
       "plants": [
-        "Almeria (Muelle 4)"
+        "Almeria"
       ],
       "num_customers": 1,
       "total_pallets": 22,
@@ -375,7 +375,7 @@
     {
       "route_id": 31,
       "plants": [
-        "Almeria (Muelle 5)"
+        "Almeria"
       ],
       "num_customers": 1,
       "total_pallets": 22,
@@ -399,7 +399,7 @@
     {
       "route_id": 33,
       "plants": [
-        "Canovelles (Muelle 2)"
+        "Canovelles"
       ],
       "num_customers": 1,
       "total_pallets": 30,
@@ -423,7 +423,7 @@
     {
       "route_id": 35,
       "plants": [
-        "Celpack (Muelle 2)"
+        "Celpack"
       ],
       "num_customers": 1,
       "total_pallets": 34,
@@ -435,7 +435,7 @@
     {
       "route_id": 36,
       "plants": [
-        "Celpack (Muelle 3)"
+        "Celpack"
       ],
       "num_customers": 2,
       "total_pallets": 34,
@@ -459,7 +459,7 @@
     {
       "route_id": 38,
       "plants": [
-        "Vigo (Muelle 2)"
+        "Vigo"
       ],
       "num_customers": 1,
       "total_pallets": 32,

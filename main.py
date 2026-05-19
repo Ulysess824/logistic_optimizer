@@ -24,6 +24,7 @@ from logistic_core.config import (
     TARIFA_INTERNA_DIESEL,
     CAPEX_TRUCK_UNIT_COST, DEFAULT_CYCLE_TIME_DAYS, DAILY_TRUCK_OUTBOUND, DEFAULT_FLEET_BUFFER,
     BACKHAUL_ENABLED, BACKHAUL_SEARCH_RADIUS_KM, BACKHAUL_MAX_RETURN_PALLETS,
+    CHAINED_PLANT_ENABLED, PLANT_CHAIN_MAP,
 )
 from logistic_core.utils.backhaul_detector import BackhaulDetector
 
@@ -381,6 +382,40 @@ def run_optimization(
                 solver = solver_bh
                 if not silent:
                     print(">>> Backhauling: Re-optimizacion completada con exito.")
+
+    # --- FASE CHAIN DISPATCH (segunda pasada para clientes remanentes de planta B) ---
+    # Detecta clientes de B no cubiertos por los camiones directos y los asigna
+    # al camion encadenado (A -> B) mediante una segunda llamada al solver.
+    if CHAINED_PLANT_ENABLED and PLANT_CHAIN_MAP:
+        from logistic_core.engine.chained_dispatcher import ChainedClientDispatcher
+
+        dispatcher = ChainedClientDispatcher(
+            enriched_data=enriched_data,
+            geo_engine=geo_engine,
+            distance_matrix=solver.distance_matrix,
+            solver_nodes=solver.nodes,
+        )
+
+        for plant_a_id, chain_targets in PLANT_CHAIN_MAP.items():
+            for plant_b_id in chain_targets:
+                # Flota para el sub-problema reducido:
+                # 1 camion encadenado de A + camiones directos de B como referencia
+                flota_chain = {
+                    plant_a_id: 1,
+                    plant_b_id: flota_final.get(plant_b_id, 1),
+                }
+
+                routes = dispatcher.run_chain_pass(
+                    routes_pass1=routes,
+                    plant_a_id=plant_a_id,
+                    plant_b_id=plant_b_id,
+                    flota_chain=flota_chain,
+                    max_pallets=max_pallets,
+                    max_search_time=max_search_time,
+                )
+
+        if not silent:
+            print("> Chain Dispatch: segunda pasada completada.")
 
     summary = _build_summary(routes, solver, max_pallets=max_pallets, threshold_km=threshold_km,
                              n_candidatos=n_candidatos)

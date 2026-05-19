@@ -15,7 +15,7 @@ from logistic_core.utils.visualizer import Visualizer
 from logistic_core.utils.report_generator import generate_dashboard
 from logistic_core.config import (
     RESULTS_DIR, DATA_DIR,
-    DEFAULT_CO2_PER_KM, DEFAULT_ALPHA_FCR,
+    GLEC_CO2_PER_LITER, GLEC_INTENSITY_GTKM, GLEC_EMPTY_FLOOR_KGKM,
     PAPER_LOAD_KG, PALLET_WEIGHT_KG, VEHICLE_MAX_LOAD_KG
 )
 from logistic_core.utils.fcr_estimator import FCREmissionEstimator
@@ -259,8 +259,9 @@ def _build_summary(routes, solver):
     total_co2_kg = 0
     
     co2_estimator = FCREmissionEstimator(
-        fcr_loaded=DEFAULT_CO2_PER_KM,
-        alpha=DEFAULT_ALPHA_FCR
+        co2_per_liter=GLEC_CO2_PER_LITER,
+        intensity_gtkm=GLEC_INTENSITY_GTKM,
+        empty_floor_kgkm=GLEC_EMPTY_FLOOR_KGKM
     )
 
     for i, route in enumerate(routes):
@@ -461,41 +462,20 @@ def main():
     except Exception as e:
         logger.warning("No se pudieron generar las visualizaciones avanzadas: %s", e)
 
-    # 9. Mapa Folium con rutas OSRM reales
-    m_lat = plants_data['paper_plant']['lat']
-    m_lng = plants_data['paper_plant']['lng']
-    mapa = folium.Map(location=[m_lat, m_lng], zoom_start=6, tiles="CartoDB positron")
-
-    colores_ruta = ['blue', 'green', 'red', 'purple', 'orange', 'darkred', 'cadetblue']
-
-    for i, route in enumerate(routes):
-        color_actual = colores_ruta[i % len(colores_ruta)]
-
-        for n in route:
-            if n['type'] == 'depot':
-                folium.Marker([n['lat'], n['lng']], popup="MENGIBAR (Depot Papel)", icon=folium.Icon(color='black', icon='home')).add_to(mapa)
-            elif n['type'] == 'carton_plant':
-                folium.Marker([n['lat'], n['lng']], popup=f"PLANTA: {n['name']}", icon=folium.Icon(color='gray', icon='industry', prefix='fa')).add_to(mapa)
-            else:
-                popup_text = f"{n['name']} | Pedido: {n.get('demanda_pallets', 0)} pallets"
-                folium.Marker([n['lat'], n['lng']], popup=popup_text, icon=folium.Icon(color=color_actual)).add_to(mapa)
-
-        for j in range(len(route) - 1):
-            start_n = route[j]
-            end_n = route[j+1]
-            try:
-                encoded_poly = geo_engine.get_route_polyline((start_n['lat'], start_n['lng']), (end_n['lat'], end_n['lng']))
-                if encoded_poly and encoded_poly != "BILLING_ERROR":
-                    decoded_points = polyline.decode(encoded_poly)
-                    folium.PolyLine(decoded_points, color=color_actual, weight=5, opacity=0.8).add_to(mapa)
-                else:
-                    folium.PolyLine([[start_n['lat'], start_n['lng']], [end_n['lat'], end_n['lng']]], color=color_actual, weight=5, opacity=0.8, dash_array='5, 10').add_to(mapa)
-            except Exception:
-                folium.PolyLine([[start_n['lat'], start_n['lng']], [end_n['lat'], end_n['lng']]], color=color_actual, weight=5, opacity=0.8, dash_array='5, 10').add_to(mapa)
-
-    output_map_html = "outputs/maps/mapa_rutas_baseline.html"
-    mapa.save(output_map_html)
-    print(f"=> Mapa de Rutas geolocalizadas: {output_map_html}")
+    # 9. Mapa Folium con rutas OSRM reales (Usando Visualizer optimizado)
+    try:
+        output_map_html = "outputs/maps/mapa_rutas_baseline.html"
+        # Usamos el visualizador para generar un mapa LIMPIO (sin sidebar) para el iframe
+        visualizer.create_map("mapa_rutas_baseline.html", show_sidebar=False)
+        print(f"=> Mapa de Rutas geolocalizadas (Optimizado): {output_map_html}")
+    except Exception as e:
+        logger.warning("No se pudo generar el mapa baseline optimizado: %s", e)
+        # Fallback manual simplificado si el visualizador falla
+        m_lat = plants_data['paper_plant']['lat']
+        m_lng = plants_data['paper_plant']['lng']
+        mapa = folium.Map(location=[m_lat, m_lng], zoom_start=6, tiles="CartoDB positron")
+        mapa.save(output_map_html)
+        print(f"=> Mapa de Rutas geolocalizadas (Fallback): {output_map_html}")
 
     # 10. Dashboard de Eficiencia por Planta
     output_dashboard = "logistics_dashboard_baseline.html"

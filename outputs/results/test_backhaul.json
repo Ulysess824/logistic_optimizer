@@ -1,0 +1,57 @@
+[
+  [
+    {
+      "id": "DEPOT",
+      "name": "Mengíbar (DEPOT)",
+      "lat": 37.961,
+      "lng": -3.801,
+      "type": "depot",
+      "matrix_idx": 0,
+      "original_matrix_idx": 0
+    },
+    {
+      "id": "CP_PALENCIA",
+      "name": "Smurfit Palencia",
+      "lat": 42.01,
+      "lng": -4.53,
+      "type": "carton_plant",
+      "matrix_idx": 1,
+      "original_matrix_idx": 1
+    },
+    {
+      "id": "C_VIGO",
+      "name": "Cliente Vigo",
+      "lat": 42.23,
+      "lng": -8.72,
+      "demanda_pallets": 20,
+      "type": "customer",
+      "parent_cp": "CP_PALENCIA",
+      "matrix_idx": 2,
+      "dist_to_plant": 433.01493825964883,
+      "original_matrix_idx": 2
+    },
+    {
+      "id": "CP_VIGO",
+      "name": "Smurfit Vigo (BACKHAUL)",
+      "lat": 42.21,
+      "lng": -8.69,
+      "dist_to_last_client_km": 3.32,
+      "dist_to_depot_km": 629.23,
+      "detour_vs_direct_km": 0.01,
+      "return_pallets_capacity": 20,
+      "parent_route_idx": 0,
+      "type": "backhaul_plant",
+      "original_matrix_idx": 0,
+      "matrix_idx": 0
+    },
+    {
+      "id": "DEPOT",
+      "name": "Mengíbar (DEPOT)",
+      "lat": 37.961,
+      "lng": -3.801,
+      "type": "depot",
+      "matrix_idx": 0,
+      "original_matrix_idx": 0
+    }
+  ]
+]

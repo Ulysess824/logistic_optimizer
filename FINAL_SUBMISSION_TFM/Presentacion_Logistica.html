@@ -4,126 +4,295 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Logístico: MC-VRPB Multi-Planta</title>
+    <title>Logistics Optimizer | Dashboard TFM</title>
+    <!-- Google Fonts: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f3f4f6; overflow-x: hidden; }
-        .tab-content { display: none; width: 100%; height: calc(100vh - 180px); min-height: 700px; }
-        .tab-content.active { display: block; }
-        .tab-btn { padding: 12px 24px; font-weight: 600; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s; color: #6b7280; }
-        .tab-btn.active { border-bottom: 3px solid #3b82f6; color: #1e3a8a; background-color: rgba(59, 130, 246, 0.05); }
-        iframe { width: 100%; height: 100%; border: none; }
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --primary-accent: #3b82f6;
+            --sidebar-bg: #0f172a;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+            color: #1e293b;
+            overflow: hidden;
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+        }
+
+        .sidebar-item {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .sidebar-item.active {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+        }
+
+        .sidebar-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 20px;
+            width: 4px;
+            background: #3b82f6;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .tab-content {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.4s ease-out;
+            height: 100%;
+        }
+
+        .tab-content.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        iframe {
+            border-radius: 16px;
+            transition: opacity 0.3s ease;
+        }
+
+        /* Custom Scrollbar for Sidebar */
+        .sidebar-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidebar-scroll::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-in-out forwards;
+        }
     </style>
 </head>
 
-<body class="bg-gray-100">
+<body class="flex">
 
-    <header class="flex justify-between items-center shadow-md px-8 bg-[#1e3a8a] text-white">
-        <div class="flex items-center py-4">
-            <img src="https://corrugandodigital.acccsa.org/hubfs/SW_LOGO_2COL.png" alt="Smurfit Logo" class="h-12 mr-6 bg-white p-1 rounded">
-            <div>
-                <h1 class="text-3xl font-bold">Logistics Optimizer</h1>
-                <p class="text-sm mt-1 opacity-80">MC-VRPB con Backhauling Multi-Planta</p>
+    <!-- Sidebar -->
+    <aside class="w-72 bg-[#0f172a] text-slate-300 flex flex-col h-screen fixed left-0 top-0 z-50 shadow-2xl">
+        <div class="p-8">
+            <div class="flex items-center gap-3 mb-8">
+                <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
+                    <i data-lucide="truck" class="text-white w-6 h-6"></i>
+                </div>
+                <div>
+                    <h2 class="text-white font-bold text-lg leading-tight">Logistics</h2>
+                    <p class="text-[10px] uppercase tracking-widest text-slate-500 font-semibold">Optimizer v5.4</p>
+                </div>
+            </div>
+
+            <nav class="space-y-1 sidebar-scroll overflow-y-auto max-h-[calc(100vh-180px)]">
+                <button onclick="openTab('resumen')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium hover:bg-white/5 active" id="btn-resumen">
+                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                    Resumen Ejecutivo
+                </button>
+                <button onclick="openTab('baseline')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium hover:bg-white/5" id="btn-baseline">
+                    <i data-lucide="activity" class="w-5 h-5"></i>
+                    Condiciones Normales
+                </button>
+                <button onclick="openTab('metodologia')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium hover:bg-white/5" id="btn-metodologia">
+                    <i data-lucide="book-open" class="w-5 h-5"></i>
+                    Metodología
+                </button>
+                <button onclick="openTab('mapa')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium hover:bg-white/5" id="btn-mapa">
+                    <i data-lucide="map" class="w-5 h-5"></i>
+                    Mapa Interactivo
+                </button>
+                <button onclick="openTab('grafo')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium hover:bg-white/5" id="btn-grafo">
+                    <i data-lucide="share-2" class="w-5 h-5"></i>
+                    Grafos de Red
+                </button>
+                <button onclick="openTab('simulacion')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium hover:bg-white/5" id="btn-simulacion">
+                    <i data-lucide="play-circle" class="w-5 h-5"></i>
+                    Simulación
+                </button>
+                <div class="pt-4 pb-2">
+                    <p class="px-4 text-[10px] uppercase tracking-widest text-slate-500 font-bold">Configuración</p>
+                </div>
+                <button onclick="openTab('parametros')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium hover:bg-white/5" id="btn-parametros">
+                    <i data-lucide="settings" class="w-5 h-5"></i>
+                    Parámetros
+                </button>
+                <button onclick="openTab('pseudocodigo')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium hover:bg-white/5" id="btn-pseudocodigo">
+                    <i data-lucide="code-2" class="w-5 h-5"></i>
+                    Lógica Algorítmica
+                </button>
+                <button onclick="openTab('bibliografia')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium hover:bg-white/5" id="btn-bibliografia">
+                    <i data-lucide="library" class="w-5 h-5"></i>
+                    Bibliografía
+                </button>
+            </nav>
+        </div>
+
+        <div class="mt-auto p-6">
+            <div class="bg-slate-800/50 border border-slate-700 rounded-2xl p-4">
+                <div class="flex items-center gap-2 mb-2">
+                    <div class="w-2 h-2 bg-slate-400 rounded-full"></div>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Estado</span>
+                </div>
+                <p class="text-[11px] text-slate-500">Datos operativos cargados.</p>
             </div>
         </div>
-        <div>
-            <p class="text-lg font-mono bg-blue-800 px-4 py-2 rounded">v5.3 (Modular)</p>
-        </div>
-    </header>
+    </aside>
 
-    <div class="max-w-[1600px] mx-auto px-4 mt-6">
-        <!-- Dashboard Tabs -->
-        <div class="flex space-x-2 mb-4 border-b border-gray-300 bg-white rounded-t-lg px-4">
-            <button class="tab-btn active" onclick="openTab('resumen')">Resumen Ejecutivo</button>
-            <button class="tab-btn" onclick="openTab('analisis_tco')">Análisis TCO</button>
-            <button class="tab-btn" onclick="openTab('baseline')">Condiciones Normales</button>
-            <button class="tab-btn" onclick="openTab('metodologia')">Metodología</button>
-            <button class="tab-btn" onclick="openTab('mapa')">Mapa Interactivo</button>
-            <button class="tab-btn" onclick="openTab('grafo')">Grafos de Red</button>
-            <button class="tab-btn" onclick="openTab('simulacion')">Simulación</button>
-            <button class="tab-btn" onclick="openTab('parametros')">Parámetros</button>
-            <button class="tab-btn" onclick="openTab('pseudocodigo')">Lógica (Pseudocódigo)</button>
-            <button class="tab-btn" onclick="openTab('bibliografia')">Bibliografía</button>
+    <!-- Main Content -->
+    <main class="ml-72 flex-1 p-8 h-screen flex flex-col overflow-hidden">
+        
+        <!-- Header / Top Bar -->
+        <header class="flex justify-between items-center mb-8 animate-fade-in">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-900" id="current-tab-title">Resumen</h1>
+                <p class="text-sm text-slate-500 mt-1">Datos operativos y financieros de la flota.</p>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <div class="glass-panel px-4 py-2 flex items-center gap-3">
+                    <div class="text-right">
+                        <p class="text-[10px] text-slate-500 font-bold uppercase tracking-tighter">Última Ejecución</p>
+                        <p class="text-xs font-bold text-slate-800">16 Mayo, 2026</p>
+                    </div>
+                    <div class="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center">
+                        <i data-lucide="calendar" class="w-4 h-4 text-slate-600"></i>
+                    </div>
+                </div>
+                <div class="w-12 h-12 bg-white rounded-2xl border border-slate-200 flex items-center justify-center shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+                    <i data-lucide="bell" class="w-5 h-5 text-slate-600"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dynamic Content Area -->
+        <div class="flex-1 glass-panel p-2 relative overflow-hidden">
+            <div id="resumen" class="tab-content active">
+                <iframe src="HTML_Bodies/tab_resumen.html?v=101" class="w-full h-full" loading="eager"></iframe>
+            </div>
+            <div id="baseline" class="tab-content">
+                <iframe src="HTML_Bodies/tab_baseline.html" class="w-full h-full"></iframe>
+            </div>
+            <div id="metodologia" class="tab-content">
+                <iframe src="HTML_Bodies/tab_metodologia.html" class="w-full h-full"></iframe>
+            </div>
+            <div id="mapa" class="tab-content">
+                <iframe src="HTML_Bodies/tab_mapa.html" class="w-full h-full"></iframe>
+            </div>
+            <div id="grafo" class="tab-content">
+                <iframe src="HTML_Bodies/tab_grafo.html" class="w-full h-full"></iframe>
+            </div>
+            <div id="simulacion" class="tab-content">
+                <iframe src="HTML_Bodies/tab_simulacion.html" class="w-full h-full"></iframe>
+            </div>
+            <div id="parametros" class="tab-content">
+                <iframe src="HTML_Bodies/tab_parametros.html" class="w-full h-full"></iframe>
+            </div>
+            <div id="pseudocodigo" class="tab-content">
+                <iframe src="HTML_Bodies/tab_pseudocodigo.html" class="w-full h-full"></iframe>
+            </div>
+            <div id="bibliografia" class="tab-content">
+                <iframe src="HTML_Bodies/tab_bibliografia.html" class="w-full h-full"></iframe>
+            </div>
         </div>
 
-        <!-- Tab Contents (Iframes con Altura Explícita) -->
-        <div id="resumen" class="tab-content active shadow-lg rounded-b-lg bg-white" style="display: block; height: 850px;">
-            <iframe src="HTML_Bodies/tab_resumen.html?v=99" style="width: 100%; height: 850px;" loading="eager"></iframe>
-        </div>
-
-        <div id="analisis_tco" class="tab-content shadow-lg rounded-b-lg bg-white" style="height: 850px;">
-            <iframe src="HTML_Bodies/tab_finanzas.html" style="width: 100%; height: 850px;" loading="lazy"></iframe>
-        </div>
-
-        <div id="baseline" class="tab-content shadow-lg rounded-b-lg bg-white" style="height: 850px;">
-            <iframe src="HTML_Bodies/tab_baseline.html" style="width: 100%; height: 850px;"></iframe>
-        </div>
-
-        <div id="metodologia" class="tab-content shadow-lg rounded-b-lg bg-white" style="height: 850px;">
-            <iframe src="HTML_Bodies/tab_metodologia.html" style="width: 100%; height: 850px;"></iframe>
-        </div>
-
-        <div id="mapa" class="tab-content shadow-lg rounded-b-lg bg-white" style="height: 850px;">
-            <iframe src="HTML_Bodies/tab_mapa.html" style="width: 100%; height: 850px;"></iframe>
-        </div>
-
-
-        <div id="grafo" class="tab-content shadow-lg rounded-b-lg bg-white" style="height: 850px;">
-            <iframe src="HTML_Bodies/tab_grafo.html" style="width: 100%; height: 850px;"></iframe>
-        </div>
-
-        <div id="simulacion" class="tab-content shadow-lg rounded-b-lg bg-white" style="height: 850px;">
-            <iframe src="HTML_Bodies/tab_simulacion.html" style="width: 100%; height: 850px;"></iframe>
-        </div>
-
-        <div id="parametros" class="tab-content shadow-lg rounded-b-lg bg-white" style="height: 850px;">
-            <iframe src="HTML_Bodies/tab_parametros.html" style="width: 100%; height: 850px;"></iframe>
-        </div>
-
-        <div id="pseudocodigo" class="tab-content shadow-lg rounded-b-lg bg-white" style="height: 850px;">
-            <iframe src="HTML_Bodies/tab_pseudocodigo.html" style="width: 100%; height: 850px;"></iframe>
-        </div>
-
-        <div id="bibliografia" class="tab-content shadow-lg rounded-b-lg bg-white" style="height: 850px;">
-            <iframe src="HTML_Bodies/tab_bibliografia.html" style="width: 100%; height: 850px;"></iframe>
-        </div>
-    </div>
+        <footer class="mt-6 flex justify-between items-center text-[11px] text-slate-400 font-medium animate-fade-in">
+            <p>&copy; 2026 Smurfit Westrock Logistics Engine. Todos los derechos reservados.</p>
+            <div class="flex items-center gap-4">
+                <a href="#" class="hover:text-blue-600 transition-colors">Soporte Técnico</a>
+                <span class="text-slate-300">|</span>
+                <a href="#" class="hover:text-blue-600 transition-colors">Documentación API</a>
+            </div>
+        </footer>
+    </main>
 
     <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        const tabTitles = {
+            'resumen': { title: 'Resumen', subtitle: 'Datos operativos y financieros de la flota.' },
+            'baseline': { title: 'Baseline', subtitle: 'Estado actual sin aplicar el optimizador.' },
+            'metodologia': { title: 'Metodología', subtitle: 'Desglose del modelo de costes.' },
+            'mapa': { title: 'Mapa', subtitle: 'Rutas generadas.' },
+            'grafo': { title: 'Grafos', subtitle: 'Relaciones origen-destino de las plantas.' },
+            'simulacion': { title: 'Simulación', subtitle: 'Resultados de simulación.' },
+            'parametros': { title: 'Parámetros', subtitle: 'Ajustes del modelo OR-Tools.' },
+            'pseudocodigo': { title: 'Algoritmo', subtitle: 'Lógica del solver y restricciones.' },
+            'bibliografia': { title: 'Bibliografía', subtitle: 'Referencias del TFM.' }
+        };
+
         function openTab(tabName) {
-            const contents = document.getElementsByClassName("tab-content");
-            const buttons = document.getElementsByClassName("tab-btn");
-            
-            for (let content of contents) {
+            // Update Tab Contents
+            const contents = document.querySelectorAll(".tab-content");
+            contents.forEach(content => {
                 content.classList.remove("active");
-                content.style.display = "none";
-            }
-            for (let btn of buttons) {
-                btn.classList.remove("active");
-            }
+            });
             
             const target = document.getElementById(tabName);
             target.classList.add("active");
-            target.style.display = "block";
+
+            // Update Sidebar buttons
+            const buttons = document.querySelectorAll(".sidebar-item");
+            buttons.forEach(btn => btn.classList.remove("active"));
             
-            // Find relative button
-            for (let btn of buttons) {
-                if (btn.getAttribute('onclick').includes(tabName)) {
-                    btn.classList.add("active");
-                }
+            const activeBtn = document.getElementById(`btn-${tabName}`);
+            if (activeBtn) activeBtn.classList.add("active");
+
+            // Update Header
+            const titleElem = document.getElementById("current-tab-title");
+            const subtitleElem = titleElem.nextElementSibling;
+            
+            if (tabTitles[tabName]) {
+                titleElem.innerText = tabTitles[tabName].title;
+                subtitleElem.innerText = tabTitles[tabName].subtitle;
+                
+                // Entrance animation reset
+                titleElem.parentElement.classList.remove('animate-fade-in');
+                void titleElem.parentElement.offsetWidth; // Trigger reflow
+                titleElem.parentElement.classList.add('animate-fade-in');
             }
         }
 
         // Keyboard navigation
         document.addEventListener('keydown', function(event) {
-            const tabOrder = ['resumen', 'analisis_tco', 'baseline', 'metodologia', 'mapa', 'grafo', 'simulacion', 'parametros', 'pseudocodigo', 'bibliografia'];
+            const tabOrder = ['resumen', 'baseline', 'metodologia', 'mapa', 'grafo', 'simulacion', 'parametros', 'pseudocodigo', 'bibliografia'];
             const activeElem = document.querySelector('.tab-content.active');
             if (!activeElem) return;
             
             let currentIndex = tabOrder.indexOf(activeElem.id);
-            if (event.key === 'ArrowRight') {
+            if (event.key === 'ArrowDown') {
                 openTab(tabOrder[(currentIndex + 1) % tabOrder.length]);
-            } else if (event.key === 'ArrowLeft') {
+            } else if (event.key === 'ArrowUp') {
                 openTab(tabOrder[(currentIndex - 1 + tabOrder.length) % tabOrder.length]);
             }
         });
